@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+:root {
+  /* Core palette — sampled from the approved Figma global styles panel */
+  --color-ink: #15130f;         /* near-black — nav, footer, dark surfaces */
+  --color-ink-soft: #2c2820;    /* secondary dark text on paper */
+  --color-paper: #faf7f0;       /* warm off-white page background */
+  --color-paper-dim: #f1ece1;   /* slightly deeper cream for section bands */
+  --color-card: #ffffff;
+  --color-line: #e7e0d1;        /* hairline borders on paper */
+  --color-line-dark: #35312a;   /* hairline borders on ink */
+  --color-accent: #c9752f;      /* warm amber / burnt-orange — primary CTA */
+  --color-accent-soft: #f4e3d1;
+  --color-muted: #7a7263;
+
+  --font-display: var(--font-poppins);
+  --font-body: var(--font-inter);
+}
+
+@theme inline {
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --color-paper: var(--color-paper);
+  --color-paper-dim: var(--color-paper-dim);
+  --color-card: var(--color-card);
+  --color-line: var(--color-line);
+  --color-line-dark: var(--color-line-dark);
+  --color-accent: var(--color-accent);
+  --color-accent-soft: var(--color-accent-soft);
+  --color-muted: var(--color-muted);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, .font-display {
+  font-family: var(--font-display);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.timecode {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
+.scrubber {
+  position: relative;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--color-line) 0,
+    var(--color-line) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
