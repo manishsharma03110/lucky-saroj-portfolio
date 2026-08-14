@@ -6,7 +6,7 @@ import { contactSchema } from "@/lib/validations/contact";
 export type ContactFormState = {
   status: "idle" | "success" | "error";
   message?: string;
-  fieldErrors?: Partial<Record<"name" | "email" | "projectType" | "budgetRange" | "message", string>>;
+  fieldErrors?: Partial<Record<"name" | "email" | "phone" | "projectType" | "budgetRange" | "message", string>>;
 };
 
 export async function submitContactForm(
@@ -16,6 +16,7 @@ export async function submitContactForm(
   const raw = {
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
+    phone: String(formData.get("phone") ?? ""),
     projectType: String(formData.get("projectType") ?? ""),
     budgetRange: String(formData.get("budgetRange") ?? ""),
     message: String(formData.get("message") ?? ""),
@@ -31,18 +32,18 @@ export async function submitContactForm(
     return { status: "error", message: "Please fix the errors below.", fieldErrors };
   }
 
-  const { name, email, projectType, budgetRange, message } = parsed.data;
+  const { name, email, phone, projectType, budgetRange, message } = parsed.data;
 
   try {
-    await db.insert(schema.contactMessages)
-      .values({
-        name,
-        email,
-        projectType: projectType || null,
-        budgetRange: budgetRange || null,
-        message,
-        status: "new",
-      });
+    await db.insert(schema.contactMessages).values({
+      name,
+      email,
+      phone,
+      projectType: projectType || null,
+      budgetRange: budgetRange || null,
+      message,
+      status: "new",
+    });
   } catch {
     return {
       status: "error",

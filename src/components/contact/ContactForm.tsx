@@ -9,6 +9,8 @@ import { CheckCircle2 } from "lucide-react";
 
 const initialState: ContactFormState = { status: "idle" };
 
+const BUDGET_OPTIONS = Array.from({ length: 20 }, (_, i) => (i + 1) * 500);
+
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(submitContactForm, initialState);
 
@@ -44,6 +46,14 @@ export function ContactForm() {
         )}
       </div>
 
+      <div>
+        <Label htmlFor="phone">Phone Number</Label>
+        <Input id="phone" name="phone" type="tel" placeholder="Enter your phone number" required maxLength={20} />
+        {state.fieldErrors?.phone && (
+          <p className="mt-1 text-xs text-red-600">{state.fieldErrors.phone}</p>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <Label htmlFor="projectType">Project Type</Label>
@@ -65,10 +75,11 @@ export function ContactForm() {
             <option value="" disabled>
               Select your budget
             </option>
-            <option value="under-10k">Under ₹10,000</option>
-            <option value="10k-30k">₹10,000 – ₹30,000</option>
-            <option value="30k-75k">₹30,000 – ₹75,000</option>
-            <option value="75k-plus">₹75,000+</option>
+            {BUDGET_OPTIONS.map((v) => (
+              <option key={v} value={String(v)}>
+                ₹{v.toLocaleString("en-IN")}
+              </option>
+            ))}
           </Select>
         </div>
       </div>
