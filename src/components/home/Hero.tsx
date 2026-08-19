@@ -39,7 +39,7 @@ export function Hero({
               className="h-full w-full bg-cover bg-center opacity-90"
               style={{
                 backgroundImage:
-                  "url('https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop')",
+                  "url('https://raw.githubusercontent.com/manishsharma03110/lucky-saroj-portfolio/refs/heads/main/public/uploads/HomePage/Video%20Editor%20Banner.png')",
               }}
               role="img"
               aria-label="Lucky Saroj, video editor, behind the camera"
