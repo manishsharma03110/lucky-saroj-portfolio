@@ -15,7 +15,7 @@ export function Hero({
     <section className="relative overflow-hidden bg-[var(--color-paper)] pb-16 pt-16 md:pb-24 md:pt-20">
       <Container className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <p className="timecode mb-5">00:00:00:01 — HI, I&rsquo;M</p>
+          <p className="timecode mb-5">HI, I&rsquo;M</p>
           <h1 className="font-display text-5xl font-bold leading-[1.05] tracking-tight text-[var(--color-ink)] sm:text-6xl lg:text-7xl">
             {heading}
           </h1>
