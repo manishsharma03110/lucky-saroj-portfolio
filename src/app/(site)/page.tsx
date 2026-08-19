@@ -1,5 +1,6 @@
 import { Hero } from "@/components/home/Hero";
 import { ValueStrip } from "@/components/home/ValueStrip";
+import { ShowreelSection } from "@/components/home/ShowreelSection";
 import { SelectedWork } from "@/components/home/SelectedWork";
 import { ServicesPreview } from "@/components/home/ServicesPreview";
 import { TestimonialsSection } from "@/components/testimonials/TestimonialCard";
@@ -18,6 +19,7 @@ export default async function HomePage() {
       />
       <ValueStrip />
       <SelectedWork />
+      <ShowreelSection />
       <ServicesPreview />
       <TestimonialsSection />
       <CTA />

@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { FormCard, FieldError, CheckboxField } from "@/components/admin/FormParts";
 import { createProject, updateProject, type ActionState } from "@/lib/actions/portfolio";
+import { FileUpload } from "@/components/admin/FileUpload";
 import type { schema } from "@/lib/db";
 
 type Project = typeof schema.portfolioProjects.$inferSelect;
@@ -100,14 +101,21 @@ export function ProjectForm({
           </div>
         </div>
 
+             <FileUpload name="thumbnailUrl" label="Thumbnail Image" kind="image" defaultValue={project?.thumbnailUrl} />
+        <FileUpload name="videoUrl" label="Project Video" kind="video" defaultValue={project?.videoUrl} />
+        <p className="-mt-3 text-xs text-[var(--color-muted)]">
+          Upload a video file directly, or leave empty and paste a YouTube/Vimeo link in Video URL below instead.
+        </p>
         <div>
-          <Label htmlFor="thumbnailUrl">Thumbnail Image URL</Label>
-          <Input id="thumbnailUrl" name="thumbnailUrl" placeholder="https://..." defaultValue={project?.thumbnailUrl ?? ""} />
+          <Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label>
+          <Input
+            id="externalVideoUrl"
+            name="externalVideoUrl"
+            placeholder="https://youtube.com/watch?v=..."
+            defaultValue={project?.videoUrl?.startsWith("http") && !project.videoUrl.includes("blob.vercel-storage.com") ? project.videoUrl : ""}
+          />
         </div>
-        <div>
-          <Label htmlFor="videoUrl">Project Video URL</Label>
-          <Input id="videoUrl" name="videoUrl" placeholder="YouTube, Vimeo, or direct link" defaultValue={project?.videoUrl ?? ""} />
-        </div>
+        
         <div>
           <Label htmlFor="tools">Tools / Software Used</Label>
           <Input

@@ -30,7 +30,7 @@ function parseProjectForm(formData: FormData) {
     approach: formData.get("approach") ?? "",
     result: formData.get("result") ?? "",
     thumbnailUrl: formData.get("thumbnailUrl") ?? "",
-    videoUrl: formData.get("videoUrl") ?? "",
+        videoUrl: (formData.get("videoUrl") as string) || (formData.get("externalVideoUrl") as string) || "",
     isFeatured: formData.get("isFeatured") === "on",
     status: formData.get("status"),
     seoTitle: formData.get("seoTitle") ?? "",

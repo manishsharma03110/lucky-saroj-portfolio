@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { VideoPlayer } from "@/components/ui/VideoPlayer";
 import { CTA } from "@/components/home/CTA";
 import { getAdjacentProjects, getProjectBySlug } from "@/lib/db/queries";
 
@@ -47,20 +48,13 @@ export default async function ProjectDetailPage({
 
       <section className="pb-16">
         <Container className="grid grid-cols-1 gap-10 lg:grid-cols-[1.6fr_1fr]">
-          <div className="relative aspect-video overflow-hidden rounded-2xl bg-[var(--color-ink)]">
-            <div
-              className="h-full w-full bg-cover bg-center opacity-90"
-              style={{
-                backgroundImage: `url('${project.thumbnailUrl || "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=1200&auto=format&fit=crop"}')`,
-              }}
-              role="img"
-              aria-label={project.title}
+                    <div className="relative aspect-video overflow-hidden rounded-2xl">
+            <VideoPlayer
+              videoUrl={project.videoUrl}
+              posterUrl={project.thumbnailUrl || "https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=1200&auto=format&fit=crop"}
+              title={project.title}
+              className="h-full w-full"
             />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/95 text-[var(--color-ink)]">
-                <Play size={20} fill="currentColor" />
-              </span>
-            </div>
           </div>
 
           <aside className="space-y-6">

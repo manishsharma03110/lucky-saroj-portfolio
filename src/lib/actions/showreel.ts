@@ -16,11 +16,12 @@ export async function upsertShowreel(_prev: ActionState, formData: FormData): Pr
   await requireAdmin();
   const parsed = showreelSchema.safeParse({
     title: formData.get("title"),
-    videoUrl: formData.get("videoUrl") ?? "",
+    videoUrl: (formData.get("videoUrl") as string) || (formData.get("externalVideoUrl") as string) || "",
     duration: formData.get("duration") ?? "",
     isFeatured: formData.get("isFeatured") === "on",
     status: formData.get("status"),
   });
+  const thumbnailUrl = (formData.get("thumbnailUrl") as string) || "";
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: { title: parsed.error.issues[0]?.message ?? "Invalid input" } };
   }
@@ -34,6 +35,7 @@ export async function upsertShowreel(_prev: ActionState, formData: FormData): Pr
       .set({
         title: data.title,
         videoUrl: data.videoUrl || null,
+        thumbnailUrl: thumbnailUrl || null,
         duration: data.duration || null,
         isFeatured: data.isFeatured ?? true,
         status: data.status,
@@ -44,6 +46,7 @@ export async function upsertShowreel(_prev: ActionState, formData: FormData): Pr
       .values({
         title: data.title,
         videoUrl: data.videoUrl || null,
+        thumbnailUrl: thumbnailUrl || null,
         duration: data.duration || null,
         isFeatured: data.isFeatured ?? true,
         status: data.status,

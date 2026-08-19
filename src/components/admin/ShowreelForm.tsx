@@ -6,6 +6,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { FormCard, CheckboxField } from "@/components/admin/FormParts";
 import { upsertShowreel } from "@/lib/actions/showreel";
+import { FileUpload } from "@/components/admin/FileUpload";
 import type { ActionState } from "@/lib/actions/portfolio";
 import type { schema } from "@/lib/db";
 
@@ -23,9 +24,16 @@ export function ShowreelForm({ showreel }: { showreel?: Showreel }) {
           <Label htmlFor="title">Title</Label>
           <Input id="title" name="title" defaultValue={showreel?.title ?? "Showreel"} required />
         </div>
+                <FileUpload name="thumbnailUrl" label="Showreel Thumbnail" kind="image" defaultValue={showreel?.thumbnailUrl} />
+        <FileUpload name="videoUrl" label="Showreel Video" kind="video" defaultValue={showreel?.videoUrl} />
         <div>
-          <Label htmlFor="videoUrl">Video URL</Label>
-          <Input id="videoUrl" name="videoUrl" placeholder="YouTube, Vimeo, or direct link" defaultValue={showreel?.videoUrl ?? ""} />
+          <Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label>
+          <Input
+            id="externalVideoUrl"
+            name="externalVideoUrl"
+            placeholder="https://youtube.com/watch?v=..."
+            defaultValue={showreel?.videoUrl?.startsWith("http") && !showreel.videoUrl.includes("blob.vercel-storage.com") ? showreel.videoUrl : ""}
+          />
         </div>
         <div>
           <Label htmlFor="duration">Duration</Label>
