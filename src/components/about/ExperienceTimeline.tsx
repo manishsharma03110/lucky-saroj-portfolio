@@ -5,7 +5,7 @@ type Experience = typeof schema.experiences.$inferSelect;
 
 export function ExperienceTimeline({
   experiences,
-  eyebrow = "00:02:20:00 — MY JOURNEY",
+  eyebrow = "MY JOURNEY",
   heading = "My Professional Journey",
   compact = false,
 }: {

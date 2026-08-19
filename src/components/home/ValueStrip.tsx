@@ -12,7 +12,7 @@ export function ValueStrip() {
   return (
     <section className="border-y border-[var(--color-line)] bg-[var(--color-paper-dim)] py-14">
       <Container>
-        <p className="timecode mb-8 text-center">00:02:00:00 — I CREATE VIDEOS THAT</p>
+        <p className="timecode mb-8 text-center">I CREATE VIDEOS THAT</p>
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
           {ITEMS.map(({ icon: Icon, title, desc }) => (
             <div key={title} className="flex flex-col items-center text-center">

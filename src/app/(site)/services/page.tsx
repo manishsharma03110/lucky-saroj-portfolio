@@ -12,7 +12,7 @@ export default function ServicesPage() {
     <>
       <section className="py-16 md:py-20">
         <Container className="max-w-2xl">
-          <p className="timecode mb-4">00:00:00:04 — SERVICES</p>
+          <p className="timecode mb-4">SERVICES</p>
           <h1 className="font-display text-4xl font-bold leading-tight text-[var(--color-ink)] sm:text-5xl">
             How I can help tell your story
           </h1>

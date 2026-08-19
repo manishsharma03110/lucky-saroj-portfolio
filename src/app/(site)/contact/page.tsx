@@ -12,7 +12,7 @@ export default async function ContactPage() {
   return (
     <section className="py-16 md:py-24">
       <Container>
-        <p className="timecode mb-4">00:00:00:06 — LET&rsquo;S WORK TOGETHER</p>
+        <p className="timecode mb-4">LET&rsquo;S WORK TOGETHER</p>
         <h1 className="mb-12 font-display text-4xl font-bold text-[var(--color-ink)] sm:text-5xl">
           Have a project in mind?
         </h1>

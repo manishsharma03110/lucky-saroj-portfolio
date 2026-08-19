@@ -11,7 +11,7 @@ export function AboutHero({
     <section className="py-16 md:py-20">
       <Container className="grid grid-cols-1 items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
-          <p className="timecode mb-4">00:00:00:02 — ABOUT ME</p>
+          <p className="timecode mb-4">ABOUT ME</p>
           <h1 className="font-display text-4xl font-bold leading-tight text-[var(--color-ink)] sm:text-5xl">
             {headline}
           </h1>

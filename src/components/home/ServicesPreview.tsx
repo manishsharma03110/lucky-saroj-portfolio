@@ -11,7 +11,7 @@ export async function ServicesPreview({ heading = "My Expertise" }: { heading?: 
     <section className="py-20 md:py-28">
       <Container>
         <div className="mb-12 text-center">
-          <p className="timecode mb-3">00:02:45:12 — WHAT I DO</p>
+          <p className="timecode mb-3">WHAT I DO</p>
           <h2 className="font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
             {heading}
           </h2>

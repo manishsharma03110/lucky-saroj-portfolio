@@ -21,7 +21,7 @@ export default async function PortfolioPage({
     <>
       <section className="py-16 md:py-20">
         <Container>
-          <p className="timecode mb-4">00:00:00:05 — MY WORK</p>
+          <p className="timecode mb-4">MY WORK</p>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <h1 className="font-display text-4xl font-bold text-[var(--color-ink)] sm:text-5xl">
               Featured Projects

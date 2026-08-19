@@ -10,7 +10,7 @@ export async function TestimonialsSection({ featuredOnly = true }: { featuredOnl
     <section className="bg-[var(--color-paper-dim)] py-20 md:py-28">
       <Container>
         <div className="mb-12 text-center">
-          <p className="timecode mb-3">00:04:10:00 — TESTIMONIALS</p>
+          <p className="timecode mb-3">TESTIMONIALS</p>
           <h2 className="font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
             What clients say
           </h2>

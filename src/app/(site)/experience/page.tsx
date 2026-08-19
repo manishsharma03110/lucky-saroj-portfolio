@@ -12,7 +12,7 @@ export default async function ExperiencePage() {
     <>
       <ExperienceTimeline
         experiences={experiences}
-        eyebrow="00:00:00:03 — EXPERIENCE"
+        eyebrow="EXPERIENCE"
         heading="My Professional Journey"
       />
       <CTA />

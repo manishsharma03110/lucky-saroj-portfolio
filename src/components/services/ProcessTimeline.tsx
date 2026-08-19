@@ -12,7 +12,7 @@ export function ProcessTimeline() {
     <section className="py-20 md:py-28">
       <Container>
         <div className="mb-12 text-center">
-          <p className="timecode mb-3">00:03:00:00 — HOW WE WORK</p>
+          <p className="timecode mb-3">HOW WE WORK</p>
           <h2 className="font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
             My Process
           </h2>

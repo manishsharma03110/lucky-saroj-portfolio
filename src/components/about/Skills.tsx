@@ -11,7 +11,7 @@ export function Skills({
     <section className="py-20 md:py-24">
       <Container className="grid grid-cols-1 gap-14 lg:grid-cols-2">
         <div>
-          <p className="timecode mb-4">00:01:12:00 — SKILLS</p>
+          <p className="timecode mb-4">SKILLS</p>
           <h2 className="mb-6 font-display text-2xl font-bold text-[var(--color-ink)]">
             What I bring to every edit
           </h2>
@@ -27,7 +27,7 @@ export function Skills({
           </div>
         </div>
         <div>
-          <p className="timecode mb-4">00:01:38:00 — TOOLS &amp; SOFTWARE</p>
+          <p className="timecode mb-4">TOOLS &amp; SOFTWARE</p>
           <h2 className="mb-6 font-display text-2xl font-bold text-[var(--color-ink)]">
             My editing toolkit
           </h2>

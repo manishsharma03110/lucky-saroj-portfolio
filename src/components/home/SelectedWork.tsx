@@ -12,7 +12,7 @@ export async function SelectedWork() {
       <Container>
         <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
           <div>
-            <p className="timecode mb-3">00:01:24:10 — SELECTED WORK</p>
+            <p className="timecode mb-3"> SELECTED WORK</p>
             <h2 className="font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
               Some of my recent projects
             </h2>
