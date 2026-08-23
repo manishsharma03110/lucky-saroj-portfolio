@@ -1,33 +1,36 @@
 import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
+import { MediaFrame } from "@/components/ui/MediaFrame";
 import { VideoPlayer } from "@/components/ui/VideoPlayer";
 import { getFeaturedShowreel } from "@/lib/db/queries";
 
 export async function ShowreelSection() {
   const showreel = await getFeaturedShowreel();
+  // Gracefully hide rather than showing broken/empty content, exactly as
+  // the previous implementation did — behavior unchanged, styling updated.
   if (!showreel?.videoUrl) return null;
 
   return (
-    <section id="showreel" className="scroll-mt-24 py-20 md:py-28">
+    <Section id="showreel" spacing="lg" className="scroll-mt-24 bg-[var(--cine-void)]">
       <Container>
-        <div className="mb-10 text-center">
-          <p className="timecode mb-3">00:00:45:00 — SHOWREEL</p>
-          <h2 className="font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
-            {showreel.title}
-          </h2>
-          {showreel.duration && (
-            <p className="mt-2 text-sm text-[var(--color-muted)]">{showreel.duration}</p>
-          )}
-        </div>
+        <SectionHeading
+          eyebrow="00:00:45:00 — SHOWREEL"
+          title={showreel.title}
+          description={showreel.duration ?? undefined}
+          align="center"
+          className="mx-auto mb-12"
+        />
 
-        <div className="mx-auto aspect-video max-w-4xl overflow-hidden rounded-2xl">
+        <MediaFrame aspect="aspect-video" className="mx-auto max-w-4xl">
           <VideoPlayer
             videoUrl={showreel.videoUrl}
             posterUrl={showreel.thumbnailUrl}
             title={showreel.title}
             className="h-full w-full"
           />
-        </div>
+        </MediaFrame>
       </Container>
-    </section>
+    </Section>
   );
 }

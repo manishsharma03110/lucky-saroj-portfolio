@@ -1,35 +1,45 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Button } from "@/components/ui/Button";
-import { ProjectCard } from "@/components/portfolio/ProjectCard";
+import { WorkCard } from "@/components/home/WorkCard";
 import { getPublishedProjects } from "@/lib/db/queries";
 
 export async function SelectedWork() {
-  const projects = await getPublishedProjects({ featuredOnly: true, limit: 4 });
+  const projects = await getPublishedProjects({ featuredOnly: true, limit: 5 });
+  const [featured, ...rest] = projects;
 
   return (
-    <section className="py-20 md:py-28">
+    <Section spacing="lg" className="bg-[var(--cine-void)]">
       <Container>
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p className="timecode mb-3"> SELECTED WORK</p>
-            <h2 className="font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
-              Some of my recent projects
-            </h2>
-          </div>
-          <Button href="/portfolio" variant="secondary">
-            View All Projects
+        <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
+          <SectionHeading
+            eyebrow="00:01:24:10 — SELECTED WORK"
+            title="Recent projects"
+            className="mb-0"
+          />
+          <Button href="/portfolio" variant="cine-outline" withArrow className="!rounded-md">
+            View All Work
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {projects.map(({ project, category }) => (
-            <ProjectCard key={project.id} project={project} categoryName={category?.name} />
-          ))}
-        </div>
+        {featured && (
+          <div className="mb-10">
+            <WorkCard project={featured.project} categoryName={featured.category?.name} size="large" />
+          </div>
+        )}
+
+        {rest.length > 0 && (
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {rest.map(({ project, category }) => (
+              <WorkCard key={project.id} project={project} categoryName={category?.name} />
+            ))}
+          </div>
+        )}
 
         {projects.length === 0 && (
-          <p className="text-sm text-[var(--color-muted)]">
+          <p className="cine-body text-sm">
             No featured projects yet —{" "}
             <Link href="/admin/portfolio/new" className="underline">
               add one from the CMS
@@ -38,6 +48,6 @@ export async function SelectedWork() {
           </p>
         )}
       </Container>
-    </section>
+    </Section>
   );
 }

@@ -1,10 +1,13 @@
 import { Hero } from "@/components/home/Hero";
-import { ValueStrip } from "@/components/home/ValueStrip";
-import { ShowreelSection } from "@/components/home/ShowreelSection";
+import { SkillsMarquee } from "@/components/home/SkillsMarquee";
 import { SelectedWork } from "@/components/home/SelectedWork";
-import { ServicesPreview } from "@/components/home/ServicesPreview";
-import { TestimonialsSection } from "@/components/testimonials/TestimonialCard";
-import { CTA } from "@/components/home/CTA";
+import { EditingStyles } from "@/components/home/EditingStyles";
+import { ShowreelSection } from "@/components/home/ShowreelSection";
+import { WhyWorkWithMe } from "@/components/home/WhyWorkWithMe";
+import { Process } from "@/components/home/Process";
+import { AboutPreview } from "@/components/home/AboutPreview";
+import { TestimonialsPreview } from "@/components/home/TestimonialsPreview";
+import { FinalCTA } from "@/components/home/FinalCTA";
 import { getSiteSettings } from "@/lib/db/queries";
 
 export default async function HomePage() {
@@ -16,13 +19,17 @@ export default async function HomePage() {
         heading={settings?.heroHeading ?? "LUCKY SAROJ"}
         subheading={settings?.heroSubheading ?? "VIDEO EDITOR & VISUAL STORYTELLER"}
         description={settings?.heroDescription ?? ""}
+        heroImageUrl={settings?.heroImageUrl}
       />
-      <ValueStrip />
+      <SkillsMarquee />
       <SelectedWork />
+      <EditingStyles />
       <ShowreelSection />
-      <ServicesPreview />
-      <TestimonialsSection />
-      <CTA />
+      <WhyWorkWithMe />
+      <Process />
+      <AboutPreview />
+      <TestimonialsPreview />
+      <FinalCTA />
     </>
   );
 }

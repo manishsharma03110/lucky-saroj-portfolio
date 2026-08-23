@@ -94,3 +94,125 @@ h1, h2, h3, h4, h5, .font-display {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* =============================================================================
+   CINEMATIC REDESIGN FOUNDATION
+   -----------------------------------------------------------------------------
+   Additive, namespaced tokens for the new dark/cinematic visual system.
+   These do NOT replace or override the existing --color-* tokens above —
+   every current page and the admin CMS keep using those, unchanged, until
+   each page is individually redesigned. New cinematic components (Section
+   headings, Card, MediaFrame, CustomCursor, Marquee, Playhead, etc.) read
+   from this block instead.
+   ========================================================================== */
+:root {
+  /* Surfaces */
+  --cine-void: #0a0a0b;           /* primary near-black background */
+  --cine-surface: #131316;        /* elevated surface — cards, panels */
+  --cine-surface-2: #1b1b1f;      /* further-elevated surface — hover states */
+
+  /* Typography */
+  --cine-text-primary: #f5f4f2;   /* off-white primary text */
+  --cine-text-secondary: #9a9a9f; /* muted gray secondary text */
+  --cine-text-tertiary: #616166;  /* dim tertiary text — timestamps, meta */
+
+  /* One controlled accent — same warm-amber family as the brand's existing
+     accent, refined slightly for a more premium/cinematic tone. */
+  --cine-accent: #e2823d;
+  --cine-accent-soft: rgba(226, 130, 61, 0.12);
+
+  /* Hairlines */
+  --cine-border: rgba(255, 255, 255, 0.08);
+  --cine-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Radii — moderate, not excessive */
+  --cine-radius-sm: 6px;
+  --cine-radius-md: 12px;
+  --cine-radius-lg: 20px;
+
+  /* Motion */
+  --cine-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cine-duration-fast: 0.2s;
+  --cine-duration-base: 0.4s;
+  --cine-duration-slow: 0.8s;
+}
+
+@theme inline {
+  --color-cine-void: var(--cine-void);
+  --color-cine-surface: var(--cine-surface);
+  --color-cine-surface-2: var(--cine-surface-2);
+  --color-cine-text-primary: var(--cine-text-primary);
+  --color-cine-text-secondary: var(--cine-text-secondary);
+  --color-cine-text-tertiary: var(--cine-text-tertiary);
+  --color-cine-accent: var(--cine-accent);
+  --color-cine-accent-soft: var(--cine-accent-soft);
+  --color-cine-border: var(--cine-border);
+  --color-cine-border-strong: var(--cine-border-strong);
+}
+
+/* Cinematic type scale — utility classes, opt-in only */
+.cine-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.cine-eyebrow {
+  font-family: var(--font-body);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--cine-accent);
+}
+
+.cine-body {
+  font-family: var(--font-body);
+  color: var(--cine-text-secondary);
+  line-height: 1.6;
+}
+
+/* Cinematic hairline scrubber — same tick-mark motif as .scrubber above,
+   restyled for dark surfaces */
+.cine-scrubber {
+  position: relative;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    var(--cine-border) 0,
+    var(--cine-border) 1px,
+    transparent 1px,
+    transparent 8px
+  );
+}
+
+/* Shared hover-zoom utility for media containers */
+.cine-hover-zoom {
+  transition: transform var(--cine-duration-slow) var(--cine-ease);
+}
+.cine-hover-zoom:hover {
+  transform: scale(1.04);
+}
+
+/* Custom cursor: hide the native cursor only where the cursor component is
+   actively mounted (it self-manages this via a body class), and only above
+   the breakpoint where it applies — mobile always keeps the native cursor. */
+@media (min-width: 1024px) {
+  body.cine-cursor-active,
+  body.cine-cursor-active a,
+  body.cine-cursor-active button {
+    cursor: none;
+  }
+}
+
+@keyframes cine-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
