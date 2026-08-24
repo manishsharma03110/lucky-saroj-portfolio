@@ -1,4 +1,6 @@
 import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow } from "@/components/ui/SectionHeading";
 
 export function Skills({
   skills,
@@ -8,18 +10,18 @@ export function Skills({
   tools: { id: string; name: string }[];
 }) {
   return (
-    <section className="py-20 md:py-24">
+    <Section spacing="lg" className="bg-[var(--cine-void)]">
       <Container className="grid grid-cols-1 gap-14 lg:grid-cols-2">
         <div>
-          <p className="timecode mb-4">SKILLS</p>
-          <h2 className="mb-6 font-display text-2xl font-bold text-[var(--color-ink)]">
+          <Eyebrow className="mb-5">00:01:12:00 — SKILLS</Eyebrow>
+          <h2 className="cine-display mb-6 text-2xl text-[var(--cine-text-primary)] sm:text-3xl">
             What I bring to every edit
           </h2>
           <div className="flex flex-wrap gap-3">
             {skills.map((skill) => (
               <span
                 key={skill.id}
-                className="rounded-full border border-[var(--color-line)] bg-white px-4 py-2 text-sm text-[var(--color-ink-soft)]"
+                className="rounded-full border border-[var(--cine-border)] px-4 py-2 text-sm text-[var(--cine-text-secondary)] transition-colors hover:border-[var(--cine-border-strong)] hover:text-[var(--cine-text-primary)]"
               >
                 {skill.name}
               </span>
@@ -27,15 +29,15 @@ export function Skills({
           </div>
         </div>
         <div>
-          <p className="timecode mb-4">TOOLS &amp; SOFTWARE</p>
-          <h2 className="mb-6 font-display text-2xl font-bold text-[var(--color-ink)]">
+          <Eyebrow className="mb-5">00:01:38:00 — TOOLS &amp; SOFTWARE</Eyebrow>
+          <h2 className="cine-display mb-6 text-2xl text-[var(--cine-text-primary)] sm:text-3xl">
             My editing toolkit
           </h2>
           <div className="flex flex-wrap gap-3">
             {tools.map((tool) => (
               <span
                 key={tool.id}
-                className="rounded-full bg-[var(--color-accent-soft)] px-4 py-2 text-sm font-medium text-[var(--color-accent)]"
+                className="rounded-full bg-[var(--cine-accent-soft)] px-4 py-2 text-sm font-medium text-[var(--cine-accent)]"
               >
                 {tool.name}
               </span>
@@ -43,6 +45,6 @@ export function Skills({
           </div>
         </div>
       </Container>
-    </section>
+    </Section>
   );
 }

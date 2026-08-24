@@ -41,7 +41,7 @@ export async function Footer() {
   ].filter((s) => s.url);
 
   return (
-    <footer className="mt-24 border-t border-white/10 bg-[var(--color-ink)] text-white/70">
+    <footer className="pt-24 border-t border-white/10 bg-[var(--color-ink)] text-white/70">
       <Container className="grid grid-cols-1 gap-12 py-16 sm:grid-cols-2 lg:grid-cols-4">
         <div className="sm:col-span-2 lg:col-span-1">
           <div className="mb-4 flex items-center gap-3">
