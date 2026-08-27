@@ -1,4 +1,4 @@
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowDown, Play } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/SectionHeading";
@@ -15,7 +15,7 @@ export function Hero({
   heroImageUrl?: string | null;
 }) {
   return (
-    <section className="relative min-h-[92vh] overflow-hidden bg-[var(--cine-void)]">
+    <section className="relative min-h-[94vh] overflow-hidden bg-[var(--cine-void)]">
       {/* Media layer — reuses the CMS hero image when the site owner has set
           one; otherwise falls back to a purposeful abstract cinematic panel
           rather than inventing a stock photo/video asset. */}
@@ -28,9 +28,23 @@ export function Hero({
             aria-label={heading}
           />
         ) : (
-          <div className="h-full w-full bg-[radial-gradient(ellipse_at_top_right,_rgba(226,130,61,0.10),_transparent_55%),radial-gradient(ellipse_at_bottom_left,_rgba(255,255,255,0.04),_transparent_50%)]" />
+          <div
+            className="h-full w-full opacity-90"
+            style={{
+              backgroundImage:
+                "radial-gradient(ellipse 60% 50% at 78% 15%, rgba(226,130,61,0.14), transparent 60%), radial-gradient(ellipse 50% 40% at 10% 90%, rgba(255,255,255,0.05), transparent 60%), repeating-linear-gradient(115deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px)",
+            }}
+          />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--cine-void)] via-[var(--cine-void)]/70 to-[var(--cine-void)]/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--cine-void)] via-[var(--cine-void)]/75 to-[var(--cine-void)]/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--cine-void)]/40 via-transparent to-transparent" />
+        {/* Header (shared across all public pages) uses a slightly different
+            near-black value than the cinematic --cine-void tokens. Rather
+            than touching the shared Header, blend the seam away from this
+            side: fade from Header's exact color into --cine-void over the
+            first ~120px, so the transition from nav into hero is invisible
+            instead of a hard color cut. */}
+        <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[var(--color-ink)] to-transparent" />
       </div>
 
       {/* Subtle video-editor chrome — corners, never dominant */}
@@ -50,16 +64,16 @@ export function Hero({
         </p>
       </div>
 
-      <Container className="relative flex min-h-[92vh] flex-col justify-center py-28">
-        <Eyebrow marker="rec" className="mb-6">
-          VIDEO EDITOR — VISUAL STORYTELLER
+      <Container className="relative flex min-h-[94vh] flex-col justify-center py-28">
+        <Eyebrow marker="rec" className="mb-7">
+          00:00:00:01 — INTRO
         </Eyebrow>
 
-        <h1 className="cine-display max-w-4xl text-6xl text-[var(--cine-text-primary)] sm:text-7xl lg:text-8xl">
+        <h1 className="cine-display max-w-5xl text-6xl text-[var(--cine-text-primary)] sm:text-8xl lg:text-[7.5rem] lg:leading-[0.95]">
           {heading}
         </h1>
 
-        <p className="mt-6 max-w-xl text-lg text-[var(--cine-text-secondary)] sm:text-xl">
+        <p className="cine-eyebrow mt-7 !text-base !tracking-[0.14em] !text-[var(--cine-accent)] sm:!text-lg">
           {subheading}
         </p>
 
@@ -67,7 +81,7 @@ export function Hero({
           <p className="cine-body mt-4 max-w-lg text-sm sm:text-base">{description}</p>
         )}
 
-        <div className="mt-10 flex flex-wrap items-center gap-4">
+        <div className="mt-11 flex flex-wrap items-center gap-4">
           <Button href="/portfolio" variant="cine-solid" withArrow className="!rounded-md !px-7 !py-3.5">
             View My Work
           </Button>
@@ -79,7 +93,7 @@ export function Hero({
 
       <div className="pointer-events-none absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-[var(--cine-text-tertiary)] sm:flex" aria-hidden>
         <span className="cine-eyebrow !text-[var(--cine-text-tertiary)]">SCROLL</span>
-        <ArrowRight size={14} className="rotate-90" />
+        <ArrowDown size={14} />
       </div>
     </section>
   );

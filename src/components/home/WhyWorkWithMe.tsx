@@ -20,7 +20,7 @@ const PRINCIPLES = [
 
 export function WhyWorkWithMe() {
   return (
-    <Section spacing="lg" className="bg-[var(--cine-void)]">
+    <Section spacing="lg" className="border-t border-[var(--cine-border)] bg-[var(--cine-void)]">
       <Container>
         <SectionHeading
           eyebrow="00:03:00:00 — PHILOSOPHY"
@@ -29,14 +29,14 @@ export function WhyWorkWithMe() {
           className="mx-auto mb-14"
         />
 
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-3 sm:gap-8">
           {PRINCIPLES.map((p, i) => (
-            <div key={p.title} className="text-center">
+            <div key={p.title} className="text-center sm:px-2">
               <span className="cine-eyebrow">{String(i + 1).padStart(2, "0")}</span>
-              <h3 className="cine-display mt-3 text-xl text-[var(--cine-text-primary)]">
+              <h3 className="cine-display mt-4 text-xl text-[var(--cine-text-primary)]">
                 {p.title}
               </h3>
-              <p className="cine-body mt-2 text-sm">{p.description}</p>
+              <p className="cine-body mx-auto mt-2 max-w-[22ch] text-sm">{p.description}</p>
             </div>
           ))}
         </div>

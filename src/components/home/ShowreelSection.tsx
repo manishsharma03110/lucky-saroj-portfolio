@@ -15,21 +15,43 @@ export async function ShowreelSection() {
     <Section id="showreel" spacing="lg" className="scroll-mt-24 bg-[var(--cine-void)]">
       <Container>
         <SectionHeading
-          eyebrow="00:00:45:00 — SHOWREEL"
+          eyebrow="00:00:45:00 — FEATURED SHOWREEL"
           title={showreel.title}
-          description={showreel.duration ?? undefined}
           align="center"
           className="mx-auto mb-12"
         />
 
-        <MediaFrame aspect="aspect-video" className="mx-auto max-w-4xl">
-          <VideoPlayer
-            videoUrl={showreel.videoUrl}
-            posterUrl={showreel.thumbnailUrl}
-            title={showreel.title}
-            className="h-full w-full"
+        <div className="relative mx-auto max-w-5xl">
+          {/* Faint accent glow behind the frame — grounds the video as the
+              visual centerpiece of the section without adding a literal
+              gradient inside the media itself. */}
+          <div
+            className="pointer-events-none absolute -inset-8 -z-10 opacity-40 blur-3xl"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, rgba(226,130,61,0.18), transparent 65%)",
+            }}
+            aria-hidden
           />
-        </MediaFrame>
+
+          <MediaFrame
+            aspect="aspect-video"
+            overlay={
+              showreel.duration ? (
+                <span className="cine-eyebrow absolute bottom-4 right-4 rounded-sm border border-white/20 bg-black/50 px-2 py-1 !text-white backdrop-blur-sm">
+                  {showreel.duration}
+                </span>
+              ) : undefined
+            }
+          >
+            <VideoPlayer
+              videoUrl={showreel.videoUrl}
+              posterUrl={showreel.thumbnailUrl}
+              title={showreel.title}
+              className="h-full w-full"
+            />
+          </MediaFrame>
+        </div>
       </Container>
     </Section>
   );

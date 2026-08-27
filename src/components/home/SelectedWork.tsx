@@ -25,7 +25,7 @@ export async function SelectedWork() {
         </div>
 
         {featured && (
-          <div className="mb-10">
+          <div className="mb-12">
             <WorkCard project={featured.project} categoryName={featured.category?.name} size="large" />
           </div>
         )}

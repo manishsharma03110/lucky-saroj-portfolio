@@ -29,18 +29,18 @@ export async function EditingStyles() {
           className="mb-14"
         />
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
           {categories.map((category) => {
             const Icon = ICONS[category.slug] ?? Film;
             return (
               <Card
                 key={category.id}
                 hover={false}
-                className="group flex flex-col items-center gap-3 border-[var(--cine-border)] bg-[var(--cine-void)] py-8 text-center transition-colors duration-300 hover:border-[var(--cine-accent)]"
+                className="group flex flex-col items-center gap-4 border-[var(--cine-border)] bg-[var(--cine-void)] py-10 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--cine-accent)]"
               >
                 <Icon
-                  size={22}
-                  strokeWidth={1.5}
+                  size={26}
+                  strokeWidth={1.25}
                   className="text-[var(--cine-text-secondary)] transition-colors group-hover:text-[var(--cine-accent)]"
                 />
                 <span className="cine-eyebrow !text-[var(--cine-text-primary)] group-hover:!text-[var(--cine-accent)]">

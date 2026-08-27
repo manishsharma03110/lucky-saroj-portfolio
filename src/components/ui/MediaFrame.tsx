@@ -14,11 +14,17 @@ import type { ReactNode } from "react";
  */
 export function MediaFrame({
   children,
+  overlay,
   aspect = "aspect-video",
   showCorners = true,
   className,
 }: {
   children: ReactNode;
+  /** Optional content rendered above the media, outside the hover-zoom
+   * scaling wrapper — badges, gradient scrims, WATCH labels, etc. Kept
+   * separate from `children` so overlay UI never stretches/scales with
+   * the zoom effect. */
+  overlay?: ReactNode;
   aspect?: string;
   showCorners?: boolean;
   className?: string;
@@ -32,6 +38,8 @@ export function MediaFrame({
       )}
     >
       <div className="cine-hover-zoom h-full w-full">{children}</div>
+
+      {overlay}
 
       {showCorners && (
         <>

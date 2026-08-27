@@ -21,13 +21,17 @@ export async function TestimonialsPreview() {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((t) => (
-            <Card key={t.id} hover={false} className="flex flex-col border-[var(--cine-border)] bg-[var(--cine-void)]">
-              <Quote size={20} className="mb-4 text-[var(--cine-accent)]" />
-              <blockquote className="cine-body flex-1 text-sm">
+            <Card
+              key={t.id}
+              hover={false}
+              className="flex flex-col gap-6 border-[var(--cine-border)] bg-[var(--cine-void)] p-7"
+            >
+              <Quote size={22} className="text-[var(--cine-accent)]" />
+              <blockquote className="cine-body flex-1 text-[0.95rem] leading-relaxed">
                 &ldquo;{t.testimonialText}&rdquo;
               </blockquote>
-              <div className="mt-6 flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--cine-accent-soft)] text-sm font-semibold text-[var(--cine-accent)]">
+              <div className="flex items-center gap-3 border-t border-[var(--cine-border)] pt-5">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--cine-accent-soft)] text-sm font-semibold text-[var(--cine-accent)]">
                   {t.clientName.charAt(0)}
                 </span>
                 <span>
