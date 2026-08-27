@@ -1,5 +1,9 @@
 import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { SectionHeading } from "@/components/ui/SectionHeading";
 
+// Preserving the exact same 4 real steps as before — only the presentation
+// is redesigned, no new steps invented.
 const STEPS = [
   { step: "01", title: "Brief & Footage", desc: "Share your raw footage, goals and any reference edits." },
   { step: "02", title: "Rough Cut", desc: "A first pass structuring the story, pacing and key moments." },
@@ -9,30 +13,42 @@ const STEPS = [
 
 export function ProcessTimeline() {
   return (
-    <section className="py-20 md:py-28">
+    <Section spacing="md" className="bg-[var(--cine-surface)]">
       <Container>
-        <div className="mb-12 text-center">
-          <p className="timecode mb-3">HOW WE WORK</p>
-          <h2 className="font-display text-3xl font-bold text-[var(--color-ink)] sm:text-4xl">
-            My Process
-          </h2>
-        </div>
+        <SectionHeading
+          eyebrow="00:02:00:00 — HOW WE WORK"
+          title="My Process"
+          className="mb-16"
+        />
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <div key={s.step} className="relative">
-              <p className="timecode mb-3">{s.step}</p>
-              <h3 className="font-display text-base font-semibold text-[var(--color-ink)]">
+              <div className="relative mb-4 flex items-center gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--cine-accent)] text-xs font-semibold text-[var(--cine-accent)]">
+                  {s.step}
+                </span>
+
+                {/* Connecting segment to the next step — positioned relative
+                    to this row so its vertical center coincides exactly with
+                    the badge's center (guaranteed by flexbox items-center on
+                    this row), not a guessed pixel offset. */}
+                {i < STEPS.length - 1 && (
+                  <span
+                    className="cine-scrubber absolute left-8 top-1/2 hidden -translate-y-1/2 lg:block"
+                    style={{ width: "calc(100% + 8px)" }}
+                    aria-hidden
+                  />
+                )}
+              </div>
+              <h3 className="cine-display text-base text-[var(--cine-text-primary)]">
                 {s.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-[var(--color-muted)]">{s.desc}</p>
-              {i < STEPS.length - 1 && (
-                <div className="scrubber absolute right-[-16px] top-2 hidden w-8 lg:block" />
-              )}
+              <p className="cine-body mt-2 text-sm">{s.desc}</p>
             </div>
           ))}
         </div>
       </Container>
-    </section>
+    </Section>
   );
 }

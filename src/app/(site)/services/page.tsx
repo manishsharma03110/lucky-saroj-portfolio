@@ -1,31 +1,36 @@
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/ui/Section";
+import { Eyebrow } from "@/components/ui/SectionHeading";
 import { ServicesPreview } from "@/components/home/ServicesPreview";
 import { ProcessTimeline } from "@/components/services/ProcessTimeline";
-import { TestimonialsSection } from "@/components/testimonials/TestimonialCard";
-import { CTA } from "@/components/home/CTA";
+import { ServicesTestimonials } from "@/components/services/ServicesTestimonials";
+import { ServicesCTA } from "@/components/services/ServicesCTA";
 
 export const metadata: Metadata = { title: "Services" };
 
 export default function ServicesPage() {
   return (
     <>
-      <section className="py-16 md:py-20">
+      <Section spacing="md" className="bg-[var(--cine-void)]">
         <Container className="max-w-2xl">
-          <p className="timecode mb-4">SERVICES</p>
-          <h1 className="font-display text-4xl font-bold leading-tight text-[var(--color-ink)] sm:text-5xl">
+          <Eyebrow marker="rec" className="mb-6">
+            00:00:00:04 — SERVICES
+          </Eyebrow>
+          <h1 className="cine-display text-4xl leading-tight text-[var(--cine-text-primary)] sm:text-5xl">
             How I can help tell your story
           </h1>
-          <p className="mt-5 text-base leading-relaxed text-[var(--color-ink-soft)]">
-            From YouTube documentaries to fast-paced social reels, I offer end-to-end
-            post-production so you can focus on creating — I&rsquo;ll handle the edit.
+          <p className="cine-body mt-5 text-base sm:text-lg">
+            From YouTube documentaries to fast-paced social reels, I offer
+            end-to-end post-production so you can focus on creating —
+            I&rsquo;ll handle the edit.
           </p>
         </Container>
-      </section>
-      <ServicesPreview heading="What I Offer" />
+      </Section>
+      <ServicesPreview />
       <ProcessTimeline />
-      <TestimonialsSection />
-      <CTA />
+      <ServicesTestimonials />
+      <ServicesCTA />
     </>
   );
 }
