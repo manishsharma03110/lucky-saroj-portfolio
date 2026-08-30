@@ -3,14 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
 import { experienceSchema } from "@/lib/validations/experience";
 import type { ActionState } from "./portfolio";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
-}
 
 function parseForm(formData: FormData) {
   return experienceSchema.safeParse({
@@ -25,7 +20,7 @@ function parseForm(formData: FormData) {
 }
 
 export async function createExperience(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: { role: parsed.error.issues[0]?.message ?? "Invalid input" } };
@@ -49,7 +44,7 @@ export async function createExperience(_prev: ActionState, formData: FormData): 
 }
 
 export async function updateExperience(id: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: { role: parsed.error.issues[0]?.message ?? "Invalid input" } };
@@ -72,7 +67,7 @@ export async function updateExperience(id: string, _prev: ActionState, formData:
 }
 
 export async function deleteExperience(id: string): Promise<void> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   await db.delete(schema.experiences).where(eq(schema.experiences.id, id));
   revalidatePath("/admin/experience");
   revalidatePath("/experience");

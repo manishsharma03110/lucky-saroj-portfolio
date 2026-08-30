@@ -3,8 +3,9 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
-import { loginSchema } from "@/lib/validations/auth";
 import { edgeAuthConfig } from "./edge-config";
+import { authorizeAdminCredentials } from "./credentials";
+import { applyAdminJwt, projectAdminSession } from "./callbacks";
 
 export const authConfig: NextAuthConfig = {
   ...edgeAuthConfig,
@@ -19,22 +20,24 @@ export const authConfig: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (raw) => {
-        const parsed = loginSchema.safeParse(raw);
-        if (!parsed.success) return null;
-        const { email, password } = parsed.data;
-
-        const users = await db
-          .select()
-          .from(schema.adminUsers)
-          .where(eq(schema.adminUsers.email, email.toLowerCase().trim()));
-        const user = users[0];
-
-        if (!user) return null;
-
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
-
-        return { id: user.id, email: user.email, name: user.name };
+        return authorizeAdminCredentials(raw, {
+          findByEmail: async (email) => {
+            const users = await db
+              .select({
+                id: schema.adminUsers.id,
+                email: schema.adminUsers.email,
+                name: schema.adminUsers.name,
+                passwordHash: schema.adminUsers.passwordHash,
+                sessionVersion: schema.adminUsers.sessionVersion,
+                isActive: schema.adminUsers.isActive,
+              })
+              .from(schema.adminUsers)
+              .where(eq(schema.adminUsers.email, email))
+              .limit(1);
+            return users[0] ?? null;
+          },
+          verifyPassword: bcrypt.compare,
+        });
       },
     }),
   ],
@@ -46,16 +49,10 @@ export const authConfig: NextAuthConfig = {
       return true;
     },
     jwt: async ({ token, user }) => {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
+      return applyAdminJwt(token, user);
     },
     session: async ({ session, token }) => {
-      if (session.user && token.id) {
-        (session.user as { id?: string }).id = token.id as string;
-      }
-      return session;
+      return projectAdminSession(session, token);
     },
   },
 };

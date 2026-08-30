@@ -15,6 +15,13 @@
       "when": 1788024375876,
       "tag": "0001_contact_inquiry_reconciliation",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788100745727,
+      "tag": "0002_admin_auth_revalidation",
+      "breakpoints": true
     }
   ]
 }

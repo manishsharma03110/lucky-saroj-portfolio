@@ -3,14 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
 import { serviceSchema } from "@/lib/validations/service";
 import type { ActionState } from "./portfolio";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
-}
 
 function parseForm(formData: FormData) {
   return serviceSchema.safeParse({
@@ -23,7 +18,7 @@ function parseForm(formData: FormData) {
 }
 
 export async function createService(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: { name: parsed.error.issues[0]?.message ?? "Invalid input" } };
@@ -45,7 +40,7 @@ export async function createService(_prev: ActionState, formData: FormData): Pro
 }
 
 export async function updateService(id: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: { name: parsed.error.issues[0]?.message ?? "Invalid input" } };
@@ -66,7 +61,7 @@ export async function updateService(id: string, _prev: ActionState, formData: Fo
 }
 
 export async function deleteService(id: string): Promise<void> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   await db.delete(schema.services).where(eq(schema.services.id, id));
   revalidatePath("/admin/services");
   revalidatePath("/services");

@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
 import { projectSchema } from "@/lib/validations/project";
 
 export type ActionState = {
@@ -12,11 +12,6 @@ export type ActionState = {
   message?: string;
   fieldErrors?: Record<string, string>;
 };
-
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
-}
 
 function parseProjectForm(formData: FormData) {
   return projectSchema.safeParse({
@@ -49,7 +44,7 @@ function fieldErrorsFrom(issues: { path: PropertyKey[]; message: string }[]) {
 }
 
 export async function createProject(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   const parsed = parseProjectForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
@@ -95,7 +90,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
 }
 
 export async function updateProject(id: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   const parsed = parseProjectForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
@@ -143,7 +138,7 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
 }
 
 export async function deleteProject(id: string): Promise<void> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   await db.delete(schema.portfolioProjects).where(eq(schema.portfolioProjects.id, id));
   revalidatePath("/admin/portfolio");
   revalidatePath("/portfolio");
@@ -151,7 +146,7 @@ export async function deleteProject(id: string): Promise<void> {
 }
 
 export async function toggleProjectFeatured(id: string, isFeatured: boolean): Promise<void> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   await db.update(schema.portfolioProjects).set({ isFeatured }).where(eq(schema.portfolioProjects.id, id));
   revalidatePath("/admin/portfolio");
   revalidatePath("/portfolio");

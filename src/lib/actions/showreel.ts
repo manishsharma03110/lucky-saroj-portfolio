@@ -3,17 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { auth } from "@/lib/auth";
+import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
 import { showreelSchema } from "@/lib/validations/showreel";
 import type { ActionState } from "./portfolio";
 
-async function requireAdmin() {
-  const session = await auth();
-  if (!session?.user) throw new Error("Unauthorized");
-}
-
 export async function upsertShowreel(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAdmin();
+  await requireAuthenticatedAdmin();
   const parsed = showreelSchema.safeParse({
     title: formData.get("title"),
     videoUrl: (formData.get("videoUrl") as string) || (formData.get("externalVideoUrl") as string) || "",

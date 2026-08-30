@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { getCurrentAdmin } from "@/lib/auth/admin";
 import { AdminSessionProvider } from "@/components/admin/AdminSessionProvider";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
@@ -7,15 +7,15 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth();
-  if (!session?.user) {
+  const admin = await getCurrentAdmin();
+  if (!admin) {
     redirect("/admin/login");
   }
 
   return (
     <AdminSessionProvider>
       <div className="flex min-h-screen bg-[var(--color-paper-dim)]">
-        <AdminSidebar userName={session.user.name} />
+        <AdminSidebar userName={admin.name} />
         <main className="flex-1 overflow-x-hidden px-8 py-8">{children}</main>
       </div>
     </AdminSessionProvider>
