@@ -1,5 +1,5 @@
 import { pgTable, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 
 // ---------------------------------------------------------------------------
 // AdminUser
@@ -180,6 +180,9 @@ export const contactMessages = pgTable("contact_messages", {
   phone: text("phone"),
   projectType: text("project_type"),
   budgetRange: text("budget_range"),
+  videoType: text("video_type"),
+  projectTimeline: text("project_timeline"),
+  referenceUrl: text("reference_url"),
   message: text("message").notNull(),
   status: text("status", { enum: ["new", "read", "replied", "archived"] })
     .notNull()
@@ -198,8 +201,11 @@ export const siteSettings = pgTable("site_settings", {
   favicon: text("favicon"),
   contactEmail: text("contact_email").notNull().default("hello@luckysaroj.com"),
   contactPhone: text("contact_phone").notNull().default("+91 12345 67890"),
+  whatsapp: text("whatsapp"),
   location: text("location").notNull().default("India"),
   availability: text("availability").notNull().default("Freelance / Full-time / Remote"),
+  paymentTerms: text("payment_terms"),
+  turnaroundTime: text("turnaround_time"),
   // Homepage
   heroHeading: text("hero_heading").notNull().default("LUCKY SAROJ"),
   heroSubheading: text("hero_subheading").notNull().default("VIDEO EDITOR & VISUAL STORYTELLER"),
@@ -216,6 +222,7 @@ export const siteSettings = pgTable("site_settings", {
     "I transform ideas and raw footage into powerful visual stories that engage, inspire and leave a lasting impact."
   ),
   instagramUrl: text("instagram_url"),
+  twitterUrl: text("twitter_url"),
   youtubeUrl: text("youtube_url"),
   linkedinUrl: text("linkedin_url"),
   behanceUrl: text("behance_url"),

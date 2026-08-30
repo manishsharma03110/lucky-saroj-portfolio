@@ -7,14 +7,29 @@ async function seed() {
   // ---- Admin user -----------------------------------------------------
   const existingAdmin = (await db.select().from(schema.adminUsers))[0];
   if (!existingAdmin) {
-    const passwordHash = await bcrypt.hash("LuckySaroj@2026", 10);
+    const bootstrapEmail = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
+    const bootstrapPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
+
+    if (!bootstrapEmail || !bootstrapPassword) {
+      throw new Error(
+        "Admin bootstrap requires ADMIN_BOOTSTRAP_EMAIL and ADMIN_BOOTSTRAP_PASSWORD when no administrator exists."
+      );
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bootstrapEmail)) {
+      throw new Error("ADMIN_BOOTSTRAP_EMAIL must be a valid email address.");
+    }
+    if (bootstrapPassword.length < 12) {
+      throw new Error("ADMIN_BOOTSTRAP_PASSWORD must be at least 12 characters long.");
+    }
+
+    const passwordHash = await bcrypt.hash(bootstrapPassword, 10);
     await db.insert(schema.adminUsers)
       .values({
-        email: "admin@luckysaroj.com",
+        email: bootstrapEmail,
         name: "Lucky Saroj",
         passwordHash,
       });
-    console.log("Created admin user: admin@luckysaroj.com / LuckySaroj@2026");
+    console.log("Created bootstrap administrator.");
   }
 
   // ---- Site settings (singleton) --------------------------------------

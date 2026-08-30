@@ -54,7 +54,7 @@ Your portfolio website is now fully set up, configured, and running on your loca
   - site_settings
 
 - **Sample Data Seeded**:
-  - ✅ Admin user created: `admin@luckysaroj.com` / `LuckySaroj@2026`
+  - ✅ Administrator bootstrap uses environment-supplied credentials
   - ✅ Site settings initialized with default values
   - ✅ Sample portfolio projects (4 projects)
   - ✅ Sample services, skills, tools, and testimonials
@@ -79,8 +79,8 @@ Your portfolio website is now fully set up, configured, and running on your loca
 - **URL**: http://localhost:3000/admin/login
 - **Status**: ✅ RUNNING
 - **Credentials**:
-  - Email: `admin@luckysaroj.com`
-  - Password: `LuckySaroj@2026`
+  - Supply `ADMIN_BOOTSTRAP_EMAIL` and `ADMIN_BOOTSTRAP_PASSWORD` only when
+    provisioning an initial administrator; never commit or document real values.
 - **Features** (available after login):
   - Manage portfolio projects
   - Edit site settings
@@ -303,8 +303,8 @@ npm run db:seed
 
 **Issue**: Admin login not working
 ```bash
-# Verify credentials: admin@luckysaroj.com / LuckySaroj@2026
-# Re-seed if needed:
+# Verify the separately managed administrator credentials.
+# Seed only when explicitly approved; it does not reset an existing password:
 npm run db:seed
 ```
 

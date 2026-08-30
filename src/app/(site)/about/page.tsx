@@ -4,25 +4,34 @@ import { AboutStats } from "@/components/about/AboutStats";
 import { Skills } from "@/components/about/Skills";
 import { Journey } from "@/components/about/Journey";
 import { AboutCTA } from "@/components/about/AboutCTA";
-import { getAboutProfile, getAboutSkills, getAboutTools, getExperiences } from "@/lib/db/queries";
+import {
+  getAboutProfile,
+  getAboutSkills,
+  getAboutTools,
+  getExperiences,
+  getSiteSettings,
+} from "@/lib/db/queries";
 
 export const metadata: Metadata = { title: "About" };
 
 export default async function AboutPage() {
-  const [profile, skills, tools, experiences] = await Promise.all([
+  const [profile, skills, tools, experiences, settings] = await Promise.all([
     getAboutProfile(),
     getAboutSkills(),
     getAboutTools(),
     getExperiences(),
+    getSiteSettings(),
   ]);
 
   return (
-    <>
+    <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
       <AboutHero
-        name={profile?.name ?? "Lucky Saroj"}
+        name={profile?.name ?? ""}
         headline={profile?.headline}
         biography={profile?.biography}
         profileImageUrl={profile?.profileImageUrl}
+        location={settings?.location}
+        availability={settings?.availability}
       />
       <AboutStats
         years={profile?.yearsExperience ?? 0}
@@ -30,9 +39,9 @@ export default async function AboutPage() {
         clients={profile?.clientCount ?? 0}
         views={profile?.viewsGenerated ?? "0"}
       />
-      <Skills skills={skills} tools={tools} />
+      <Skills biography={profile?.biography} skills={skills} tools={tools} />
       <Journey experiences={experiences} />
       <AboutCTA />
-    </>
+    </main>
   );
 }

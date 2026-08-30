@@ -1,11 +1,26 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 
 type CursorLabel = null | "watch" | "play";
 
 const CursorContext = createContext<{ setLabel: (label: CursorLabel) => void } | null>(null);
+const CURSOR_MEDIA_QUERY = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
+
+function subscribeToCursorMediaQuery(onStoreChange: () => void) {
+  const mediaQuery = window.matchMedia(CURSOR_MEDIA_QUERY);
+  mediaQuery.addEventListener("change", onStoreChange);
+  return () => mediaQuery.removeEventListener("change", onStoreChange);
+}
+
+function getCursorMediaQuerySnapshot() {
+  return window.matchMedia(CURSOR_MEDIA_QUERY).matches;
+}
+
+function getServerCursorMediaQuerySnapshot() {
+  return false;
+}
 
 /**
  * Wrap a page (or section) in this to enable the custom cursor. Automatically
@@ -16,20 +31,16 @@ const CursorContext = createContext<{ setLabel: (label: CursorLabel) => void } |
  */
 export function CustomCursorProvider({ children }: { children: ReactNode }) {
   const [label, setLabel] = useState<CursorLabel>(null);
-  const [enabled, setEnabled] = useState(false);
+  const enabled = useSyncExternalStore(
+    subscribeToCursorMediaQuery,
+    getCursorMediaQuerySnapshot,
+    getServerCursorMediaQuerySnapshot
+  );
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const springX = useSpring(x, { damping: 30, stiffness: 400, mass: 0.5 });
   const springY = useSpring(y, { damping: 30, stiffness: 400, mass: 0.5 });
   const bodyClassAdded = useRef(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px) and (hover: hover) and (pointer: fine)");
-    setEnabled(mq.matches);
-    const onChange = (e: MediaQueryListEvent) => setEnabled(e.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -70,7 +81,7 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
             className="flex items-center justify-center rounded-full"
           >
             {label && (
-              <span className="cine-eyebrow !text-[0.6rem] !text-[#0a0a0b]">
+              <span className="cine-eyebrow !text-[0.6rem] !text-[var(--background-primary)]">
                 {label.toUpperCase()}
               </span>
             )}

@@ -54,9 +54,9 @@ npm run db:studio
 
 | Field | Value |
 |-------|-------|
-| Email | `admin@luckysaroj.com` |
-| Password | `LuckySaroj@2026` |
-| Change Password | Via admin settings (admin/settings) |
+| Bootstrap login | Supplied through `ADMIN_BOOTSTRAP_EMAIL` and `ADMIN_BOOTSTRAP_PASSWORD` |
+| Credential storage | Never commit or document real values |
+| Change Password | No in-app password-change screen currently exists |
 
 ---
 
@@ -169,9 +169,9 @@ npm run dev -- -p 3001
 # Re-seed the database:
 npm run db:seed
 
-# This will recreate the admin user:
-# Email: admin@luckysaroj.com
-# Password: LuckySaroj@2026
+# Bootstrap creation requires ADMIN_BOOTSTRAP_EMAIL and
+# ADMIN_BOOTSTRAP_PASSWORD when no administrator exists.
+# It does not overwrite an existing administrator password.
 ```
 
 ### Issue: Database table doesn't exist after changes

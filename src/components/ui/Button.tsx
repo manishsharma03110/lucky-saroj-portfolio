@@ -7,7 +7,7 @@ type Variant = "primary" | "secondary" | "ghost" | "cine-outline" | "cine-solid"
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-[var(--color-accent)] text-white hover:bg-[#b3661f] shadow-[0_1px_0_rgba(0,0,0,0.05)]",
+    "bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] active:bg-[var(--accent-active)] shadow-[0_1px_0_rgba(0,0,0,0.05)]",
   secondary:
     "bg-transparent text-[var(--color-ink)] border border-[var(--color-ink)]/20 hover:border-[var(--color-ink)]/50",
   ghost: "bg-transparent text-[var(--color-ink)] hover:text-[var(--color-accent)]",
@@ -16,7 +16,7 @@ const variantClasses: Record<Variant, string> = {
   "cine-outline":
     "bg-transparent text-[var(--cine-text-primary)] border border-[var(--cine-border-strong)] hover:border-[var(--cine-accent)] hover:text-[var(--cine-accent)]",
   "cine-solid":
-    "bg-[var(--cine-accent)] text-[#0a0a0b] hover:brightness-110",
+    "bg-[var(--accent-primary)] text-white hover:bg-[var(--accent-hover)] active:bg-[var(--accent-active)]",
 };
 
 const base =

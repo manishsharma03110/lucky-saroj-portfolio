@@ -20,28 +20,45 @@ export function SettingsForm({ settings }: { settings?: Settings }) {
       <FormCard title="General">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <Label htmlFor="siteName">Site Name</Label>
-            <Input id="siteName" name="siteName" defaultValue={settings?.siteName ?? "Lucky Saroj"} required />
-          </div>
-          <div>
             <Label htmlFor="logoText">Logo Text</Label>
             <Input id="logoText" name="logoText" defaultValue={settings?.logoText ?? "LS"} maxLength={10} required />
           </div>
+        </div>
+      </FormCard>
+
+      <FormCard title="Contact & Professional Details">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <Label htmlFor="contactEmail">Contact Email</Label>
+            <Label htmlFor="siteName">Display Name</Label>
+            <Input id="siteName" name="siteName" defaultValue={settings?.siteName ?? "Lucky Saroj"} required />
+          </div>
+          <div>
+            <Label htmlFor="contactEmail">Email</Label>
             <Input id="contactEmail" name="contactEmail" type="email" defaultValue={settings?.contactEmail ?? ""} required />
           </div>
           <div>
-            <Label htmlFor="contactPhone">Contact Phone</Label>
-            <Input id="contactPhone" name="contactPhone" defaultValue={settings?.contactPhone ?? ""} />
+            <Label htmlFor="contactPhone">Phone</Label>
+            <Input id="contactPhone" name="contactPhone" type="tel" defaultValue={settings?.contactPhone ?? ""} />
+          </div>
+          <div>
+            <Label htmlFor="whatsapp">WhatsApp</Label>
+            <Input id="whatsapp" name="whatsapp" inputMode="tel" defaultValue={settings?.whatsapp ?? ""} />
           </div>
           <div>
             <Label htmlFor="location">Location</Label>
             <Input id="location" name="location" defaultValue={settings?.location ?? ""} />
           </div>
+          <div className="sm:col-span-2">
+            <Label htmlFor="availability">Availability</Label>
+            <Input id="availability" name="availability" placeholder="Available for freelance projects" defaultValue={settings?.availability ?? ""} />
+          </div>
           <div>
-            <Label htmlFor="availability">Available For</Label>
-            <Input id="availability" name="availability" defaultValue={settings?.availability ?? ""} />
+            <Label htmlFor="paymentTerms">Payment Terms</Label>
+            <Textarea id="paymentTerms" name="paymentTerms" rows={3} placeholder="50% advance, remaining on final delivery" defaultValue={settings?.paymentTerms ?? ""} />
+          </div>
+          <div>
+            <Label htmlFor="turnaroundTime">Turnaround Time</Label>
+            <Textarea id="turnaroundTime" name="turnaroundTime" rows={3} placeholder="Typically 3–7 working days depending on scope" defaultValue={settings?.turnaroundTime ?? ""} />
           </div>
         </div>
       </FormCard>
@@ -79,31 +96,38 @@ export function SettingsForm({ settings }: { settings?: Settings }) {
         </div>
       </FormCard>
 
-      <FormCard title="Footer & Social">
+      <FormCard title="Footer">
         <div>
           <Label htmlFor="footerDescription">Footer Description</Label>
           <Textarea id="footerDescription" name="footerDescription" rows={2} defaultValue={settings?.footerDescription ?? ""} />
         </div>
+      </FormCard>
+
+      <FormCard title="Social Links">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="instagramUrl">Instagram URL</Label>
-            <Input id="instagramUrl" name="instagramUrl" defaultValue={settings?.instagramUrl ?? ""} />
+            <Input id="instagramUrl" name="instagramUrl" type="url" defaultValue={settings?.instagramUrl ?? ""} />
+          </div>
+          <div>
+            <Label htmlFor="twitterUrl">X / Twitter URL</Label>
+            <Input id="twitterUrl" name="twitterUrl" type="url" defaultValue={settings?.twitterUrl ?? ""} />
           </div>
           <div>
             <Label htmlFor="youtubeUrl">YouTube URL</Label>
-            <Input id="youtubeUrl" name="youtubeUrl" defaultValue={settings?.youtubeUrl ?? ""} />
+            <Input id="youtubeUrl" name="youtubeUrl" type="url" defaultValue={settings?.youtubeUrl ?? ""} />
           </div>
           <div>
             <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
-            <Input id="linkedinUrl" name="linkedinUrl" defaultValue={settings?.linkedinUrl ?? ""} />
+            <Input id="linkedinUrl" name="linkedinUrl" type="url" defaultValue={settings?.linkedinUrl ?? ""} />
           </div>
           <div>
             <Label htmlFor="behanceUrl">Behance URL</Label>
-            <Input id="behanceUrl" name="behanceUrl" defaultValue={settings?.behanceUrl ?? ""} />
+            <Input id="behanceUrl" name="behanceUrl" type="url" defaultValue={settings?.behanceUrl ?? ""} />
           </div>
           <div>
             <Label htmlFor="vimeoUrl">Vimeo URL</Label>
-            <Input id="vimeoUrl" name="vimeoUrl" defaultValue={settings?.vimeoUrl ?? ""} />
+            <Input id="vimeoUrl" name="vimeoUrl" type="url" defaultValue={settings?.vimeoUrl ?? ""} />
           </div>
         </div>
       </FormCard>

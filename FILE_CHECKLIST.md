@@ -36,9 +36,8 @@
 | File | Purpose | Status | Customization |
 |------|---------|--------|--------------|
 | `home/Hero.tsx` | Main hero section | ✅ Ready | Data from DB |
-| `home/ValueStrip.tsx` | 4 value propositions | ✅ Ready | Data from DB |
 | `home/SelectedWork.tsx` | Featured projects | ✅ Ready | Add via admin |
-| `home/ServicesPreview.tsx` | Services showcase | ✅ Ready | Add via admin |
+| `home/EditingStyles.tsx` | Home services showcase | ✅ Ready | Add via admin |
 | `home/CTA.tsx` | Call-to-action section | ✅ Ready | Data from DB |
 
 #### Portfolio Section
@@ -52,7 +51,7 @@
 |------|---------|--------|--------------|
 | `about/AboutHero.tsx` | About introduction | ✅ Ready | Update in admin |
 | `about/AboutStats.tsx` | Stats display | ✅ Ready | Data from DB |
-| `about/ExperienceTimeline.tsx` | Work experience | ✅ Ready | Add via admin |
+| `about/Journey.tsx` | Work experience | ✅ Ready | Add via admin |
 | `about/Skills.tsx` | Skills display | ✅ Ready | Add via admin |
 
 #### Contact Section
@@ -64,7 +63,7 @@
 #### Testimonials
 | File | Purpose | Status | Customization |
 |------|---------|--------|--------------|
-| `testimonials/TestimonialCard.tsx` | Testimonial display | ✅ Ready | Add via admin |
+| `home/TestimonialsPreview.tsx` | Testimonial display | ✅ Ready | Add via admin |
 
 #### Layout
 | File | Purpose | Status | Customization |
@@ -160,8 +159,8 @@ These handle create/update/delete operations and are called from admin forms:
 1. **Login to Admin Dashboard**:
    ```
    http://localhost:3000/admin/login
-   Email: admin@luckysaroj.com
-   Password: LuckySaroj@2026
+    Use the environment-supplied administrator bootstrap credentials. Never
+    commit or document real values.
    ```
 
 2. **Update Site Settings** (appears on all pages):

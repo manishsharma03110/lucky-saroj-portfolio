@@ -2,16 +2,33 @@
 
 :root {
   /* Core palette — sampled from the approved Figma global styles panel */
-  --color-ink: #15130f;         /* near-black — nav, footer, dark surfaces */
-  --color-ink-soft: #2c2820;    /* secondary dark text on paper */
-  --color-paper: #faf7f0;       /* warm off-white page background */
-  --color-paper-dim: #f1ece1;   /* slightly deeper cream for section bands */
-  --color-card: #ffffff;
-  --color-line: #e7e0d1;        /* hairline borders on paper */
-  --color-line-dark: #35312a;   /* hairline borders on ink */
-  --color-accent: #c9752f;      /* warm amber / burnt-orange — primary CTA */
-  --color-accent-soft: #f4e3d1;
-  --color-muted: #7a7263;
+  --background-primary: #08090b;
+  --background-secondary: #0d0f13;
+  --surface-primary: #121419;
+  --surface-elevated: #181b22;
+  --text-primary: #f5f7fa;
+  --text-secondary: #9298a3;
+  --text-muted: #626975;
+  --accent-primary: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-active: #2563eb;
+  --border-primary: #242832;
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.16);
+  --border-accent: rgba(59, 130, 246, 0.5);
+  --accent-soft: rgba(59, 130, 246, 0.08);
+  --accent-glow: rgba(59, 130, 246, 0.14);
+
+  --color-ink: var(--background-primary);
+  --color-ink-soft: var(--surface-elevated);
+  --color-paper: var(--background-primary);
+  --color-paper-dim: var(--background-secondary);
+  --color-card: var(--surface-primary);
+  --color-line: var(--border-primary);
+  --color-line-dark: var(--border-hover);
+  --color-accent: var(--accent-primary);
+  --color-accent-soft: var(--accent-soft);
+  --color-muted: var(--text-secondary);
 
   --font-display: var(--font-poppins);
   --font-body: var(--font-inter);
@@ -37,8 +54,8 @@
 }
 
 body {
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--background-primary);
+  color: var(--text-primary);
   font-family: var(--font-body);
 }
 
@@ -107,23 +124,22 @@ h1, h2, h3, h4, h5, .font-display {
    ========================================================================== */
 :root {
   /* Surfaces */
-  --cine-void: #0a0a0b;           /* primary near-black background */
-  --cine-surface: #131316;        /* elevated surface — cards, panels */
-  --cine-surface-2: #1b1b1f;      /* further-elevated surface — hover states */
+  --cine-void: var(--background-primary);
+  --cine-surface: var(--surface-primary);
+  --cine-surface-2: var(--surface-elevated);
 
   /* Typography */
-  --cine-text-primary: #f5f4f2;   /* off-white primary text */
-  --cine-text-secondary: #9a9a9f; /* muted gray secondary text */
-  --cine-text-tertiary: #616166;  /* dim tertiary text — timestamps, meta */
+  --cine-text-primary: var(--text-primary);
+  --cine-text-secondary: var(--text-secondary);
+  --cine-text-tertiary: var(--text-muted);
 
-  /* One controlled accent — same warm-amber family as the brand's existing
-     accent, refined slightly for a more premium/cinematic tone. */
-  --cine-accent: #e2823d;
-  --cine-accent-soft: rgba(226, 130, 61, 0.12);
+  /* Controlled electric-blue accent for public interactive states. */
+  --cine-accent: var(--accent-primary);
+  --cine-accent-soft: var(--accent-soft);
 
   /* Hairlines */
-  --cine-border: rgba(255, 255, 255, 0.08);
-  --cine-border-strong: rgba(255, 255, 255, 0.16);
+  --cine-border: var(--border-soft);
+  --cine-border-strong: var(--border-hover);
 
   /* Radii — moderate, not excessive */
   --cine-radius-sm: 6px;
@@ -215,4 +231,3 @@ h1, h2, h3, h4, h5, .font-display {
     transform: translateX(-50%);
   }
 }
-

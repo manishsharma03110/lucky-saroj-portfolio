@@ -6,7 +6,7 @@ import { contactSchema } from "@/lib/validations/contact";
 export type ContactFormState = {
   status: "idle" | "success" | "error";
   message?: string;
-  fieldErrors?: Partial<Record<"name" | "email" | "phone" | "projectType" | "budgetRange" | "message", string>>;
+  fieldErrors?: Partial<Record<"name" | "email" | "phone" | "projectType" | "budgetRange" | "videoType" | "projectTimeline" | "referenceUrl" | "message", string>>;
 };
 
 export async function submitContactForm(
@@ -19,6 +19,9 @@ export async function submitContactForm(
     phone: String(formData.get("phone") ?? ""),
     projectType: String(formData.get("projectType") ?? ""),
     budgetRange: String(formData.get("budgetRange") ?? ""),
+    videoType: String(formData.get("videoType") ?? ""),
+    projectTimeline: String(formData.get("projectTimeline") ?? ""),
+    referenceUrl: String(formData.get("referenceUrl") ?? ""),
     message: String(formData.get("message") ?? ""),
   };
 
@@ -32,15 +35,18 @@ export async function submitContactForm(
     return { status: "error", message: "Please fix the errors below.", fieldErrors };
   }
 
-  const { name, email, phone, projectType, budgetRange, message } = parsed.data;
+  const { name, email, phone, projectType, budgetRange, videoType, projectTimeline, referenceUrl, message } = parsed.data;
 
   try {
     await db.insert(schema.contactMessages).values({
       name,
       email,
-      phone,
-      projectType: projectType || null,
-      budgetRange: budgetRange || null,
+      phone: phone || null,
+      projectType,
+      budgetRange,
+      videoType,
+      projectTimeline: projectTimeline || null,
+      referenceUrl: referenceUrl || null,
       message,
       status: "new",
     });

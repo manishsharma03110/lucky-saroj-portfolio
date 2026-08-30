@@ -47,15 +47,19 @@ Visit `http://localhost:3000` for the public site and
 
 **`.env` values you need:**
 - `DATABASE_URL` — your Postgres connection string (e.g. from Neon's
-  dashboard: Connect to your database → copy the connection string).
+  dashboard: Connect to your database → copy the connection string). Hosted
+  Neon production must use the pooled endpoint with `sslmode=verify-full`.
 - `AUTH_SECRET` — generate one with:
   `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+- `ADMIN_BOOTSTRAP_EMAIL` and `ADMIN_BOOTSTRAP_PASSWORD` — required by
+  `npm run db:seed` only when no administrator exists. Use unique values and
+  never commit real credentials. The password must be at least 12 characters.
 
-**Seeded admin login:** `admin@luckysaroj.com` / `LuckySaroj@2026`
-— change this before going live. There's no in-app "change password" screen
-in this build, so update it directly via `npm run db:studio` or a short
-script using the same bcrypt hashing already wired up in
-`src/lib/db/seed.ts`.
+The bootstrap secret is for initial provisioning, not a permanent shared
+password. Rotate production credentials separately and remove the bootstrap
+password from the environment when it is no longer needed. The seed remains
+idempotent and does not overwrite an existing administrator password. There is
+currently no in-app password-change or password-reset screen.
 
 ## Project structure
 
@@ -119,15 +123,17 @@ edits made in the CMS show up immediately without a redeploy.
    the connection string from the dashboard.
 3. Go to [vercel.com](https://vercel.com), import the GitHub repo. Vercel
    auto-detects Next.js — no custom build config needed.
-4. Before the first deploy, add two Environment Variables in the Vercel
+4. Before the first deploy, add Environment Variables in the Vercel
    project settings: `DATABASE_URL` (your Neon connection string) and
-   `AUTH_SECRET` (generate a fresh one — don't reuse a dev value).
+   `AUTH_SECRET` (generate a fresh one — don't reuse a dev value). Supply
+   `ADMIN_BOOTSTRAP_EMAIL` and `ADMIN_BOOTSTRAP_PASSWORD` only for an
+   explicitly approved initial administrator bootstrap; never commit them.
 5. Deploy.
 6. From your own machine, point your local `.env`'s `DATABASE_URL` at the
-   same Neon database, then run `npm run db:push` followed by
-   `npm run db:seed` once. This creates the tables and seeds your admin user
-   + sample content in the live database — your deployed site will
-   immediately show the seeded content.
+   same database and use the reviewed migration and provisioning procedure.
+   Run `npm run db:seed` only when database seeding has been explicitly
+   approved. It requires the bootstrap variables when no administrator exists
+   and will not replace an existing administrator password.
 
 ## Scripts
 

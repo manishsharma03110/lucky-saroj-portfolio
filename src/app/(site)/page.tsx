@@ -1,35 +1,30 @@
-import { Hero } from "@/components/home/Hero";
-import { SkillsMarquee } from "@/components/home/SkillsMarquee";
-import { SelectedWork } from "@/components/home/SelectedWork";
-import { EditingStyles } from "@/components/home/EditingStyles";
-import { ShowreelSection } from "@/components/home/ShowreelSection";
-import { WhyWorkWithMe } from "@/components/home/WhyWorkWithMe";
-import { Process } from "@/components/home/Process";
 import { AboutPreview } from "@/components/home/AboutPreview";
-import { TestimonialsPreview } from "@/components/home/TestimonialsPreview";
+import { EditingStyles } from "@/components/home/EditingStyles";
 import { FinalCTA } from "@/components/home/FinalCTA";
-import { getSiteSettings } from "@/lib/db/queries";
+import { Hero } from "@/components/home/Hero";
+import { SelectedWork } from "@/components/home/SelectedWork";
+import { ShowreelSection } from "@/components/home/ShowreelSection";
+import { TestimonialsPreview } from "@/components/home/TestimonialsPreview";
+import { getFeaturedShowreel, getSiteSettings } from "@/lib/db/queries";
 
 export default async function HomePage() {
-  const settings = await getSiteSettings();
+  const [settings, showreel] = await Promise.all([getSiteSettings(), getFeaturedShowreel()]);
 
   return (
-    <>
+    <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
       <Hero
-        heading={settings?.heroHeading ?? "LUCKY SAROJ"}
-        subheading={settings?.heroSubheading ?? "VIDEO EDITOR & VISUAL STORYTELLER"}
+        heading={settings?.heroHeading ?? settings?.siteName ?? ""}
+        subheading={settings?.heroSubheading ?? ""}
         description={settings?.heroDescription ?? ""}
         heroImageUrl={settings?.heroImageUrl}
+        hasShowreel={Boolean(showreel?.videoUrl)}
       />
-      <SkillsMarquee />
       <SelectedWork />
+      <ShowreelSection showreel={showreel} />
       <EditingStyles />
-      <ShowreelSection />
-      <WhyWorkWithMe />
-      <Process />
       <AboutPreview />
       <TestimonialsPreview />
       <FinalCTA />
-    </>
+    </main>
   );
 }

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { Label, Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import { getSafeAdminCallbackUrl } from "@/lib/auth/safe-callback-url";
 
 export function LoginForm() {
   const router = useRouter();
@@ -26,7 +27,7 @@ export function LoginForm() {
         return;
       }
 
-      const callbackUrl = searchParams.get("callbackUrl") || "/admin/dashboard";
+      const callbackUrl = getSafeAdminCallbackUrl(searchParams.get("callbackUrl"));
       router.push(callbackUrl);
       router.refresh();
     });

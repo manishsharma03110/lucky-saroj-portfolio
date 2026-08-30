@@ -26,7 +26,11 @@ export async function updateSettings(_prev: ActionState, formData: FormData): Pr
   const data = parsed.data;
   const values = {
     ...data,
+    whatsapp: data.whatsapp || null,
+    paymentTerms: data.paymentTerms || null,
+    turnaroundTime: data.turnaroundTime || null,
     instagramUrl: data.instagramUrl || null,
+    twitterUrl: data.twitterUrl || null,
     youtubeUrl: data.youtubeUrl || null,
     linkedinUrl: data.linkedinUrl || null,
     behanceUrl: data.behanceUrl || null,
@@ -41,5 +45,7 @@ export async function updateSettings(_prev: ActionState, formData: FormData): Pr
   }
 
   revalidatePath("/", "layout");
+  revalidatePath("/contact");
+  revalidatePath("/admin/settings");
   return { status: "success", message: "Settings updated." };
 }

@@ -43,11 +43,12 @@ export function MessageListItem({ message }: { message: ContactMessage }) {
           <DeleteButton confirmText={`Delete message from ${message.name}?`} onDelete={() => deleteMessage(message.id)} />
         </div>
       </div>
-      {(message.projectType || message.budgetRange) && (
+      {(message.projectType || message.videoType || message.budgetRange || message.projectTimeline) && (
         <p className="mb-2 text-xs text-[var(--color-muted)]">
-          {[message.projectType, message.budgetRange].filter(Boolean).join(" · ")}
+          {[message.projectType, message.videoType, message.budgetRange, message.projectTimeline].filter(Boolean).join(" · ")}
         </p>
       )}
+      {message.referenceUrl && <a href={message.referenceUrl} target="_blank" rel="noreferrer" className="mb-2 block break-all text-xs text-[var(--color-accent)] underline">Reference link</a>}
       <p className="text-sm text-[var(--color-ink-soft)]">{message.message}</p>
     </div>
   );

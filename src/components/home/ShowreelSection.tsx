@@ -1,58 +1,31 @@
-import { Container } from "@/components/ui/Container";
-import { Section } from "@/components/ui/Section";
-import { SectionHeading } from "@/components/ui/SectionHeading";
-import { MediaFrame } from "@/components/ui/MediaFrame";
 import { VideoPlayer } from "@/components/ui/VideoPlayer";
-import { getFeaturedShowreel } from "@/lib/db/queries";
+import type { getFeaturedShowreel } from "@/lib/db/queries";
 
-export async function ShowreelSection() {
-  const showreel = await getFeaturedShowreel();
-  // Gracefully hide rather than showing broken/empty content, exactly as
-  // the previous implementation did — behavior unchanged, styling updated.
+export function ShowreelSection({ showreel }: { showreel: Awaited<ReturnType<typeof getFeaturedShowreel>> }) {
   if (!showreel?.videoUrl) return null;
 
   return (
-    <Section id="showreel" spacing="lg" className="scroll-mt-24 bg-[var(--cine-void)]">
-      <Container>
-        <SectionHeading
-          eyebrow="00:00:45:00 — FEATURED SHOWREEL"
-          title={showreel.title}
-          align="center"
-          className="mx-auto mb-12"
-        />
-
-        <div className="relative mx-auto max-w-5xl">
-          {/* Faint accent glow behind the frame — grounds the video as the
-              visual centerpiece of the section without adding a literal
-              gradient inside the media itself. */}
-          <div
-            className="pointer-events-none absolute -inset-8 -z-10 opacity-40 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, rgba(226,130,61,0.18), transparent 65%)",
-            }}
-            aria-hidden
-          />
-
-          <MediaFrame
-            aspect="aspect-video"
-            overlay={
-              showreel.duration ? (
-                <span className="cine-eyebrow absolute bottom-4 right-4 rounded-sm border border-white/20 bg-black/50 px-2 py-1 !text-white backdrop-blur-sm">
-                  {showreel.duration}
-                </span>
-              ) : undefined
-            }
-          >
-            <VideoPlayer
-              videoUrl={showreel.videoUrl}
-              posterUrl={showreel.thumbnailUrl}
-              title={showreel.title}
-              className="h-full w-full"
-            />
-          </MediaFrame>
+    <section id="showreel" className="scroll-mt-24 bg-[var(--background-primary)] py-16 md:py-20 lg:py-28">
+      <div className="mx-auto w-full max-w-[1360px] px-5 sm:px-8 lg:px-12">
+        <div className="mb-8 grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.5fr)] lg:items-end lg:gap-12">
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Featured showreel</p>
+            <h2 className="max-w-4xl font-display text-[clamp(2.25rem,4.5vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-[var(--text-primary)]">
+              {showreel.title}
+            </h2>
+          </div>
+          {showreel.duration && <p className="max-w-md text-sm uppercase tracking-[0.16em] text-[var(--text-muted)]">Runtime · {showreel.duration}</p>}
         </div>
-      </Container>
-    </Section>
+
+        <div className="relative aspect-video overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_28px_90px_rgba(0,0,0,0.32)]">
+          <VideoPlayer
+            videoUrl={showreel.videoUrl}
+            posterUrl={showreel.thumbnailUrl}
+            title={showreel.title}
+            className="h-full w-full"
+          />
+        </div>
+      </div>
+    </section>
   );
 }
