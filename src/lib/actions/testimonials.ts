@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
+import { requirePermission } from "@/lib/auth/authorization";
 import { testimonialSchema } from "@/lib/validations/testimonial";
 import type { ActionState } from "./portfolio";
 
@@ -20,7 +20,7 @@ function parseForm(formData: FormData) {
 }
 
 export async function createTestimonial(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("testimonials.create");
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: { clientName: parsed.error.issues[0]?.message ?? "Invalid input" } };
@@ -42,7 +42,7 @@ export async function createTestimonial(_prev: ActionState, formData: FormData):
 }
 
 export async function updateTestimonial(id: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("testimonials.update");
   const parsed = parseForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: { clientName: parsed.error.issues[0]?.message ?? "Invalid input" } };
@@ -65,7 +65,7 @@ export async function updateTestimonial(id: string, _prev: ActionState, formData
 }
 
 export async function deleteTestimonial(id: string): Promise<void> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("testimonials.delete");
   await db.delete(schema.testimonials).where(eq(schema.testimonials.id, id));
   revalidatePath("/admin/testimonials");
   revalidatePath("/");

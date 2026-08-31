@@ -4,9 +4,9 @@ import { before, mock, test } from "node:test";
 let authorizationFailure: Error | null = null;
 let mutationCalls = 0;
 
-mock.module("@/lib/auth/admin", {
+mock.module("@/lib/auth/authorization", {
   namedExports: {
-    requireAuthenticatedAdmin: async () => {
+    requirePermission: async () => {
       if (authorizationFailure) throw authorizationFailure;
       return { id: "11111111-1111-4111-8111-111111111111", email: "admin@example.invalid", name: "Admin" };
     },

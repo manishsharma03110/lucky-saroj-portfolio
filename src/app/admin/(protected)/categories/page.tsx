@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { db, schema } from "@/lib/db";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { CategoryForm } from "@/components/admin/CategoryForm";
 import { DeleteCategoryButton } from "@/components/admin/DeleteCategoryButton";
+import { requirePermission } from "@/lib/auth/authorization";
+import { AuthorizationError } from "@/lib/auth/authorization-core";
 
 export const metadata: Metadata = { title: "Categories" };
 
 export default async function AdminCategoriesPage() {
+  await requirePermission("categories.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
   const categories = await db.select().from(schema.portfolioCategories).orderBy(schema.portfolioCategories.displayOrder);
 
   return (

@@ -1,5 +1,6 @@
 import { db, schema } from "./index";
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 
 async function seed() {
   console.log("Seeding database...");
@@ -7,6 +8,8 @@ async function seed() {
   // ---- Admin user -----------------------------------------------------
   const existingAdmin = (await db.select().from(schema.adminUsers))[0];
   if (!existingAdmin) {
+    const superAdminRole = (await db.select({ id: schema.roles.id }).from(schema.roles).where(eq(schema.roles.key, "SUPER_ADMIN")).limit(1))[0];
+    if (!superAdminRole) throw new Error("RBAC migration must be applied before administrator bootstrap.");
     const bootstrapEmail = process.env.ADMIN_BOOTSTRAP_EMAIL?.trim().toLowerCase();
     const bootstrapPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
 
@@ -28,6 +31,7 @@ async function seed() {
         email: bootstrapEmail,
         name: "Lucky Saroj",
         passwordHash,
+        roleId: superAdminRole.id,
       });
     console.log("Created bootstrap administrator.");
   }

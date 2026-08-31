@@ -1,8 +1,8 @@
 import { handleUpload } from "@vercel/blob/client";
-import { requireAdminForApi } from "@/lib/auth/admin";
+import { requirePermissionForApi } from "@/lib/auth/authorization";
 import { createUploadHandler } from "./handler";
 
 export const POST = createUploadHandler({
-  authorizeAdmin: requireAdminForApi,
+  authorizeAdmin: () => requirePermissionForApi("media.upload"),
   handleBlobUpload: handleUpload,
 });

@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { db, schema } from "@/lib/db";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { AboutForm } from "@/components/admin/AboutForm";
+import { requirePermission } from "@/lib/auth/authorization";
+import { AuthorizationError } from "@/lib/auth/authorization-core";
 
 export const metadata: Metadata = { title: "About Me" };
 
 export default async function AdminAboutPage() {
+  await requirePermission("about.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
   const profileRows = await db.select().from(schema.aboutProfile);
   const profile = profileRows[0];
   const skills = await db.select().from(schema.aboutSkills).orderBy(schema.aboutSkills.displayOrder);

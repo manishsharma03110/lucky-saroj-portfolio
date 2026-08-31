@@ -17,33 +17,35 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
+import type { PermissionKey } from "@/lib/auth/permissions";
 
 const NAV_SECTIONS = [
   {
     label: "Content Management",
     items: [
-      { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-      { label: "Portfolio", href: "/admin/portfolio", icon: FolderKanban },
-      { label: "Categories", href: "/admin/categories", icon: Tags },
-      { label: "Experience", href: "/admin/experience", icon: Briefcase },
-      { label: "Services", href: "/admin/services", icon: Wrench },
-      { label: "About Me", href: "/admin/about", icon: UserCircle },
-      { label: "Showreel", href: "/admin/showreel", icon: Film },
-      { label: "Testimonials", href: "/admin/testimonials", icon: MessageSquareText },
+      { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
+      { label: "Portfolio", href: "/admin/portfolio", icon: FolderKanban, permission: "portfolio.read" },
+      { label: "Categories", href: "/admin/categories", icon: Tags, permission: "categories.read" },
+      { label: "Experience", href: "/admin/experience", icon: Briefcase, permission: "experience.read" },
+      { label: "Services", href: "/admin/services", icon: Wrench, permission: "services.read" },
+      { label: "About Me", href: "/admin/about", icon: UserCircle, permission: "about.read" },
+      { label: "Showreel", href: "/admin/showreel", icon: Film, permission: "showreel.read" },
+      { label: "Testimonials", href: "/admin/testimonials", icon: MessageSquareText, permission: "testimonials.read" },
     ],
   },
   {
     label: "Communication",
-    items: [{ label: "Messages", href: "/admin/messages", icon: Mail }],
+    items: [{ label: "Messages", href: "/admin/messages", icon: Mail, permission: "messages.read" }],
   },
   {
     label: "System",
-    items: [{ label: "Settings", href: "/admin/settings", icon: Settings }],
+    items: [{ label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings.read" }],
   },
 ];
 
-export function AdminSidebar({ userName }: { userName?: string | null }) {
+export function AdminSidebar({ userName, permissions }: { userName?: string | null; permissions: PermissionKey[] }) {
   const pathname = usePathname();
+  const allowed = new Set(permissions);
 
   return (
     <aside className="flex h-screen w-64 shrink-0 flex-col border-r border-[var(--color-line)] bg-white">
@@ -66,7 +68,7 @@ export function AdminSidebar({ userName }: { userName?: string | null }) {
               {section.label}
             </p>
             <ul className="space-y-1">
-              {section.items.map((item) => {
+              {section.items.filter((item) => allowed.has(item.permission as PermissionKey)).map((item) => {
                 const active = pathname === item.href || pathname.startsWith(item.href + "/");
                 const Icon = item.icon;
                 return (

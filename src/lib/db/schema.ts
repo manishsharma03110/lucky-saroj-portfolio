@@ -1,5 +1,35 @@
-import { pgTable, text, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { pgTable, text, integer, boolean, timestamp, primaryKey, index, check } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
+
+export const roles = pgTable("roles", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  key: text("key").notNull().unique(),
+  label: text("label").notNull(),
+  trustLevel: integer("trust_level").notNull().unique(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  check("roles_trust_level_nonnegative", sql`${table.trustLevel} >= 0`),
+]);
+
+export const permissions = pgTable("permissions", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  key: text("key").notNull().unique(),
+  resource: text("resource").notNull(),
+  action: text("action").notNull(),
+  description: text("description").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  check("permissions_key_matches_parts", sql`${table.key} = ${table.resource} || '.' || ${table.action}`),
+  check("permissions_key_format", sql`${table.key} ~ '^[a-z][a-z0-9_]*\\.[a-z][a-z0-9_]*$'`),
+]);
+
+export const rolePermissions = pgTable("role_permissions", {
+  roleId: text("role_id").notNull().references(() => roles.id, { onDelete: "cascade" }),
+  permissionId: text("permission_id").notNull().references(() => permissions.id, { onDelete: "cascade" }),
+}, (table) => [
+  primaryKey({ columns: [table.roleId, table.permissionId] }),
+  index("role_permissions_permission_id_idx").on(table.permissionId),
+]);
 
 // ---------------------------------------------------------------------------
 // AdminUser
@@ -11,8 +41,11 @@ export const adminUsers = pgTable("admin_users", {
   passwordHash: text("password_hash").notNull(),
   sessionVersion: integer("session_version").notNull().default(1),
   isActive: boolean("is_active").notNull().default(true),
+  roleId: text("role_id").notNull().references(() => roles.id, { onDelete: "restrict" }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (table) => [
+  index("admin_users_role_id_idx").on(table.roleId),
+]);
 
 // ---------------------------------------------------------------------------
 // PortfolioCategory

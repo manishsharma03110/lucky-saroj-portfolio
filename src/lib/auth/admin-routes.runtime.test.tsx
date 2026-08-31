@@ -9,6 +9,9 @@ class RedirectSignal extends Error {}
 mock.module("@/lib/auth/admin", {
   namedExports: { getCurrentAdmin: async () => currentAdmin },
 });
+mock.module("@/lib/auth/authorization", {
+  namedExports: { getAuthorizationContext: async () => ({ admin: currentAdmin, role: "SUPER_ADMIN", permissions: new Set(["dashboard.view"]) }) },
+});
 mock.module("next/navigation", {
   namedExports: {
     redirect: (target: string) => {

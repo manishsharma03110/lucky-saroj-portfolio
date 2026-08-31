@@ -1,13 +1,17 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { desc } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { TestimonialForm } from "@/components/admin/TestimonialForm";
 import { TestimonialListItem } from "@/components/admin/TestimonialListItem";
+import { requirePermission } from "@/lib/auth/authorization";
+import { AuthorizationError } from "@/lib/auth/authorization-core";
 
 export const metadata: Metadata = { title: "Testimonials" };
 
 export default async function AdminTestimonialsPage() {
+  await requirePermission("testimonials.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
   const testimonials = await db.select().from(schema.testimonials).orderBy(desc(schema.testimonials.createdAt));
 
   return (

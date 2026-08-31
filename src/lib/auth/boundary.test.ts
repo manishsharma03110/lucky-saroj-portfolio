@@ -16,13 +16,13 @@ const protectedActions = [
   "testimonials.ts",
 ];
 
-test("all protected action modules use centralized revalidation", () => {
+test("all protected action modules use centralized permission authorization", () => {
   let authorizationCalls = 0;
   for (const filename of protectedActions) {
     const source = fs.readFileSync(path.join(root, "src/lib/actions", filename), "utf8");
-    assert.match(source, /import \{ requireAuthenticatedAdmin \} from "@\/lib\/auth\/admin";/);
+    assert.match(source, /import \{ requirePermission \} from "@\/lib\/auth\/authorization";/);
     assert.doesNotMatch(source, /function requireAdmin|await auth\(\)|session\?\.user/);
-    authorizationCalls += source.match(/await requireAuthenticatedAdmin\(\);/g)?.length ?? 0;
+    authorizationCalls += source.match(/await requirePermission\("[a-z_]+\.[a-z_]+"\);/g)?.length ?? 0;
   }
   assert.equal(authorizationCalls, 20);
 });
@@ -30,13 +30,13 @@ test("all protected action modules use centralized revalidation", () => {
 test("public contact submission remains intentionally public", () => {
   const source = fs.readFileSync(path.join(root, "src/lib/actions/contact.ts"), "utf8");
   assert.match(source, /export async function submitContactForm/);
-  assert.doesNotMatch(source, /requireAuthenticatedAdmin|requireAdminForApi/);
+  assert.doesNotMatch(source, /requireAuthenticatedAdmin|requireAdminForApi|requirePermission/);
 });
 
 test("upload API rejects requests through centralized API authorization", () => {
   const routeSource = fs.readFileSync(path.join(root, "src/app/api/upload/route.ts"), "utf8");
   const handlerSource = fs.readFileSync(path.join(root, "src/app/api/upload/handler.ts"), "utf8");
-  assert.match(routeSource, /authorizeAdmin: requireAdminForApi/);
+  assert.match(routeSource, /authorizeAdmin: \(\) => requirePermissionForApi\("media\.upload"\)/);
   assert.match(routeSource, /handleBlobUpload: handleUpload/);
   assert.match(handlerSource, /const authorization = await authorizeAdmin\(\)/);
   assert.match(handlerSource, /if \(!authorization\.ok\) return authorization\.response/);

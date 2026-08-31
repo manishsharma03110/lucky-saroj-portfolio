@@ -2,12 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { db, schema } from "@/lib/db";
-import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
+import { requirePermission } from "@/lib/auth/authorization";
 import { settingsSchema } from "@/lib/validations/settings";
 import type { ActionState } from "./portfolio";
 
 export async function updateSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("settings.update");
   const raw = Object.fromEntries(formData.entries());
   const parsed = settingsSchema.safeParse(raw);
   if (!parsed.success) {

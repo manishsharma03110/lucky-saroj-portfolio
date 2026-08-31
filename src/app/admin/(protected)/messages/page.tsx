@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { desc } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { MessageListItem } from "@/components/admin/MessageListItem";
+import { requirePermission } from "@/lib/auth/authorization";
+import { AuthorizationError } from "@/lib/auth/authorization-core";
 
 export const metadata: Metadata = { title: "Messages" };
 
 export default async function AdminMessagesPage() {
+  await requirePermission("messages.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
   const messages = await db.select().from(schema.contactMessages).orderBy(desc(schema.contactMessages.createdAt));
 
   return (

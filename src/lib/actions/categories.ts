@@ -3,12 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
+import { requirePermission } from "@/lib/auth/authorization";
 import { categorySchema } from "@/lib/validations/category";
 import type { ActionState } from "./portfolio";
 
 export async function createCategory(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("categories.create");
   const parsed = categorySchema.safeParse({
     name: formData.get("name"),
     slug: formData.get("slug"),
@@ -31,7 +31,7 @@ export async function createCategory(_prev: ActionState, formData: FormData): Pr
 }
 
 export async function deleteCategory(id: string): Promise<void> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("categories.delete");
   await db.delete(schema.portfolioCategories).where(eq(schema.portfolioCategories.id, id));
   revalidatePath("/admin/categories");
   revalidatePath("/portfolio");

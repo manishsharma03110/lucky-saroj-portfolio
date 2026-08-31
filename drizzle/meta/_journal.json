@@ -22,6 +22,13 @@
       "when": 1788100745727,
       "tag": "0002_admin_auth_revalidation",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788160017202,
+      "tag": "0003_roles_permissions",
+      "breakpoints": true
     }
   ]
 }

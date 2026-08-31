@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
-import { requireAuthenticatedAdmin } from "@/lib/auth/admin";
+import { requirePermission } from "@/lib/auth/authorization";
 import { projectSchema } from "@/lib/validations/project";
 
 export type ActionState = {
@@ -44,7 +44,7 @@ function fieldErrorsFrom(issues: { path: PropertyKey[]; message: string }[]) {
 }
 
 export async function createProject(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("portfolio.create");
   const parsed = parseProjectForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
@@ -90,7 +90,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
 }
 
 export async function updateProject(id: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("portfolio.update");
   const parsed = parseProjectForm(formData);
   if (!parsed.success) {
     return { status: "error", message: "Please fix the errors below.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
@@ -138,7 +138,7 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
 }
 
 export async function deleteProject(id: string): Promise<void> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("portfolio.delete");
   await db.delete(schema.portfolioProjects).where(eq(schema.portfolioProjects.id, id));
   revalidatePath("/admin/portfolio");
   revalidatePath("/portfolio");
@@ -146,7 +146,7 @@ export async function deleteProject(id: string): Promise<void> {
 }
 
 export async function toggleProjectFeatured(id: string, isFeatured: boolean): Promise<void> {
-  await requireAuthenticatedAdmin();
+  await requirePermission("portfolio.update");
   await db.update(schema.portfolioProjects).set({ isFeatured }).where(eq(schema.portfolioProjects.id, id));
   revalidatePath("/admin/portfolio");
   revalidatePath("/portfolio");

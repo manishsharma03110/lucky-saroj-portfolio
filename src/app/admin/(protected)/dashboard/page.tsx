@@ -1,13 +1,17 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { FolderKanban, Star, MessageSquareText, MessageCircle, Plus } from "lucide-react";
 import { db, schema } from "@/lib/db";
 import { desc, eq } from "drizzle-orm";
 import { Button } from "@/components/ui/Button";
+import { requirePermission } from "@/lib/auth/authorization";
+import { AuthorizationError } from "@/lib/auth/authorization-core";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function AdminDashboardPage() {
+  await requirePermission("dashboard.view").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
   const [allProjects, featuredRows, allMessages, allTestimonials, recentProjects, recentMessages] = await Promise.all([
     db.select().from(schema.portfolioProjects),
     db.select().from(schema.portfolioProjects).where(eq(schema.portfolioProjects.isFeatured, true)),

@@ -1,15 +1,19 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Plus, Pencil, ExternalLink } from "lucide-react";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/lib/db";
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { Button } from "@/components/ui/Button";
 import { PortfolioRowActions, DeleteProjectButton } from "@/components/admin/PortfolioRowActions";
+import { requirePermission } from "@/lib/auth/authorization";
+import { AuthorizationError } from "@/lib/auth/authorization-core";
 
 export const metadata: Metadata = { title: "Manage Portfolio" };
 
 export default async function AdminPortfolioListPage() {
+  await requirePermission("portfolio.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
   const rows = await db
     .select({ project: schema.portfolioProjects, category: schema.portfolioCategories })
     .from(schema.portfolioProjects)
