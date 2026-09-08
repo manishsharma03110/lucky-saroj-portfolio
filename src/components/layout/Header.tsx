@@ -44,8 +44,8 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-ink)] text-white">
-      <Container className="flex h-20 items-center justify-between">
-        <Link href="/" className="flex items-center gap-3">
+      <Container className="flex h-16 max-w-[1560px] items-center justify-between px-5 sm:h-[4.5rem] sm:px-8 lg:h-20 lg:px-12">
+        <Link href="/" className="flex min-h-11 items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-md border border-white/20 font-display text-sm font-bold">
             {logoText}
           </span>
@@ -57,7 +57,7 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
+        <nav className="hidden items-center gap-7 xl:gap-9 lg:flex" aria-label="Primary">
           {NAV_LINKS.map((link) => {
             const active = isActive(link.href);
             return (
@@ -66,7 +66,7 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "text-sm font-medium transition-colors hover:text-[var(--color-accent)]",
+                  "text-[0.9375rem] font-medium transition-colors hover:text-[var(--color-accent)]",
                   active ? "text-[var(--color-accent)]" : "text-white/80"
                 )}
               >
@@ -85,7 +85,7 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
         <button
           ref={menuButtonRef}
           type="button"
-          className="rounded-md p-2 text-white transition-colors hover:text-[var(--color-accent)] lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-md text-white transition-colors hover:text-[var(--color-accent)] lg:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="mobile-navigation"

@@ -2,15 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
-import { db, schema } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/authorization";
 import { projectSchema } from "@/lib/validations/project";
+import { revisionSchema } from "@/lib/validations/revision";
+import { createPortfolioProject, deletePortfolioProject, togglePortfolioFeatured, updatePortfolioProject } from "@/lib/db/portfolio-service";
+import { ContentNotFoundError, DuplicateContentError, DuplicateSlugError, StaleRevisionError } from "@/lib/db/mutation-errors";
+import { fieldErrorsFromIssues, InvalidActionInputError, SAFE_VALIDATION_MESSAGE } from "@/lib/validations/action-errors";
+import { entityIdSchema } from "@/lib/validations/identifiers";
+import { strictBooleanSchema } from "@/lib/validations/booleans";
+import { MediaAssetBindingError, MediaAssetNotAttachableError, MediaAssetNotFoundError } from "@/lib/db/media-asset-service";
 
 export type ActionState = {
   status: "idle" | "success" | "error";
   message?: string;
   fieldErrors?: Record<string, string>;
+  revision?: number;
 };
 
 function parseProjectForm(formData: FormData) {
@@ -25,8 +31,10 @@ function parseProjectForm(formData: FormData) {
     approach: formData.get("approach") ?? "",
     result: formData.get("result") ?? "",
     thumbnailUrl: formData.get("thumbnailUrl") ?? "",
-        videoUrl: (formData.get("videoUrl") as string) || (formData.get("externalVideoUrl") as string) || "",
-    isFeatured: formData.get("isFeatured") === "on",
+    thumbnailAssetId: formData.get("thumbnailAssetId") ?? "",
+    videoUrl: (formData.get("videoUrl") as string) || (formData.get("externalVideoUrl") as string) || "",
+    videoAssetId: formData.get("videoAssetId") ?? "",
+    isFeatured: formData.get("isFeatured"),
     status: formData.get("status"),
     seoTitle: formData.get("seoTitle") ?? "",
     seoDescription: formData.get("seoDescription") ?? "",
@@ -34,53 +42,21 @@ function parseProjectForm(formData: FormData) {
   });
 }
 
-function fieldErrorsFrom(issues: { path: PropertyKey[]; message: string }[]) {
-  const out: Record<string, string> = {};
-  for (const issue of issues) {
-    const key = String(issue.path[0] ?? "form");
-    if (!out[key]) out[key] = issue.message;
-  }
-  return out;
-}
-
 export async function createProject(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requirePermission("portfolio.create");
   const parsed = parseProjectForm(formData);
   if (!parsed.success) {
-    return { status: "error", message: "Please fix the errors below.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
+    return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: fieldErrorsFromIssues(parsed.error.issues) };
   }
   const data = parsed.data;
 
-  const existingRows = await db.select().from(schema.portfolioProjects).where(eq(schema.portfolioProjects.slug, data.slug));
-  if (existingRows[0]) {
-    return { status: "error", message: "A project with this slug already exists.", fieldErrors: { slug: "Slug already in use" } };
-  }
-
-  const inserted = await db
-    .insert(schema.portfolioProjects)
-    .values({
-      title: data.title,
-      slug: data.slug,
-      clientName: data.clientName || null,
-      year: data.year ?? null,
-      categoryId: data.categoryId || null,
-      description: data.description || null,
-      challenge: data.challenge || null,
-      approach: data.approach || null,
-      result: data.result || null,
-      thumbnailUrl: data.thumbnailUrl || null,
-      videoUrl: data.videoUrl || null,
-      isFeatured: !!data.isFeatured,
-      status: data.status,
-      seoTitle: data.seoTitle || null,
-      seoDescription: data.seoDescription || null,
-    })
-    .returning();
-  const row = inserted[0];
-
   const tools = (data.tools ?? "").split(",").map((t) => t.trim()).filter(Boolean);
-  for (const tool of tools) {
-    await db.insert(schema.projectTools).values({ projectId: row.id, name: tool });
+  try { await createPortfolioProject({ ...data, tools }); }
+  catch (error) {
+    if (error instanceof DuplicateSlugError) return { status: "error", message: error.message, fieldErrors: { slug: "Slug already in use" } };
+    if (error instanceof DuplicateContentError) return { status: "error", message: error.message, fieldErrors: { tools: error.message } };
+    if (error instanceof MediaAssetBindingError || error instanceof MediaAssetNotAttachableError || error instanceof MediaAssetNotFoundError) return { status: "error", message: "Uploaded media is invalid or no longer available." };
+    throw error;
   }
 
   revalidatePath("/admin/portfolio");
@@ -91,43 +67,23 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
 
 export async function updateProject(id: string, _prev: ActionState, formData: FormData): Promise<ActionState> {
   await requirePermission("portfolio.update");
+  const parsedId = entityIdSchema.safeParse(id);
   const parsed = parseProjectForm(formData);
+  const revision = revisionSchema.safeParse(formData.get("revision"));
+  if (!parsedId.success) return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { id: "Invalid project." } };
   if (!parsed.success) {
-    return { status: "error", message: "Please fix the errors below.", fieldErrors: fieldErrorsFrom(parsed.error.issues) };
+    return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: fieldErrorsFromIssues(parsed.error.issues) };
   }
   const data = parsed.data;
-
-  const existingRows = await db.select().from(schema.portfolioProjects).where(eq(schema.portfolioProjects.slug, data.slug));
-  const existing = existingRows[0];
-  if (existing && existing.id !== id) {
-    return { status: "error", message: "A project with this slug already exists.", fieldErrors: { slug: "Slug already in use" } };
-  }
-
-  await db.update(schema.portfolioProjects)
-    .set({
-      title: data.title,
-      slug: data.slug,
-      clientName: data.clientName || null,
-      year: data.year ?? null,
-      categoryId: data.categoryId || null,
-      description: data.description || null,
-      challenge: data.challenge || null,
-      approach: data.approach || null,
-      result: data.result || null,
-      thumbnailUrl: data.thumbnailUrl || null,
-      videoUrl: data.videoUrl || null,
-      isFeatured: !!data.isFeatured,
-      status: data.status,
-      seoTitle: data.seoTitle || null,
-      seoDescription: data.seoDescription || null,
-      updatedAt: new Date(),
-    })
-    .where(eq(schema.portfolioProjects.id, id));
-
-  await db.delete(schema.projectTools).where(eq(schema.projectTools.projectId, id));
+  if (!revision.success) return { status: "error", message: "Invalid content revision. Reload before saving." };
   const tools = (data.tools ?? "").split(",").map((t) => t.trim()).filter(Boolean);
-  for (const tool of tools) {
-    await db.insert(schema.projectTools).values({ projectId: id, name: tool });
+  try { await updatePortfolioProject(parsedId.data, revision.data, { ...data, tools }); }
+  catch (error) {
+    if (error instanceof DuplicateSlugError) return { status: "error", message: error.message, fieldErrors: { slug: "Slug already in use" } };
+    if (error instanceof DuplicateContentError) return { status: "error", message: error.message, fieldErrors: { tools: error.message } };
+    if (error instanceof MediaAssetBindingError || error instanceof MediaAssetNotAttachableError || error instanceof MediaAssetNotFoundError) return { status: "error", message: "Uploaded media is invalid or no longer available." };
+    if (error instanceof StaleRevisionError || error instanceof ContentNotFoundError) return { status: "error", message: error.message };
+    throw error;
   }
 
   revalidatePath("/admin/portfolio");
@@ -139,16 +95,24 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
 
 export async function deleteProject(id: string): Promise<void> {
   await requirePermission("portfolio.delete");
-  await db.delete(schema.portfolioProjects).where(eq(schema.portfolioProjects.id, id));
+  const parsedId = entityIdSchema.safeParse(id);
+  if (!parsedId.success) throw new InvalidActionInputError();
+  await deletePortfolioProject(parsedId.data);
   revalidatePath("/admin/portfolio");
   revalidatePath("/portfolio");
   revalidatePath("/");
 }
 
-export async function toggleProjectFeatured(id: string, isFeatured: boolean): Promise<void> {
+export async function toggleProjectFeatured(id: string, expectedRevision: number, isFeatured: boolean): Promise<{ revision: number }> {
   await requirePermission("portfolio.update");
-  await db.update(schema.portfolioProjects).set({ isFeatured }).where(eq(schema.portfolioProjects.id, id));
+  const parsedId = entityIdSchema.safeParse(id);
+  const parsedRevision = revisionSchema.safeParse(expectedRevision);
+  const parsedFeatured = strictBooleanSchema.safeParse(isFeatured);
+  if (!parsedId.success || !parsedFeatured.success) throw new InvalidActionInputError();
+  if (!parsedRevision.success) throw new StaleRevisionError();
+  const revision = await togglePortfolioFeatured(parsedId.data, parsedRevision.data, parsedFeatured.data);
   revalidatePath("/admin/portfolio");
   revalidatePath("/portfolio");
   revalidatePath("/");
+  return { revision };
 }

@@ -3,6 +3,7 @@
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { deleteExperience } from "@/lib/actions/experience";
 import type { schema } from "@/lib/db";
+import { ExperienceForm } from "./ExperienceForm";
 
 type Experience = typeof schema.experiences.$inferSelect;
 
@@ -20,6 +21,10 @@ export function ExperienceListItem({ experience }: { experience: Experience }) {
         )}
       </div>
       <DeleteButton confirmText={`Delete "${experience.role}" at ${experience.company}?`} onDelete={() => deleteExperience(experience.id)} />
+      <details className="basis-full">
+        <summary className="cursor-pointer text-sm text-[var(--color-accent)]">Edit</summary>
+        <div className="mt-3"><ExperienceForm experience={experience} /></div>
+      </details>
     </div>
   );
 }

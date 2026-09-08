@@ -14,18 +14,19 @@ type Showreel = typeof schema.showreels.$inferSelect;
 
 const initialState: ActionState = { status: "idle" };
 
-export function ShowreelForm({ showreel }: { showreel?: Showreel }) {
+export function ShowreelForm({ showreel, mediaAssetIds }: { showreel?: Showreel; mediaAssetIds?: Partial<Record<"thumbnail" | "video", string>> }) {
   const [state, formAction, pending] = useActionState(upsertShowreel, initialState);
 
   return (
     <form action={formAction}>
+      <input type="hidden" name="revision" value={showreel?.revision ?? ""} />
       <FormCard title="Showreel Details">
         <div>
           <Label htmlFor="title">Title</Label>
           <Input id="title" name="title" defaultValue={showreel?.title ?? "Showreel"} required />
         </div>
-                <FileUpload name="thumbnailUrl" label="Showreel Thumbnail" kind="image" defaultValue={showreel?.thumbnailUrl} />
-        <FileUpload name="videoUrl" label="Showreel Video" kind="video" defaultValue={showreel?.videoUrl} />
+                <FileUpload name="thumbnailUrl" assetIdName="thumbnailAssetId" label="Showreel Thumbnail" kind="image" defaultValue={showreel?.thumbnailUrl} defaultAssetId={mediaAssetIds?.thumbnail} />
+        <FileUpload name="videoUrl" assetIdName="videoAssetId" label="Showreel Video" kind="video" defaultValue={showreel?.videoUrl} defaultAssetId={mediaAssetIds?.video} />
         <div>
           <Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label>
           <Input

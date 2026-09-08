@@ -29,6 +29,27 @@
       "when": 1788160017202,
       "tag": "0003_roles_permissions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788203232619,
+      "tag": "0004_phase3e_content_invariants",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788341139504,
+      "tag": "0005_media_asset_ownership",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788705315985,
+      "tag": "0006_site_settings_hero_media_ownership",
+      "breakpoints": true
     }
   ]
 }

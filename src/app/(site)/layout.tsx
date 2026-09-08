@@ -10,11 +10,11 @@ export const dynamic = "force-dynamic";
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings();
   return (
-    <>
+    <div className="public-site contents">
       <Header logoText={settings?.logoText} siteName={settings?.siteName} />
       <main className="flex-1">{children}</main>
       <Footer />
       <ContactPopup />
-    </>
+    </div>
   );
 }

@@ -1,19 +1,23 @@
 "use server";
 
 import { db, schema } from "@/lib/db";
-import { contactSchema } from "@/lib/validations/contact";
+import { getServices } from "@/lib/db/queries";
+import { createContactSubmissionHandler, type ContactFormState, type ContactSubmissionDependencies, type RawContactSubmission } from "@/lib/contact/contact-submission";
 
-export type ContactFormState = {
-  status: "idle" | "success" | "error";
-  message?: string;
-  fieldErrors?: Partial<Record<"name" | "email" | "phone" | "projectType" | "budgetRange" | "videoType" | "projectTimeline" | "referenceUrl" | "message", string>>;
+export type { ContactFormState } from "@/lib/contact/contact-submission";
+
+const dependencies: ContactSubmissionDependencies = {
+  readActiveServiceNames: async () => (await getServices()).map((service) => service.name),
+  createMessage: async (message) => {
+    await db.insert(schema.contactMessages).values({ ...message, status: "new" });
+  },
 };
 
-export async function submitContactForm(
-  _prevState: ContactFormState,
-  formData: FormData
-): Promise<ContactFormState> {
-  const raw = {
+const handlePopupContactSubmission = createContactSubmissionHandler("popup", dependencies);
+const handleFullContactSubmission = createContactSubmissionHandler("full", dependencies);
+
+function contactSubmissionFromFormData(formData: FormData): RawContactSubmission {
+  return {
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
     phone: String(formData.get("phone") ?? ""),
@@ -23,39 +27,14 @@ export async function submitContactForm(
     projectTimeline: String(formData.get("projectTimeline") ?? ""),
     referenceUrl: String(formData.get("referenceUrl") ?? ""),
     message: String(formData.get("message") ?? ""),
+    honeypot: String(formData.get("website") ?? ""),
   };
+}
 
-  const parsed = contactSchema.safeParse(raw);
-  if (!parsed.success) {
-    const fieldErrors: ContactFormState["fieldErrors"] = {};
-    for (const issue of parsed.error.issues) {
-      const field = issue.path[0] as keyof NonNullable<ContactFormState["fieldErrors"]>;
-      if (field) fieldErrors[field] = issue.message;
-    }
-    return { status: "error", message: "Please fix the errors below.", fieldErrors };
-  }
+export async function submitPopupContactForm(_prevState: ContactFormState, formData: FormData): Promise<ContactFormState> {
+  return handlePopupContactSubmission(contactSubmissionFromFormData(formData));
+}
 
-  const { name, email, phone, projectType, budgetRange, videoType, projectTimeline, referenceUrl, message } = parsed.data;
-
-  try {
-    await db.insert(schema.contactMessages).values({
-      name,
-      email,
-      phone: phone || null,
-      projectType,
-      budgetRange,
-      videoType,
-      projectTimeline: projectTimeline || null,
-      referenceUrl: referenceUrl || null,
-      message,
-      status: "new",
-    });
-  } catch {
-    return {
-      status: "error",
-      message: "Something went wrong sending your message. Please try again.",
-    };
-  }
-
-  return { status: "success", message: "Thanks — your message has been sent. I'll be in touch soon." };
+export async function submitFullContactForm(_prevState: ContactFormState, formData: FormData): Promise<ContactFormState> {
+  return handleFullContactSubmission(contactSubmissionFromFormData(formData));
 }

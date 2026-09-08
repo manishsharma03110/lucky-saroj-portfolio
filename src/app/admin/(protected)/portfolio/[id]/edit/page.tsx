@@ -22,11 +22,13 @@ export default async function EditProjectPage({
 
   const tools = await db.select().from(schema.projectTools).where(eq(schema.projectTools.projectId, id));
   const categories = await db.select().from(schema.portfolioCategories).orderBy(schema.portfolioCategories.displayOrder);
+  const mediaReferences = await db.select({ slot: schema.mediaAssetReferences.slot, assetId: schema.mediaAssetReferences.assetId }).from(schema.mediaAssetReferences).where(eq(schema.mediaAssetReferences.portfolioProjectId, id));
+  const mediaAssetIds = Object.fromEntries(mediaReferences.map((reference) => [reference.slot, reference.assetId]));
 
   return (
     <div>
       <AdminPageHeader title="Edit Project" description={project.title} />
-      <ProjectForm project={project} tools={tools} categories={categories} />
+      <ProjectForm project={project} tools={tools} categories={categories} mediaAssetIds={mediaAssetIds} />
     </div>
   );
 }

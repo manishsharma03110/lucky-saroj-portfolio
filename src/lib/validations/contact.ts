@@ -1,15 +1,67 @@
 import { z } from "zod";
+import { boundedContactEmailSchema } from "./email";
+import { budgetRangeSchema, popupProjectTypeSchema, projectTimelineSchema, videoTypeSchema } from "./contact-options";
+import { externalWebUrlSchema } from "./urls";
 
-export const contactSchema = z.object({
-  name: z.string().trim().min(2, "Please enter your name").max(120),
-  email: z.string().trim().email("Please enter a valid email address"),
-  phone: z.string().trim().max(20).refine((value) => !value || value.replace(/\D/g, "").length >= 10, "Please enter a valid phone number"),
-  projectType: z.string().trim().min(1, "Please select a project category").max(120),
-  budgetRange: z.string().trim().min(1, "Please select a budget range").max(120),
-  videoType: z.string().trim().min(1, "Please select a video type").max(120),
-  projectTimeline: z.string().trim().max(120).optional().or(z.literal("")),
-  referenceUrl: z.string().trim().url("Please enter a valid reference URL").max(500).optional().or(z.literal("")),
-  message: z.string().trim().min(10, "Tell me a bit more about your project").max(4000),
+export const CONTACT_NAME_MAX_LENGTH = 120;
+export const CONTACT_PHONE_MAX_LENGTH = 20;
+export const CONTACT_PROJECT_TYPE_MAX_LENGTH = 120;
+export const CONTACT_MESSAGE_MAX_LENGTH = 4000;
+export const CONTACT_REFERENCE_URL_MAX_LENGTH = 500;
+export const CONTACT_HONEYPOT_MAX_LENGTH = 200;
+
+const singleLineText = (maximum: number) => z.string().trim().max(maximum).refine(
+  (value) => !/[\u0000-\u001f\u007f]/.test(value),
+  "Please remove unsupported control characters."
+);
+
+const phoneSchema = singleLineText(CONTACT_PHONE_MAX_LENGTH).refine(
+  (value) => !value || value.replace(/\D/g, "").length >= 10,
+  "Please enter a valid phone number"
+);
+
+const messageSchema = z.string().trim()
+  .min(10, "Tell me a bit more about your project")
+  .max(CONTACT_MESSAGE_MAX_LENGTH)
+  .refine((value) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value), "Please remove unsupported control characters.");
+
+const optionalTimelineSchema = z.union([z.literal(""), projectTimelineSchema]);
+const boundedReferenceUrlSchema = externalWebUrlSchema.refine(
+  (value) => value.length <= CONTACT_REFERENCE_URL_MAX_LENGTH,
+  `Reference URL must be at most ${CONTACT_REFERENCE_URL_MAX_LENGTH} characters.`
+);
+const optionalReferenceUrlSchema = z.union([z.literal(""), boundedReferenceUrlSchema]);
+const honeypotSchema = z.string().max(CONTACT_HONEYPOT_MAX_LENGTH);
+
+const commonContactFields = {
+  name: singleLineText(CONTACT_NAME_MAX_LENGTH).min(2, "Please enter your name"),
+  email: boundedContactEmailSchema,
+  message: messageSchema,
+  honeypot: honeypotSchema,
+};
+
+export const popupContactSchema = z.object({
+  ...commonContactFields,
+  formContext: z.literal("popup"),
+  phone: phoneSchema.min(1, "Please enter your phone number"),
+  projectType: popupProjectTypeSchema,
+  budgetRange: budgetRangeSchema,
+  videoType: z.string().max(CONTACT_PROJECT_TYPE_MAX_LENGTH),
+  projectTimeline: z.literal(""),
+  referenceUrl: z.literal(""),
 });
+
+export const fullContactStructuralSchema = z.object({
+  ...commonContactFields,
+  formContext: z.literal("full"),
+  phone: phoneSchema,
+  projectType: singleLineText(CONTACT_PROJECT_TYPE_MAX_LENGTH).min(1, "Please select a project category"),
+  budgetRange: budgetRangeSchema,
+  videoType: videoTypeSchema,
+  projectTimeline: optionalTimelineSchema,
+  referenceUrl: optionalReferenceUrlSchema,
+});
+
+export const contactSchema = z.discriminatedUnion("formContext", [popupContactSchema, fullContactStructuralSchema]);
 
 export type ContactInput = z.infer<typeof contactSchema>;

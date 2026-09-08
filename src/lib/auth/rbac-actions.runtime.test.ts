@@ -5,6 +5,14 @@ class Denied extends Error {}
 let seen: string | null = null;
 mock.module("@/lib/auth/authorization", { namedExports: { requirePermission: async (permission: string) => { seen = permission; throw new Denied(); } } });
 mock.module("@/lib/db", { namedExports: { db: {}, schema: {} } });
+mock.module("@/lib/db/about-service", { namedExports: { replaceAbout: async () => 2 } });
+mock.module("@/lib/db/portfolio-service", { namedExports: { createPortfolioProject: async () => "id", updatePortfolioProject: async () => 2, togglePortfolioFeatured: async () => 2 } });
+mock.module("@/lib/db/remaining-content-service", { namedExports: {
+  createOrderedCategory: async () => "id", createOrderedExperience: async () => "id", createOrderedService: async () => "id",
+  createTestimonialRecord: async () => "id", updateExperienceRevision: async () => 2, updateMessageStatusRevision: async () => 2,
+  updateServiceRevision: async () => 2, updateTestimonialRevision: async () => 2,
+} });
+mock.module("@/lib/db/singleton-content-service", { namedExports: { updateSingletonSettings: async () => 2, upsertSingletonShowreel: async () => 2 } });
 mock.module("next/cache", { namedExports: { revalidatePath: () => {} } });
 mock.module("next/navigation", { namedExports: { redirect: () => {} } });
 

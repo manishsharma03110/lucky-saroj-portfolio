@@ -29,10 +29,12 @@ export function ProjectForm({
   project,
   tools,
   categories,
+  mediaAssetIds,
 }: {
   project?: Project;
   tools?: ProjectTool[];
   categories: Category[];
+  mediaAssetIds?: Partial<Record<"thumbnail" | "video", string>>;
 }) {
   const router = useRouter();
   const action = project ? updateProject.bind(null, project.id) : createProject;
@@ -42,6 +44,7 @@ export function ProjectForm({
 
   return (
     <form action={formAction} className="space-y-6">
+      {project && <input type="hidden" name="revision" value={project.revision} />}
       <FormCard title="Project Details">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
@@ -101,8 +104,8 @@ export function ProjectForm({
           </div>
         </div>
 
-             <FileUpload name="thumbnailUrl" label="Thumbnail Image" kind="image" defaultValue={project?.thumbnailUrl} />
-        <FileUpload name="videoUrl" label="Project Video" kind="video" defaultValue={project?.videoUrl} />
+             <FileUpload name="thumbnailUrl" assetIdName="thumbnailAssetId" label="Thumbnail Image" kind="image" defaultValue={project?.thumbnailUrl} defaultAssetId={mediaAssetIds?.thumbnail} />
+        <FileUpload name="videoUrl" assetIdName="videoAssetId" label="Project Video" kind="video" defaultValue={project?.videoUrl} defaultAssetId={mediaAssetIds?.video} />
         <p className="-mt-3 text-xs text-[var(--color-muted)]">
           Upload a video file directly, or leave empty and paste a YouTube/Vimeo link in Video URL below instead.
         </p>

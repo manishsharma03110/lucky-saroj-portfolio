@@ -39,7 +39,7 @@ export default async function AboutPage() {
         clients={profile?.clientCount ?? 0}
         views={profile?.viewsGenerated ?? "0"}
       />
-      <Skills biography={profile?.biography} skills={skills} tools={tools} />
+      <Skills skills={skills} tools={tools} />
       <Journey experiences={experiences} />
       <AboutCTA />
     </main>

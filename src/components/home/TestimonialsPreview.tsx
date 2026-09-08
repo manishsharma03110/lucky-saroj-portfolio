@@ -27,10 +27,10 @@ export async function TestimonialsPreview() {
   const [featured, secondary] = testimonials.slice(0, 2);
 
   return (
-    <section className="relative overflow-hidden bg-[var(--background-primary)] py-16 md:py-20 lg:py-24">
+    <section className="relative overflow-hidden bg-[var(--background-primary)] py-16 md:py-20 lg:py-24 2xl:py-28">
       <div className="pointer-events-none absolute right-0 top-1/3 h-80 w-80 rounded-full bg-[var(--accent-primary)]/[0.035] blur-3xl" aria-hidden />
 
-      <div className="relative mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12">
+      <div className="relative mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">
         <div className={`grid items-stretch gap-5 ${secondary ? "lg:grid-cols-[minmax(0,1.62fr)_minmax(280px,0.78fr)] lg:gap-6" : ""}`}>
           <div className="min-w-0">
             <header className="mb-8 max-w-3xl sm:mb-10">
@@ -43,7 +43,7 @@ export async function TestimonialsPreview() {
               </p>
             </header>
 
-            <article className="relative overflow-hidden border border-white/10 bg-[var(--surface-primary)] px-6 pb-7 pt-9 sm:px-9 sm:pb-9 sm:pt-11 lg:min-h-[340px] lg:px-11">
+            <article className="relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] px-6 pb-7 pt-9 shadow-[0_24px_80px_rgba(0,0,0,0.2)] sm:px-9 sm:pb-9 sm:pt-11 lg:min-h-[340px] lg:px-11">
               <span className="absolute left-0 top-0 h-1 w-28 bg-[var(--accent-primary)]" aria-hidden />
               <span className="absolute bottom-5 right-5 h-7 w-7 border-b border-r border-white/15" aria-hidden />
 
@@ -60,7 +60,7 @@ export async function TestimonialsPreview() {
           </div>
 
           {secondary && (
-            <article className="relative flex flex-col justify-between overflow-hidden border border-white/[0.08] bg-[var(--background-secondary)] px-6 py-8 sm:px-8 lg:mt-24 lg:min-h-[430px] lg:px-7 lg:py-9">
+            <article className="relative flex flex-col justify-between overflow-hidden rounded-[12px] border border-white/[0.08] bg-[var(--background-secondary)] px-6 py-8 sm:px-8 lg:mt-16 lg:min-h-[390px] lg:px-7 lg:py-9 2xl:mt-20 2xl:min-h-[420px]">
               <div>
                 <div className="flex items-center justify-between gap-4">
                   <Quote size={25} strokeWidth={1.25} className="text-[var(--accent-primary)]/80" aria-hidden />

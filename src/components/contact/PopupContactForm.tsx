@@ -2,24 +2,11 @@
 
 import { useActionState, useState, type ComponentType, type InputHTMLAttributes } from "react";
 import { ArrowRight, CheckCircle2, Mail, Phone, ShieldCheck, SquarePen, Star, User, Wallet, Zap } from "lucide-react";
-import { submitContactForm, type ContactFormState } from "@/lib/actions/contact";
-import { BUDGET_RANGES } from "./contactConfig";
+import { submitPopupContactForm, type ContactFormState } from "@/lib/actions/contact";
+import { BUDGET_RANGES, POPUP_PROJECT_TYPES } from "./contactConfig";
 import { PopupContactSelect } from "./PopupContactSelect";
 
 const initialState: ContactFormState = { status: "idle" };
-const POPUP_PROJECT_TYPES = [
-  "YouTube Video",
-  "Reels / Shorts",
-  "Brand / Commercial Video",
-  "Social Media Ad",
-  "Corporate Video",
-  "Event / Wedding Video",
-  "Podcast / Talking Head",
-  "Music Video",
-  "Documentary / Short Film",
-  "Motion Graphics",
-  "Other",
-] as const;
 const fieldClass = "min-h-[2.875rem] w-full rounded-[7px] border border-white/18 bg-black/20 py-2 pl-11 pr-4 text-xs text-white placeholder:text-white/55 transition-[border-color,box-shadow,background-color] hover:border-white/30 focus:border-[var(--accent-primary)]/80 focus:bg-[var(--surface-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/25 motion-reduce:transition-none sm:text-sm [@media(max-height:800px)]:sm:min-h-11";
 const errorClass = "mt-1.5 text-xs text-red-300";
 type PopupIcon = ComponentType<{ size?: number; className?: string; "aria-hidden"?: boolean }>;
@@ -29,7 +16,7 @@ function PopupField({ id, name, label, icon: Icon, error, ...props }: { id: stri
 }
 
 export function PopupContactForm() {
-  const [state, formAction, pending] = useActionState(submitContactForm, initialState);
+  const [state, formAction, pending] = useActionState(submitPopupContactForm, initialState);
   const [projectType, setProjectType] = useState("");
   const [budget, setBudget] = useState("");
 
@@ -39,6 +26,7 @@ export function PopupContactForm() {
 
   return (
     <form action={formAction} className="relative -mt-px space-y-2 bg-[linear-gradient(to_bottom,var(--background-primary)_0%,var(--background-primary)_4rem)] px-5 pb-4 pt-2 sm:px-7 sm:pb-5 [@media(max-height:800px)]:sm:space-y-1.5 [@media(max-height:800px)]:sm:pb-3" aria-label="Project inquiry form">
+      <div hidden aria-hidden="true"><label htmlFor="popup-website">Website</label><input id="popup-website" name="website" type="text" tabIndex={-1} autoComplete="off" /></div>
       <input type="hidden" name="videoType" value={projectType} />
       <input type="hidden" name="budgetRange" value={budget || "Let's Discuss"} />
       <PopupField id="popup-name" name="name" label="Your Name" icon={User} placeholder="Your Name" autoComplete="name" required maxLength={120} error={state.fieldErrors?.name} />

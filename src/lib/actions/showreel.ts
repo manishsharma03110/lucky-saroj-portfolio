@@ -1,51 +1,39 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { eq } from "drizzle-orm";
-import { db, schema } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/authorization";
 import { showreelSchema } from "@/lib/validations/showreel";
+import { revisionSchema } from "@/lib/validations/revision";
+import { upsertSingletonShowreel } from "@/lib/db/singleton-content-service";
+import { ContentNotFoundError, InvalidSingletonStateError, StaleRevisionError } from "@/lib/db/mutation-errors";
 import type { ActionState } from "./portfolio";
+import { fieldErrorsFromIssues, SAFE_VALIDATION_MESSAGE } from "@/lib/validations/action-errors";
+import { MediaAssetBindingError, MediaAssetNotAttachableError, MediaAssetNotFoundError } from "@/lib/db/media-asset-service";
 
 export async function upsertShowreel(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requirePermission("showreel.update");
   const parsed = showreelSchema.safeParse({
     title: formData.get("title"),
     videoUrl: (formData.get("videoUrl") as string) || (formData.get("externalVideoUrl") as string) || "",
+    videoAssetId: formData.get("videoAssetId") ?? "",
+    thumbnailUrl: formData.get("thumbnailUrl") ?? "",
+    thumbnailAssetId: formData.get("thumbnailAssetId") ?? "",
     duration: formData.get("duration") ?? "",
-    isFeatured: formData.get("isFeatured") === "on",
+    isFeatured: formData.get("isFeatured"),
     status: formData.get("status"),
   });
-  const thumbnailUrl = (formData.get("thumbnailUrl") as string) || "";
+  const rawRevision = formData.get("revision");
+  const revision = rawRevision === "" ? null : revisionSchema.safeParse(rawRevision);
   if (!parsed.success) {
-    return { status: "error", message: "Please fix the errors below.", fieldErrors: { title: parsed.error.issues[0]?.message ?? "Invalid input" } };
+    return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: fieldErrorsFromIssues(parsed.error.issues) };
   }
-
-  const existingRows = await db.select().from(schema.showreels);
-  const existing = existingRows[0];
+  if (revision !== null && !revision.success) return { status: "error", message: "Invalid content revision. Reload before saving." };
   const data = parsed.data;
-
-  if (existing) {
-    await db.update(schema.showreels)
-      .set({
-        title: data.title,
-        videoUrl: data.videoUrl || null,
-        thumbnailUrl: thumbnailUrl || null,
-        duration: data.duration || null,
-        isFeatured: data.isFeatured ?? true,
-        status: data.status,
-      })
-      .where(eq(schema.showreels.id, existing.id));
-  } else {
-    await db.insert(schema.showreels)
-      .values({
-        title: data.title,
-        videoUrl: data.videoUrl || null,
-        thumbnailUrl: thumbnailUrl || null,
-        duration: data.duration || null,
-        isFeatured: data.isFeatured ?? true,
-        status: data.status,
-      });
+  try { await upsertSingletonShowreel({ ...data, thumbnailUrl: data.thumbnailUrl || null }, revision === null ? null : revision.data); }
+  catch (error) {
+    if (error instanceof StaleRevisionError || error instanceof ContentNotFoundError || error instanceof InvalidSingletonStateError) return { status: "error", message: error.message };
+    if (error instanceof MediaAssetBindingError || error instanceof MediaAssetNotAttachableError || error instanceof MediaAssetNotFoundError) return { status: "error", message: "Uploaded media is invalid or no longer available." };
+    throw error;
   }
 
   revalidatePath("/admin/showreel");

@@ -23,8 +23,8 @@ export async function AboutPreview() {
   ].filter((stat): stat is { value: string; label: string } => Boolean(stat.value));
 
   return (
-    <section className="overflow-hidden border-y border-white/10 bg-[var(--surface-primary)] py-16 md:py-20 lg:py-28">
-      <div className="mx-auto grid w-full max-w-[1280px] items-center gap-10 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20 lg:px-12">
+    <section className="overflow-hidden border-y border-white/10 bg-[var(--surface-primary)] py-16 md:py-20 lg:py-24 2xl:py-28">
+      <div className="mx-auto grid w-full max-w-[1480px] items-center gap-9 px-5 sm:px-8 md:gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-16 lg:px-12 2xl:gap-24 2xl:px-16">
         <div className="relative mx-auto aspect-[4/5] w-full max-w-[470px] overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-elevated)] lg:mx-0">
           {profile.profileImageUrl ? (
             <div
@@ -34,7 +34,7 @@ export async function AboutPreview() {
               aria-label={profile.name}
             />
           ) : (
-            <div className="relative flex h-full items-end bg-[radial-gradient(circle_at_62%_32%,rgba(59,130,246,0.14),transparent_38%),linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-primary)_78%)] p-7 sm:p-9">
+            <div className="relative flex h-full items-end bg-[radial-gradient(circle_at_62%_32%,var(--accent-glow),transparent_38%),linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-primary)_78%)] p-7 sm:p-9">
               <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:64px_64px]" aria-hidden />
               <span className="absolute left-6 top-6 h-8 w-8 border-l border-t border-[var(--accent-primary)]/65" aria-hidden />
               <span className="absolute bottom-6 right-6 h-8 w-8 border-b border-r border-white/20" aria-hidden />
@@ -62,9 +62,9 @@ export async function AboutPreview() {
           {stats.length > 0 && (
             <dl className="mt-8 grid grid-cols-2 border-y border-white/12 sm:grid-cols-4">
               {stats.map((stat) => (
-                <div key={stat.label} className="border-white/10 py-5 odd:border-r sm:border-r sm:px-5 sm:first:pl-0 sm:last:border-r-0">
-                  <dd className="text-2xl font-semibold tracking-[-0.04em] text-[var(--accent-primary)]">{stat.value}</dd>
-                  <dt className="mt-1 text-xs uppercase tracking-[0.18em] text-white/38">{stat.label}</dt>
+                <div key={stat.label} className="border-white/10 py-4 odd:border-r sm:border-r sm:px-5 sm:py-5 sm:first:pl-0 sm:last:border-r-0">
+                  <dd className="text-[1.75rem] font-semibold tracking-[-0.04em] text-[var(--accent-primary)] lg:text-3xl">{stat.value}</dd>
+                  <dt className="mt-1 text-[0.7rem] uppercase tracking-[0.16em] text-[var(--text-secondary)]">{stat.label}</dt>
                 </div>
               ))}
             </dl>
@@ -72,7 +72,7 @@ export async function AboutPreview() {
 
           <Link
             href="/about"
-            className="mt-9 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)]"
+            className="mt-9 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)]"
           >
             More about me
             <ArrowUpRight size={17} aria-hidden />

@@ -1,10 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db, schema } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/authorization";
 import { aboutProfileSchema } from "@/lib/validations/about";
+import { revisionSchema } from "@/lib/validations/revision";
+import { replaceAbout } from "@/lib/db/about-service";
+import { DuplicateContentError, StaleRevisionError } from "@/lib/db/mutation-errors";
 import type { ActionState } from "./portfolio";
+import { fieldErrorsFromIssues, SAFE_VALIDATION_MESSAGE } from "@/lib/validations/action-errors";
 
 export async function updateAboutProfile(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requirePermission("about.update");
@@ -19,51 +22,20 @@ export async function updateAboutProfile(_prev: ActionState, formData: FormData)
     skills: formData.get("skills") ?? "",
     tools: formData.get("tools") ?? "",
   });
+  const revision = revisionSchema.safeParse(formData.get("revision"));
 
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] = issue.message;
-    return { status: "error", message: "Please fix the errors below.", fieldErrors };
+  if (!parsed.success || !revision.success) {
+    const fieldErrors = parsed.success ? {} : fieldErrorsFromIssues(parsed.error.issues);
+    return { status: "error", message: revision.success ? SAFE_VALIDATION_MESSAGE : "Invalid content revision. Reload before saving.", fieldErrors };
   }
-
-  const existingRows = await db.select().from(schema.aboutProfile);
-  const existing = existingRows[0];
   const data = parsed.data;
-
-  if (existing) {
-    await db.update(schema.aboutProfile)
-      .set({
-        name: data.name,
-        headline: data.headline || null,
-        biography: data.biography || null,
-        yearsExperience: data.yearsExperience,
-        projectsCompleted: data.projectsCompleted,
-        clientCount: data.clientCount,
-        viewsGenerated: data.viewsGenerated,
-      });
-  } else {
-    await db.insert(schema.aboutProfile)
-      .values({
-        name: data.name,
-        headline: data.headline || null,
-        biography: data.biography || null,
-        yearsExperience: data.yearsExperience,
-        projectsCompleted: data.projectsCompleted,
-        clientCount: data.clientCount,
-        viewsGenerated: data.viewsGenerated,
-      });
-  }
-
-  await db.delete(schema.aboutSkills);
   const skills = (data.skills ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-  for (let i = 0; i < skills.length; i++) {
-    await db.insert(schema.aboutSkills).values({ name: skills[i], displayOrder: i });
-  }
-
-  await db.delete(schema.aboutTools);
   const tools = (data.tools ?? "").split(",").map((s) => s.trim()).filter(Boolean);
-  for (let i = 0; i < tools.length; i++) {
-    await db.insert(schema.aboutTools).values({ name: tools[i], displayOrder: i });
+  try {
+    await replaceAbout({ expectedRevision: revision.data, name: data.name, headline: data.headline || null, biography: data.biography || null, yearsExperience: data.yearsExperience, projectsCompleted: data.projectsCompleted, clientCount: data.clientCount, viewsGenerated: data.viewsGenerated, skills: skills.map((name, displayOrder) => ({ name, displayOrder })), tools: tools.map((name, displayOrder) => ({ name, displayOrder })) });
+  } catch (error) {
+    if (error instanceof StaleRevisionError || error instanceof DuplicateContentError) return { status: "error", message: error.message };
+    throw error;
   }
 
   revalidatePath("/admin/about");

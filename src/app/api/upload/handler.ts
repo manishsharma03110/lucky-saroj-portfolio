@@ -1,45 +1,48 @@
 import type { HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
 import type { ApiAuthorization } from "@/lib/auth/admin-api";
+import type { AuthorizePendingMediaAssetUploadInput } from "@/lib/db/media-asset-service";
+import { createStorageKey } from "@/lib/media/ownership";
+import { uploadClientPayloadSchema, uploadCompletionPayloadSchema } from "./contracts";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 
 type UploadHandlerDependencies = {
   authorizeAdmin: () => Promise<ApiAuthorization>;
+  authorizePendingUpload: (input: AuthorizePendingMediaAssetUploadInput) => Promise<unknown>;
   handleBlobUpload: typeof import("@vercel/blob/client").handleUpload;
 };
 
-export function createUploadHandler({ authorizeAdmin, handleBlobUpload }: UploadHandlerDependencies) {
+export function createUploadHandler({ authorizeAdmin, authorizePendingUpload, handleBlobUpload }: UploadHandlerDependencies) {
   return async function uploadHandler(request: Request): Promise<NextResponse> {
     const authorization = await authorizeAdmin();
     if (!authorization.ok) return authorization.response;
-
-    const body = (await request.json()) as HandleUploadBody;
-
     try {
+      const body = (await request.json()) as HandleUploadBody;
       const jsonResponse = await handleBlobUpload({
         body,
         request,
-        onBeforeGenerateToken: async (_pathname, clientPayload) => {
-          const kind = clientPayload === "video" ? "video" : "image";
-
+        onBeforeGenerateToken: async (pathname, clientPayload) => {
+          const intent = uploadClientPayloadSchema.parse(JSON.parse(clientPayload ?? "null"));
+          const providerKey = createStorageKey(intent.assetId, intent.kind);
+          if (pathname !== providerKey) throw new Error("Upload pathname mismatch.");
+          await authorizePendingUpload({ assetId: intent.assetId, expectedProviderKey: providerKey, kind: intent.kind, uploaderAdminId: authorization.admin.id });
+          const tokenPayload = uploadCompletionPayloadSchema.parse({ assetId: intent.assetId, providerKey, kind: intent.kind });
           return {
-            allowedContentTypes: kind === "video" ? ALLOWED_VIDEO_TYPES : ALLOWED_IMAGE_TYPES,
-            addRandomSuffix: true,
-            maximumSizeInBytes: kind === "video" ? 200 * 1024 * 1024 : 10 * 1024 * 1024,
-            tokenPayload: JSON.stringify({ kind }),
+            allowedContentTypes: intent.kind === "video" ? ALLOWED_VIDEO_TYPES : ALLOWED_IMAGE_TYPES,
+            addRandomSuffix: false,
+            allowOverwrite: false,
+            maximumSizeInBytes: intent.kind === "video" ? 200 * 1024 * 1024 : 10 * 1024 * 1024,
+            tokenPayload: JSON.stringify(tokenPayload),
+            callbackUrl: new URL("/api/upload/complete", request.url).toString(),
           };
         },
-        onUploadCompleted: async () => {},
+        onUploadCompleted: async () => { throw new Error("Completion must use the dedicated callback."); },
       });
-
       return NextResponse.json(jsonResponse);
-    } catch (error) {
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : "Upload failed" },
-        { status: 400 }
-      );
+    } catch {
+      return NextResponse.json({ error: "Upload request could not be completed." }, { status: 400 });
     }
   };
 }

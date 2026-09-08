@@ -19,7 +19,7 @@ export function AboutForm({
   skills,
   tools,
 }: {
-  profile?: Profile;
+  profile: Profile;
   skills: Skill[];
   tools: Tool[];
 }) {
@@ -27,6 +27,7 @@ export function AboutForm({
 
   return (
     <form action={formAction} className="space-y-6">
+      <input type="hidden" name="revision" value={profile.revision} />
       <FormCard title="Profile">
         <div>
           <Label htmlFor="name">Name</Label>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { updateMessageStatus, deleteMessage } from "@/lib/actions/messages";
 import type { schema } from "@/lib/db";
@@ -16,6 +16,9 @@ const STATUS_STYLES: Record<string, string> = {
 
 export function MessageListItem({ message }: { message: ContactMessage }) {
   const [pending, startTransition] = useTransition();
+  const [revision, setRevision] = useState(message.revision);
+  const [status, setStatus] = useState(message.status);
+  const [error, setError] = useState<string>();
 
   return (
     <div className="rounded-2xl border border-[var(--color-line)] bg-white p-5">
@@ -26,14 +29,18 @@ export function MessageListItem({ message }: { message: ContactMessage }) {
         </div>
         <div className="flex items-center gap-2">
           <select
-            defaultValue={message.status}
+            value={status}
             disabled={pending}
-            onChange={(e) =>
-              startTransition(() =>
-                updateMessageStatus(message.id, e.target.value as "new" | "read" | "replied" | "archived")
-              )
-            }
-            className={`rounded-full border-0 px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[message.status]}`}
+            onChange={(e) => {
+              const nextStatus = e.target.value as "new" | "read" | "replied" | "archived";
+              setError(undefined);
+              startTransition(async () => {
+                const result = await updateMessageStatus(message.id, revision, nextStatus);
+                if (result.status === "success") { setStatus(nextStatus); setRevision(result.revision); }
+                else setError(result.message);
+              });
+            }}
+            className={`rounded-full border-0 px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[status]}`}
           >
             <option value="new">New</option>
             <option value="read">Read</option>
@@ -43,6 +50,7 @@ export function MessageListItem({ message }: { message: ContactMessage }) {
           <DeleteButton confirmText={`Delete message from ${message.name}?`} onDelete={() => deleteMessage(message.id)} />
         </div>
       </div>
+      {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
       {(message.projectType || message.videoType || message.budgetRange || message.projectTimeline) && (
         <p className="mb-2 text-xs text-[var(--color-muted)]">
           {[message.projectType, message.videoType, message.budgetRange, message.projectTimeline].filter(Boolean).join(" · ")}

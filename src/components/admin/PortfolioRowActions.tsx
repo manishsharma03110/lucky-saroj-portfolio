@@ -5,11 +5,13 @@ import { toggleProjectFeatured, deleteProject } from "@/lib/actions/portfolio";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { cn } from "@/lib/utils/cn";
 
-export function PortfolioRowActions({ id, isFeatured }: { id: string; isFeatured: boolean }) {
+export function PortfolioRowActions({ id, isFeatured, revision: initialRevision }: { id: string; isFeatured: boolean; revision: number }) {
   const [featured, setFeatured] = useState(isFeatured);
+  const [revision, setRevision] = useState(initialRevision);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  return (
+  return <div className="flex flex-col gap-1">
     <button
       type="button"
       role="switch"
@@ -18,7 +20,10 @@ export function PortfolioRowActions({ id, isFeatured }: { id: string; isFeatured
       onClick={() => {
         const next = !featured;
         setFeatured(next);
-        startTransition(() => toggleProjectFeatured(id, next));
+        startTransition(async () => {
+          try { const result = await toggleProjectFeatured(id, revision, next); setRevision(result.revision); setError(null); }
+          catch { setFeatured(!next); setError("Content changed. Reload before retrying."); }
+        });
       }}
       className={cn(
         "relative inline-flex h-6 w-11 items-center rounded-full transition-colors disabled:opacity-50",
@@ -32,7 +37,8 @@ export function PortfolioRowActions({ id, isFeatured }: { id: string; isFeatured
         )}
       />
     </button>
-  );
+    {error && <span className="max-w-40 text-xs text-red-600">{error}</span>}
+  </div>;
 }
 
 export function DeleteProjectButton({ id, title }: { id: string; title: string }) {

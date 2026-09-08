@@ -14,7 +14,7 @@ export function ContactFormShell({ projectCategories }: { projectCategories: str
           <span className="grid size-12 shrink-0 place-items-center rounded-full border border-[var(--accent-primary)]/55 bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] shadow-[0_0_22px_rgba(59,130,246,0.12)]"><Send size={20} strokeWidth={1.5} aria-hidden /></span>
           <div>
             <h2 id="contact-form-heading" className="font-display text-3xl font-semibold tracking-[-0.04em] text-[var(--text-primary)] sm:text-4xl">Send a Message</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)] sm:text-base">Tell me about your project.</p>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-[var(--text-secondary)] sm:text-base">Share the brief, timeline, and references so I can understand what your project needs.</p>
           </div>
         </div>
         <div className="relative min-w-0"><ContactForm projectCategories={projectCategories} /></div>

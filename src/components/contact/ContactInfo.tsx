@@ -90,7 +90,7 @@ export function ContactInfo({
                 </span>
                 <div className="min-w-0">
                   <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">{label}</p>
-                  {href ? <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} className="mt-1.5 block break-words text-sm font-medium text-[var(--accent-hover)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]">{value}</a> : <p className="mt-1.5 break-words text-sm font-medium leading-6 text-[var(--accent-hover)]">{value}</p>}
+                  {href ? <a href={href} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} className="mt-1.5 block break-words text-sm font-medium text-[var(--accent-hover)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">{value}</a> : <p className="mt-1.5 break-words text-sm font-medium leading-6 text-[var(--accent-hover)]">{value}</p>}
                 </div>
               </div>
             ))}
@@ -110,7 +110,7 @@ export function ContactInfo({
           <div className="relative mt-4 grid grid-cols-1 gap-2 min-[360px]:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
             {populatedSocialLinks.map(({ label, href }) => {
               const Icon = socialIcons[label as keyof typeof socialIcons];
-              return <a key={label} href={href!} target="_blank" rel="noopener noreferrer" className="group flex min-w-0 items-center gap-3 rounded-md border border-white/10 bg-white/[0.015] px-3 py-3 text-[var(--text-primary)] transition-[border-color,background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-[var(--accent-primary)]/55 hover:bg-[var(--accent-primary)]/[0.04] hover:shadow-[0_8px_24px_rgba(59,130,246,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] motion-reduce:transform-none motion-reduce:transition-none">
+              return <a key={label} href={href!} target="_blank" rel="noopener noreferrer" className="group flex min-w-0 items-center gap-3 rounded-md border border-white/10 bg-white/[0.015] px-3 py-3 text-[var(--text-primary)] transition-[border-color,background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:border-[var(--accent-primary)]/55 hover:bg-[var(--accent-primary)]/[0.04] hover:shadow-[0_8px_24px_rgba(59,130,246,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] motion-reduce:transform-none motion-reduce:transition-none">
                 {Icon ? <Icon size={16} className="shrink-0 text-[var(--accent-primary)]" aria-hidden /> : <span className="grid size-4 shrink-0 place-items-center text-[0.65rem] font-semibold text-[var(--accent-primary)]" aria-hidden>X</span>}
                 <span className="min-w-0 flex-1 truncate text-xs font-medium">{label}</span>
                 <ArrowUpRight size={14} className="shrink-0 text-[var(--text-muted)] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--accent-primary)] motion-reduce:transition-none" aria-hidden />

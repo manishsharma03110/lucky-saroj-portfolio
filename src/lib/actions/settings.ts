@@ -1,42 +1,33 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { db, schema } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/authorization";
 import { settingsSchema } from "@/lib/validations/settings";
+import { revisionSchema } from "@/lib/validations/revision";
+import { updateSingletonSettings } from "@/lib/db/singleton-content-service";
+import { ContentNotFoundError, StaleRevisionError } from "@/lib/db/mutation-errors";
 import type { ActionState } from "./portfolio";
+import { fieldErrorsFromIssues, SAFE_VALIDATION_MESSAGE } from "@/lib/validations/action-errors";
+import { MediaAssetBindingError, MediaAssetNotAttachableError, MediaAssetNotFoundError } from "@/lib/db/media-asset-service";
 
 export async function updateSettings(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requirePermission("settings.update");
   const raw = Object.fromEntries(formData.entries());
   const parsed = settingsSchema.safeParse(raw);
-  if (!parsed.success) {
-    const fieldErrors: Record<string, string> = {};
-    for (const issue of parsed.error.issues) fieldErrors[String(issue.path[0])] = issue.message;
-    return { status: "error", message: "Please fix the errors below.", fieldErrors };
+  const revision = revisionSchema.safeParse(formData.get("revision"));
+  if (!parsed.success || !revision.success) {
+    const fieldErrors = parsed.success ? {} : fieldErrorsFromIssues(parsed.error.issues);
+    return { status: "error", message: revision.success ? SAFE_VALIDATION_MESSAGE : "Invalid content revision. Reload before saving.", fieldErrors };
   }
 
-  const existingRows = await db.select().from(schema.siteSettings);
-  const existing = existingRows[0];
   const data = parsed.data;
-  const values = {
-    ...data,
-    whatsapp: data.whatsapp || null,
-    paymentTerms: data.paymentTerms || null,
-    turnaroundTime: data.turnaroundTime || null,
-    instagramUrl: data.instagramUrl || null,
-    twitterUrl: data.twitterUrl || null,
-    youtubeUrl: data.youtubeUrl || null,
-    linkedinUrl: data.linkedinUrl || null,
-    behanceUrl: data.behanceUrl || null,
-    vimeoUrl: data.vimeoUrl || null,
-    seoDescription: data.seoDescription || null,
-  };
-
-  if (existing) {
-    await db.update(schema.siteSettings).set(values);
-  } else {
-    await db.insert(schema.siteSettings).values(values);
+  try { await updateSingletonSettings(data, revision.data); }
+  catch (error) {
+    if (error instanceof MediaAssetBindingError || error instanceof MediaAssetNotAttachableError || error instanceof MediaAssetNotFoundError) {
+      return { status: "error", message: "Uploaded Hero image is invalid or no longer available." };
+    }
+    if (error instanceof StaleRevisionError || error instanceof ContentNotFoundError) return { status: "error", message: error.message };
+    throw error;
   }
 
   revalidatePath("/", "layout");

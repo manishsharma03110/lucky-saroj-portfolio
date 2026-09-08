@@ -5,7 +5,7 @@ export function PortfolioCTA() {
   return (
     <section className="relative overflow-hidden border-t border-[var(--cine-border)] bg-[var(--surface-primary)] py-14 sm:py-16 lg:py-20">
       <div className="pointer-events-none absolute bottom-0 right-[8%] h-64 w-64 rounded-full bg-[var(--accent-primary)]/[0.05] blur-3xl" aria-hidden />
-      <Container>
+      <Container className="max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">
         <div className="relative flex max-w-5xl flex-col items-start gap-8 border-l border-[var(--accent-primary)]/55 pl-6 sm:pl-9 md:flex-row md:items-end md:justify-between md:gap-16">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--cine-accent)]">Next project</p>

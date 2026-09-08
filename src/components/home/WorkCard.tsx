@@ -42,7 +42,7 @@ export function WorkCard({
         href={`/portfolio/${project.slug}`}
         className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-primary)]"
       >
-        <div className={`relative overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] ${large ? "aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2.35/1]" : "aspect-[4/3] sm:aspect-[16/10]"}`}>
+        <div className={`relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)] ${large ? "aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2.35/1]" : "aspect-[4/3] sm:aspect-[16/10]"}`}>
           {visualUrl ? (
             <div
               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.025]"
@@ -53,7 +53,7 @@ export function WorkCard({
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-secondary)_68%)]">
               <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:72px_72px]" aria-hidden />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_67%_38%,rgba(59,130,246,0.14),transparent_35%)]" aria-hidden />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_67%_38%,var(--accent-glow),transparent_38%)]" aria-hidden />
               <span className="absolute right-[5%] top-1/2 -translate-y-1/2 select-none font-display text-[clamp(5rem,16vw,13rem)] font-semibold text-[var(--text-primary)] opacity-[0.055]" aria-hidden="true">
                 {initials(project.title)}
               </span>

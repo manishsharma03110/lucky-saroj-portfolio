@@ -46,8 +46,8 @@ export function Skills({ biography, skills, tools }: { biography?: string | null
   if (!biography && skills.length === 0 && tools.length === 0) return null;
 
   return (
-    <section className="bg-[var(--background-primary)] py-10 sm:py-12 lg:py-14">
-      <div className="mx-auto grid w-full max-w-[1280px] gap-10 px-5 sm:px-8 md:grid-cols-2 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.08fr)_minmax(0,1.08fr)] lg:gap-6 lg:px-12">
+    <section className="bg-[var(--background-primary)] py-12 sm:py-16 lg:py-20">
+      <div className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 sm:px-8 md:grid-cols-2 lg:gap-16 lg:px-12 2xl:px-16">
         {biography && (
           <div className="md:col-span-2 lg:col-span-1 lg:pr-4">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">My story</p>
@@ -57,24 +57,24 @@ export function Skills({ biography, skills, tools }: { biography?: string | null
         )}
 
         {skills.length > 0 && (
-          <div className="border-white/10 lg:border-l lg:pl-6">
+          <div className="border-t border-white/10 pt-6 md:border-t-0 md:pt-0">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Skills</p>
-            <ul className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <ul className="mt-5 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
               {skills.map((skill) => {
                 const Icon = iconForSkill(skill.name);
-                return <li key={skill.id} className="flex min-h-12 min-w-0 items-center gap-2.5 rounded-md border border-white/10 bg-[var(--surface-primary)] px-3 py-2 text-xs leading-5 text-[var(--text-primary)]"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]"><Icon size={15} strokeWidth={1.6} aria-hidden /></span><span className="min-w-0">{skill.name}</span></li>;
+                return <li key={skill.id} className="flex min-h-12 min-w-0 items-center gap-3 border-b border-white/10 py-3 text-sm leading-5 text-[var(--text-primary)]"><span className="flex h-8 w-8 shrink-0 items-center justify-center text-[var(--accent-primary)]"><Icon size={17} strokeWidth={1.5} aria-hidden /></span><span className="min-w-0">{skill.name}</span></li>;
               })}
             </ul>
           </div>
         )}
 
         {tools.length > 0 && (
-          <div className="border-white/10 lg:border-l lg:pl-6">
+          <div className="border-t border-white/10 pt-6 md:border-t-0 md:pt-0">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Tools I use</p>
-            <ul className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <ul className="mt-5 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
               {tools.map((tool) => {
                 const Icon = iconForTool(tool.name);
-                return <li key={tool.id} className="flex min-h-12 min-w-0 items-center gap-2.5 rounded-md border border-white/10 bg-[var(--surface-primary)] px-3 py-2 text-xs leading-5 text-[var(--text-primary)]"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded border border-[var(--accent-primary)]/30 bg-[var(--accent-primary)]/[0.06] text-[0.6rem] font-bold tracking-[-0.02em] text-[var(--accent-primary)]">{Icon ? <Icon size={15} strokeWidth={1.6} aria-hidden /> : monogram(tool.name)}</span><span className="min-w-0">{tool.name}</span></li>;
+                return <li key={tool.id} className="flex min-h-12 min-w-0 items-center gap-3 border-b border-white/10 py-3 text-sm leading-5 text-[var(--text-primary)]"><span className="flex h-8 w-8 shrink-0 items-center justify-center text-[0.65rem] font-bold text-[var(--accent-primary)]">{Icon ? <Icon size={17} strokeWidth={1.5} aria-hidden /> : monogram(tool.name)}</span><span className="min-w-0">{tool.name}</span></li>;
               })}
             </ul>
           </div>

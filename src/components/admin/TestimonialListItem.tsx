@@ -4,6 +4,7 @@ import { Star } from "lucide-react";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { deleteTestimonial } from "@/lib/actions/testimonials";
 import type { schema } from "@/lib/db";
+import { TestimonialForm } from "./TestimonialForm";
 
 type Testimonial = typeof schema.testimonials.$inferSelect;
 
@@ -39,6 +40,10 @@ export function TestimonialListItem({ testimonial }: { testimonial: Testimonial 
         ))}
       </div>
       <p className="text-sm text-[var(--color-muted)]">{testimonial.testimonialText}</p>
+      <details className="mt-3">
+        <summary className="cursor-pointer text-sm text-[var(--color-accent)]">Edit</summary>
+        <div className="mt-3"><TestimonialForm testimonial={testimonial} /></div>
+      </details>
     </div>
   );
 }

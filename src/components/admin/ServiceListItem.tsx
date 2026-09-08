@@ -5,6 +5,7 @@ import type { LucideIcon } from "lucide-react";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { deleteService } from "@/lib/actions/services";
 import type { schema } from "@/lib/db";
+import { ServiceForm } from "./ServiceForm";
 
 type Service = typeof schema.services.$inferSelect;
 
@@ -22,6 +23,10 @@ export function ServiceListItem({ service }: { service: Service }) {
           <p className="text-xs text-[var(--color-muted)]">{service.description}</p>
         </div>
       </div>
+      <details>
+        <summary className="cursor-pointer text-sm text-[var(--color-accent)]">Edit</summary>
+        <div className="mt-3"><ServiceForm service={service} /></div>
+      </details>
       <div className="flex items-center gap-2">
         {service.isFeatured && (
           <span className="rounded-full bg-[var(--color-accent-soft)] px-2.5 py-1 text-xs font-medium text-[var(--color-accent)]">

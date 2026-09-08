@@ -5,19 +5,26 @@ import { upload } from "@vercel/blob/client";
 import { UploadCloud, X, Loader2, Play } from "lucide-react";
 import { Label } from "@/components/ui/Input";
 
+type UploadInitiation = { assetId: string; pathname: string; kind: "image" | "video" };
+
 export function FileUpload({
   name,
+  assetIdName,
   label,
   kind,
   defaultValue,
+  defaultAssetId,
 }: {
   name: string;
+  assetIdName: string;
   label: string;
   kind: "image" | "video";
   defaultValue?: string | null;
+  defaultAssetId?: string | null;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [url, setUrl] = useState(defaultValue ?? "");
+  const [assetId, setAssetId] = useState(defaultAssetId ?? "");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -28,15 +35,25 @@ export function FileUpload({
     setUploading(true);
     setProgress(0);
     try {
-      const result = await upload(file.name, file, {
+      const initiationResponse = await fetch("/api/upload/initiate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind, originalFilename: file.name }),
+      });
+      if (!initiationResponse.ok) throw new Error("Upload initiation failed.");
+      const initiation = await initiationResponse.json() as UploadInitiation;
+      if (!initiation.assetId || !initiation.pathname || initiation.kind !== kind) throw new Error("Invalid upload initiation.");
+      const result = await upload(initiation.pathname, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
-        clientPayload: kind,
+        clientPayload: JSON.stringify({ assetId: initiation.assetId, kind }),
         onUploadProgress: ({ percentage }) => setProgress(percentage),
       });
+      if (result.pathname !== initiation.pathname) throw new Error("Upload identity mismatch.");
+      setAssetId(initiation.assetId);
       setUrl(result.url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
+    } catch {
+      setError("Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -46,6 +63,7 @@ export function FileUpload({
     <div>
       <Label>{label}</Label>
       <input type="hidden" name={name} value={url} />
+      <input type="hidden" name={assetIdName} value={assetId} />
 
       {url ? (
         <div className="relative overflow-hidden rounded-lg border border-[var(--color-line)] bg-black">
@@ -64,6 +82,7 @@ export function FileUpload({
             type="button"
             onClick={() => {
               setUrl("");
+              setAssetId("");
               if (inputRef.current) inputRef.current.value = "";
             }}
             className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-[var(--color-ink)] shadow"
@@ -80,27 +99,14 @@ export function FileUpload({
           className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--color-line)] bg-white py-8 text-sm text-[var(--color-muted)] transition-colors hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] disabled:opacity-60"
         >
           {uploading ? (
-            <>
-              <Loader2 size={20} className="animate-spin" />
-              Uploading… {progress}%
-            </>
+            <><Loader2 size={20} className="animate-spin" />Uploading… {progress}%</>
           ) : (
-            <>
-              <UploadCloud size={20} />
-              Click to upload {kind === "image" ? "an image" : "a video"}
-            </>
+            <><UploadCloud size={20} />Click to upload {kind === "image" ? "an image" : "a video"}</>
           )}
         </button>
       )}
 
-      <input
-        ref={inputRef}
-        type="file"
-        accept={kind === "image" ? "image/*" : "video/*"}
-        className="hidden"
-        onChange={(e) => handleFile(e.target.files?.[0])}
-      />
-
+      <input ref={inputRef} type="file" accept={kind === "image" ? "image/*" : "video/*"} className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );

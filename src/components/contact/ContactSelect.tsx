@@ -10,9 +10,11 @@ type ContactSelectProps = {
   options: readonly string[];
   required?: boolean;
   describedBy?: string;
+  invalid?: boolean;
+  disabled?: boolean;
 };
 
-export function ContactSelect({ id, name, placeholder, options, required, describedBy }: ContactSelectProps) {
+export function ContactSelect({ id, name, placeholder, options, required, describedBy, invalid, disabled }: ContactSelectProps) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -79,9 +81,11 @@ export function ContactSelect({ id, name, placeholder, options, required, descri
         aria-activedescendant={open ? `${listId}-${activeIndex}` : undefined}
         aria-describedby={describedBy}
         aria-required={required || undefined}
+        aria-invalid={invalid || undefined}
+        disabled={disabled}
         onClick={() => setOpen((current) => !current)}
         onKeyDown={handleKeyDown}
-        className={`flex min-h-[3.25rem] w-full items-center justify-between gap-3 rounded-md border px-4 text-left text-sm transition-[border-color,box-shadow,background-color] duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/15 motion-reduce:transition-none ${open ? "border-[var(--accent-primary)] bg-[var(--surface-primary)] shadow-[0_0_18px_rgba(59,130,246,0.10)]" : "border-white/10 bg-[var(--surface-primary)] hover:border-white/20"}`}
+        className={`flex min-h-[3.25rem] w-full items-center justify-between gap-3 rounded-md border px-4 text-left text-sm transition-[border-color,box-shadow,background-color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-hover)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)] disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none ${invalid ? "border-red-400/60" : open ? "border-[var(--accent-primary)] bg-[var(--surface-primary)] shadow-[0_0_18px_rgba(59,130,246,0.10)]" : "border-white/10 bg-[var(--surface-primary)] hover:border-white/20"}`}
       >
         <span className={value ? "min-w-0 truncate text-[var(--text-primary)]" : "min-w-0 truncate text-[var(--text-muted)]"}>{value || placeholder}</span>
         <ChevronDown size={17} className={`shrink-0 text-[var(--text-secondary)] transition-transform duration-200 motion-reduce:transition-none ${open ? "rotate-180 text-[var(--accent-primary)]" : ""}`} aria-hidden />

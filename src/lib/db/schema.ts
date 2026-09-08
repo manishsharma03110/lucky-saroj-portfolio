@@ -1,4 +1,4 @@
-import { pgTable, text, integer, boolean, timestamp, primaryKey, index, check } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, boolean, timestamp, primaryKey, index, check, unique, uniqueIndex } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
 export const roles = pgTable("roles", {
@@ -45,6 +45,7 @@ export const adminUsers = pgTable("admin_users", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => [
   index("admin_users_role_id_idx").on(table.roleId),
+  check("admin_users_session_version_positive", sql`${table.sessionVersion} >= 1`),
 ]);
 
 // ---------------------------------------------------------------------------
@@ -55,7 +56,10 @@ export const portfolioCategories = pgTable("portfolio_categories", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   displayOrder: integer("display_order").notNull().default(0),
-});
+}, (table) => [
+  unique("portfolio_categories_display_order_unique").on(table.displayOrder),
+  check("portfolio_categories_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
+]);
 
 // ---------------------------------------------------------------------------
 // PortfolioProject
@@ -85,7 +89,12 @@ export const portfolioProjects = pgTable("portfolio_projects", {
   seoDescription: text("seo_description"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("portfolio_projects_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
+  check("portfolio_projects_revision_positive", sql`${table.revision} >= 1`),
+  check("portfolio_projects_status_valid", sql`${table.status} IN ('draft', 'published')`),
+]);
 
 // ---------------------------------------------------------------------------
 // ProjectMedia (gallery / extra media beyond thumbnail+video)
@@ -98,7 +107,11 @@ export const projectMedia = pgTable("project_media", {
   url: text("url").notNull(),
   type: text("type", { enum: ["image", "video"] }).notNull(),
   displayOrder: integer("display_order").notNull().default(0),
-});
+}, (table) => [
+  unique("project_media_project_id_display_order_unique").on(table.projectId, table.displayOrder),
+  check("project_media_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
+  check("project_media_type_valid", sql`${table.type} IN ('image', 'video')`),
+]);
 
 // ---------------------------------------------------------------------------
 // ProjectTool (tools/software used, per project)
@@ -109,7 +122,9 @@ export const projectTools = pgTable("project_tools", {
     .notNull()
     .references(() => portfolioProjects.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-});
+}, (table) => [
+  unique("project_tools_project_id_name_unique").on(table.projectId, table.name),
+]);
 
 // ---------------------------------------------------------------------------
 // Experience
@@ -124,7 +139,13 @@ export const experiences = pgTable("experiences", {
   description: text("description"),
   location: text("location"),
   displayOrder: integer("display_order").notNull().default(0),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  unique("experiences_display_order_unique").on(table.displayOrder),
+  check("experiences_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
+  check("experiences_revision_positive", sql`${table.revision} >= 1`),
+  check("experiences_current_end_date", sql`NOT ${table.isCurrent} OR ${table.endDate} IS NULL`),
+]);
 
 // ---------------------------------------------------------------------------
 // Service
@@ -137,13 +158,18 @@ export const services = pgTable("services", {
   isFeatured: boolean("is_featured").notNull().default(false),
   displayOrder: integer("display_order").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  unique("services_display_order_unique").on(table.displayOrder),
+  check("services_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
+  check("services_revision_positive", sql`${table.revision} >= 1`),
+]);
 
 // ---------------------------------------------------------------------------
 // AboutProfile (singleton row)
 // ---------------------------------------------------------------------------
 export const aboutProfile = pgTable("about_profile", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id").primaryKey().default("singleton:about"),
   profileImageUrl: text("profile_image_url"),
   name: text("name").notNull().default("Lucky Saroj"),
   headline: text("headline"),
@@ -152,25 +178,42 @@ export const aboutProfile = pgTable("about_profile", {
   projectsCompleted: integer("projects_completed").notNull().default(0),
   clientCount: integer("client_count").notNull().default(0),
   viewsGenerated: text("views_generated").notNull().default("0"),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("about_profile_singleton_id", sql`${table.id} = 'singleton:about'`),
+  check("about_profile_years_experience_nonnegative", sql`${table.yearsExperience} >= 0`),
+  check("about_profile_projects_completed_nonnegative", sql`${table.projectsCompleted} >= 0`),
+  check("about_profile_client_count_nonnegative", sql`${table.clientCount} >= 0`),
+  check("about_profile_revision_positive", sql`${table.revision} >= 1`),
+]);
 
 // ---------------------------------------------------------------------------
 // AboutSkill
 // ---------------------------------------------------------------------------
 export const aboutSkills = pgTable("about_skills", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  profileId: text("profile_id").notNull().default("singleton:about").references(() => aboutProfile.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   displayOrder: integer("display_order").notNull().default(0),
-});
+}, (table) => [
+  unique("about_skills_profile_id_name_unique").on(table.profileId, table.name),
+  unique("about_skills_profile_id_display_order_unique").on(table.profileId, table.displayOrder),
+  check("about_skills_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
+]);
 
 // ---------------------------------------------------------------------------
 // AboutTool (software/tools shown on About page)
 // ---------------------------------------------------------------------------
 export const aboutTools = pgTable("about_tools", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  profileId: text("profile_id").notNull().default("singleton:about").references(() => aboutProfile.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   displayOrder: integer("display_order").notNull().default(0),
-});
+}, (table) => [
+  unique("about_tools_profile_id_name_unique").on(table.profileId, table.name),
+  unique("about_tools_profile_id_display_order_unique").on(table.profileId, table.displayOrder),
+  check("about_tools_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
+]);
 
 // ---------------------------------------------------------------------------
 // Testimonial
@@ -188,13 +231,18 @@ export const testimonials = pgTable("testimonials", {
     .notNull()
     .default("published"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("testimonials_rating_range", sql`${table.rating} BETWEEN 1 AND 5`),
+  check("testimonials_revision_positive", sql`${table.revision} >= 1`),
+  check("testimonials_status_valid", sql`${table.status} IN ('draft', 'published')`),
+]);
 
 // ---------------------------------------------------------------------------
 // Showreel
 // ---------------------------------------------------------------------------
 export const showreels = pgTable("showreels", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id").primaryKey().default("singleton:showreel"),
   title: text("title").notNull(),
   videoUrl: text("video_url"),
   thumbnailUrl: text("thumbnail_url"),
@@ -203,7 +251,12 @@ export const showreels = pgTable("showreels", {
   status: text("status", { enum: ["draft", "published"] })
     .notNull()
     .default("published"),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("showreels_singleton_id", sql`${table.id} = 'singleton:showreel'`),
+  check("showreels_revision_positive", sql`${table.revision} >= 1`),
+  check("showreels_status_valid", sql`${table.status} IN ('draft', 'published')`),
+]);
 
 // ---------------------------------------------------------------------------
 // ContactMessage
@@ -223,13 +276,17 @@ export const contactMessages = pgTable("contact_messages", {
     .notNull()
     .default("new"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("contact_messages_revision_positive", sql`${table.revision} >= 1`),
+  check("contact_messages_status_valid", sql`${table.status} IN ('new', 'read', 'replied', 'archived')`),
+]);
 
 // ---------------------------------------------------------------------------
 // SiteSettings (singleton row, JSON-ish flat fields per §16)
 // ---------------------------------------------------------------------------
 export const siteSettings = pgTable("site_settings", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text("id").primaryKey().default("singleton:settings"),
   // General
   siteName: text("site_name").notNull().default("Lucky Saroj"),
   logoText: text("logo_text").notNull().default("LS"),
@@ -266,7 +323,72 @@ export const siteSettings = pgTable("site_settings", {
   seoTitle: text("seo_title").notNull().default("Lucky Saroj — Video Editor & Visual Storyteller"),
   seoDescription: text("seo_description"),
   ogImageUrl: text("og_image_url"),
-});
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("site_settings_singleton_id", sql`${table.id} = 'singleton:settings'`),
+  check("site_settings_revision_positive", sql`${table.revision} >= 1`),
+]);
+
+// ---------------------------------------------------------------------------
+// MediaAsset (provider-owned object metadata; URLs are rendering metadata only)
+// ---------------------------------------------------------------------------
+export const mediaAssets = pgTable("media_assets", {
+  id: text("id").primaryKey(),
+  provider: text("provider", { enum: ["vercel_blob"] }).notNull().default("vercel_blob"),
+  providerKey: text("provider_key").notNull().unique(),
+  url: text("url"),
+  kind: text("kind", { enum: ["image", "video"] }).notNull(),
+  originalFilename: text("original_filename").notNull(),
+  uploadedByAdminId: text("uploaded_by_admin_id").references(() => adminUsers.id, { onDelete: "set null" }),
+  state: text("state", { enum: ["pending", "attached", "orphaned", "deleting", "delete_failed", "deleted"] }).notNull().default("pending"),
+  deleteAttempts: integer("delete_attempts").notNull().default(0),
+  lastDeleteAttemptAt: timestamp("last_delete_attempt_at"),
+  lastDeleteErrorCode: text("last_delete_error_code"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => [
+  check("media_assets_id_canonical_uuid", sql`${table.id} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`),
+  check("media_assets_provider_valid", sql`${table.provider} = 'vercel_blob'`),
+  check("media_assets_provider_key_canonical", sql`${table.providerKey} = 'cms-media/' || ${table.id} || '/' || ${table.kind}`),
+  check("media_assets_url_bounded", sql`${table.url} IS NULL OR char_length(${table.url}) BETWEEN 1 AND 2048`),
+  check("media_assets_state_url_coherent", sql`${table.state} IN ('pending', 'orphaned') OR ${table.url} IS NOT NULL`),
+  check("media_assets_kind_valid", sql`${table.kind} IN ('image', 'video')`),
+  check("media_assets_original_filename_bounded", sql`char_length(${table.originalFilename}) BETWEEN 1 AND 255`),
+  check("media_assets_state_valid", sql`${table.state} IN ('pending', 'attached', 'orphaned', 'deleting', 'delete_failed', 'deleted')`),
+  check("media_assets_delete_attempts_nonnegative", sql`${table.deleteAttempts} >= 0`),
+  check("media_assets_delete_error_code_bounded", sql`${table.lastDeleteErrorCode} IS NULL OR char_length(${table.lastDeleteErrorCode}) BETWEEN 1 AND 64`),
+  index("media_assets_cleanup_state_updated_idx").on(table.state, table.updatedAt),
+  index("media_assets_delete_retry_idx").on(table.state, table.lastDeleteAttemptAt),
+]);
+
+// Typed owner columns provide real FKs; ownerType selects exactly one column.
+export const mediaAssetReferences = pgTable("media_asset_references", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  assetId: text("asset_id").notNull().references(() => mediaAssets.id, { onDelete: "restrict" }),
+  ownerType: text("owner_type", { enum: ["portfolio_project", "showreel", "site_settings"] }).notNull(),
+  portfolioProjectId: text("portfolio_project_id").references(() => portfolioProjects.id, { onDelete: "cascade" }),
+  showreelId: text("showreel_id").references(() => showreels.id, { onDelete: "cascade" }),
+  siteSettingsId: text("site_settings_id").references(() => siteSettings.id, { onDelete: "cascade" }),
+  slot: text("slot", { enum: ["thumbnail", "video", "hero_image"] }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  check("media_asset_references_owner_valid", sql`(
+    (${table.ownerType} = 'portfolio_project' AND ${table.portfolioProjectId} IS NOT NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} IS NULL)
+    OR
+    (${table.ownerType} = 'showreel' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} = 'singleton:showreel' AND ${table.siteSettingsId} IS NULL)
+    OR
+    (${table.ownerType} = 'site_settings' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} = 'singleton:settings')
+  )`),
+  check("media_asset_references_slot_valid", sql`(
+    (${table.ownerType} IN ('portfolio_project','showreel') AND ${table.slot} IN ('thumbnail','video'))
+    OR (${table.ownerType} = 'site_settings' AND ${table.slot} = 'hero_image')
+  )`),
+  unique("media_asset_references_asset_owner_slot_unique").on(table.assetId, table.ownerType, table.portfolioProjectId, table.showreelId, table.slot),
+  uniqueIndex("media_asset_references_project_slot_unique").on(table.portfolioProjectId, table.slot).where(sql`${table.ownerType} = 'portfolio_project'`),
+  uniqueIndex("media_asset_references_showreel_slot_unique").on(table.showreelId, table.slot).where(sql`${table.ownerType} = 'showreel'`),
+  uniqueIndex("media_asset_references_settings_slot_unique").on(table.siteSettingsId, table.slot).where(sql`${table.ownerType} = 'site_settings'`),
+  index("media_asset_references_asset_id_idx").on(table.assetId),
+]);
 
 // ---------------------------------------------------------------------------
 // Relations
@@ -295,5 +417,24 @@ export const projectToolsRelations = relations(projectTools, ({ one }) => ({
   project: one(portfolioProjects, {
     fields: [projectTools.projectId],
     references: [portfolioProjects.id],
+  }),
+}));
+
+export const aboutProfileRelations = relations(aboutProfile, ({ many }) => ({
+  skills: many(aboutSkills),
+  tools: many(aboutTools),
+}));
+
+export const aboutSkillsRelations = relations(aboutSkills, ({ one }) => ({
+  profile: one(aboutProfile, {
+    fields: [aboutSkills.profileId],
+    references: [aboutProfile.id],
+  }),
+}));
+
+export const aboutToolsRelations = relations(aboutTools, ({ one }) => ({
+  profile: one(aboutProfile, {
+    fields: [aboutTools.profileId],
+    references: [aboutProfile.id],
   }),
 }));

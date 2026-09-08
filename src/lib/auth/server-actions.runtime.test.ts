@@ -27,9 +27,11 @@ mock.module("@/lib/db", {
 
 let categories: typeof import("@/lib/actions/categories");
 let experience: typeof import("@/lib/actions/experience");
+let portfolio: typeof import("@/lib/actions/portfolio");
 before(async () => {
   categories = await import("@/lib/actions/categories");
   experience = await import("@/lib/actions/experience");
+  portfolio = await import("@/lib/actions/portfolio");
 });
 const idle = { status: "idle" as const };
 
@@ -59,3 +61,33 @@ for (const [name, invoke] of [
     assert.equal(mutationCalls, 0);
   });
 }
+
+test("authorized malformed ordinary IDs stop before database mutation", async () => {
+  authorizationFailure = null;
+  mutationCalls = 0;
+  await assert.rejects(() => categories.deleteCategory("singleton:about"), /Invalid action input/);
+  await assert.rejects(() => experience.deleteExperience("not-a-uuid"), /Invalid action input/);
+  assert.equal(mutationCalls, 0);
+});
+
+test("featured toggle rejects malformed IDs and string booleans before its service", async () => {
+  authorizationFailure = null;
+  mutationCalls = 0;
+  await assert.rejects(() => portfolio.toggleProjectFeatured("not-a-uuid", 1, true), /Invalid action input/);
+  await assert.rejects(() => portfolio.toggleProjectFeatured("11111111-1111-4111-8111-111111111111", 1, "false" as never), /Invalid action input/);
+  assert.equal(mutationCalls, 0);
+});
+mock.module("@/lib/db/remaining-content-service", {
+  namedExports: {
+    createOrderedCategory: async () => { mutationCalls += 1; },
+    createOrderedExperience: async () => { mutationCalls += 1; },
+    updateExperienceRevision: async () => { mutationCalls += 1; return 2; },
+  },
+});
+mock.module("@/lib/db/portfolio-service", {
+  namedExports: {
+    createPortfolioProject: async () => { mutationCalls += 1; return "id"; },
+    updatePortfolioProject: async () => { mutationCalls += 1; return 2; },
+    togglePortfolioFeatured: async () => { mutationCalls += 1; return 2; },
+  },
+});

@@ -16,7 +16,7 @@ export function ContactPortfolioCTA() {
             <h2 id="contact-portfolio-title" className="font-display text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)]">Have a project to discuss?</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">Explore the work and see how different stories have been shaped.</p>
           </div>
-          <Link href="/portfolio" className="relative mt-6 inline-flex min-h-12 items-center justify-center gap-3 rounded-md border border-[var(--accent-primary)]/55 px-6 py-3 text-sm font-semibold text-[var(--accent-hover)] transition-[background-color,border-color] duration-300 hover:border-[var(--accent-hover)] hover:bg-[var(--accent-primary)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)] sm:mt-0 motion-reduce:transition-none">View My Work <ArrowRight size={17} className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" aria-hidden /></Link>
+          <Link href="/portfolio" className="relative mt-6 inline-flex min-h-12 items-center justify-center gap-3 rounded-md border border-[var(--accent-primary)]/55 px-6 py-3 text-sm font-semibold text-[var(--accent-hover)] transition-[background-color,border-color] duration-300 hover:border-[var(--accent-hover)] hover:bg-[var(--accent-primary)]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:mt-0 motion-reduce:transition-none">View My Work <ArrowRight size={17} className="transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" aria-hidden /></Link>
         </div>
       </div>
     </motion.section>

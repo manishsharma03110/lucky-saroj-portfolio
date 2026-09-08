@@ -7,16 +7,18 @@ import { FormCard } from "@/components/admin/FormParts";
 import { updateSettings } from "@/lib/actions/settings";
 import type { ActionState } from "@/lib/actions/portfolio";
 import type { schema } from "@/lib/db";
+import { FileUpload } from "@/components/admin/FileUpload";
 
 type Settings = typeof schema.siteSettings.$inferSelect;
 
 const initialState: ActionState = { status: "idle" };
 
-export function SettingsForm({ settings }: { settings?: Settings }) {
+export function SettingsForm({ settings, heroImageAssetId }: { settings: Settings; heroImageAssetId?: string | null }) {
   const [state, formAction, pending] = useActionState(updateSettings, initialState);
 
   return (
     <form action={formAction} className="space-y-6">
+      <input type="hidden" name="revision" value={settings.revision} />
       <FormCard title="General">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
@@ -76,6 +78,15 @@ export function SettingsForm({ settings }: { settings?: Settings }) {
           <Label htmlFor="heroDescription">Hero Description</Label>
           <Textarea id="heroDescription" name="heroDescription" rows={3} defaultValue={settings?.heroDescription ?? ""} />
         </div>
+        <FileUpload
+          name="heroImageUrl"
+          assetIdName="heroImageAssetId"
+          label="Home Hero Image"
+          kind="image"
+          defaultValue={settings.heroImageUrl}
+          defaultAssetId={heroImageAssetId}
+        />
+        <p className="text-xs text-[var(--color-muted)]">Upload, replace, or remove the Home Hero image. Removing it restores the built-in fallback image.</p>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div>
             <Label htmlFor="statYears">Years</Label>

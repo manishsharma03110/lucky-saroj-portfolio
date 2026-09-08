@@ -34,6 +34,41 @@
   --font-body: var(--font-inter);
 }
 
+/* Public-site palette boundary. Admin routes remain isolated on the root tokens. */
+.public-site {
+  --public-accent-primary: #3b82f6;
+  --public-accent-hover: #60a5fa;
+  --public-accent-active: #2563eb;
+  --public-accent-subtle: rgba(59, 130, 246, 0.08);
+  --public-accent-border: rgba(59, 130, 246, 0.35);
+  --public-accent-text: #60a5fa;
+  --public-focus-ring: #60a5fa;
+  --public-accent-glow: rgba(59, 130, 246, 0.14);
+  --public-accent-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%);
+
+  --surface: #121419;
+  --border-default: #242832;
+  --border-hover: rgba(255, 255, 255, 0.16);
+  --focus: var(--public-focus-ring);
+
+  --accent-primary: var(--public-accent-primary);
+  --accent-hover: var(--public-accent-hover);
+  --accent-active: var(--public-accent-active);
+  --accent-soft: var(--public-accent-subtle);
+  --accent-glow: var(--public-accent-glow);
+  --accent-border: var(--public-accent-border);
+  --accent-text: var(--public-accent-text);
+  --border-accent: var(--public-accent-border);
+  --color-accent: var(--public-accent-primary);
+  --color-accent-soft: var(--public-accent-subtle);
+  --cine-accent: var(--public-accent-primary);
+  --cine-accent-soft: var(--public-accent-subtle);
+}
+
+.public-site :focus-visible {
+  outline-color: var(--public-focus-ring);
+}
+
 @theme inline {
   --color-ink: var(--color-ink);
   --color-ink-soft: var(--color-ink-soft);

@@ -6,6 +6,10 @@ import { db, schema } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/authorization";
 import { categorySchema } from "@/lib/validations/category";
 import type { ActionState } from "./portfolio";
+import { createOrderedCategory } from "@/lib/db/remaining-content-service";
+import { DuplicateSlugError } from "@/lib/db/mutation-errors";
+import { fieldErrorsFromIssues, InvalidActionInputError, SAFE_VALIDATION_MESSAGE } from "@/lib/validations/action-errors";
+import { entityIdSchema } from "@/lib/validations/identifiers";
 
 export async function createCategory(_prev: ActionState, formData: FormData): Promise<ActionState> {
   await requirePermission("categories.create");
@@ -14,16 +18,14 @@ export async function createCategory(_prev: ActionState, formData: FormData): Pr
     slug: formData.get("slug"),
   });
   if (!parsed.success) {
-    return { status: "error", message: "Please fix the errors below.", fieldErrors: { name: parsed.error.issues[0]?.message ?? "Invalid input" } };
+    return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: fieldErrorsFromIssues(parsed.error.issues) };
   }
 
-  const existingRows = await db.select().from(schema.portfolioCategories).where(eq(schema.portfolioCategories.slug, parsed.data.slug));
-  if (existingRows[0]) {
-    return { status: "error", message: "A category with this slug already exists." };
+  try { await createOrderedCategory(parsed.data); }
+  catch (error) {
+    if (error instanceof DuplicateSlugError) return { status: "error", message: "A category with this slug already exists.", fieldErrors: { slug: "Slug already in use" } };
+    throw error;
   }
-
-  const all = await db.select().from(schema.portfolioCategories);
-  await db.insert(schema.portfolioCategories).values({ ...parsed.data, displayOrder: all.length });
 
   revalidatePath("/admin/categories");
   revalidatePath("/portfolio");
@@ -32,7 +34,9 @@ export async function createCategory(_prev: ActionState, formData: FormData): Pr
 
 export async function deleteCategory(id: string): Promise<void> {
   await requirePermission("categories.delete");
-  await db.delete(schema.portfolioCategories).where(eq(schema.portfolioCategories.id, id));
+  const parsedId = entityIdSchema.safeParse(id);
+  if (!parsedId.success) throw new InvalidActionInputError();
+  await db.delete(schema.portfolioCategories).where(eq(schema.portfolioCategories.id, parsedId.data));
   revalidatePath("/admin/categories");
   revalidatePath("/portfolio");
 }

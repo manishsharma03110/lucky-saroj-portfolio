@@ -63,7 +63,7 @@ export default async function AdminPortfolioListPage() {
                   </span>
                 </td>
                 <td className="px-5 py-3">
-                  <PortfolioRowActions id={project.id} isFeatured={project.isFeatured} />
+                  <PortfolioRowActions id={project.id} isFeatured={project.isFeatured} revision={project.revision} />
                 </td>
                 <td className="px-5 py-3">
                   <div className="flex items-center justify-end gap-1">

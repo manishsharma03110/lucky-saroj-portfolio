@@ -29,7 +29,8 @@ test("all protected action modules use centralized permission authorization", ()
 
 test("public contact submission remains intentionally public", () => {
   const source = fs.readFileSync(path.join(root, "src/lib/actions/contact.ts"), "utf8");
-  assert.match(source, /export async function submitContactForm/);
+  assert.match(source, /export async function submitPopupContactForm/);
+  assert.match(source, /export async function submitFullContactForm/);
   assert.doesNotMatch(source, /requireAuthenticatedAdmin|requireAdminForApi|requirePermission/);
 });
 
