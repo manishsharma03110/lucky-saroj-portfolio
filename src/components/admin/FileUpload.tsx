@@ -46,6 +46,7 @@ export function FileUpload({
       const result = await upload(initiation.pathname, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
+        contentType: file.type,
         clientPayload: JSON.stringify({ assetId: initiation.assetId, kind }),
         onUploadProgress: ({ percentage }) => setProgress(percentage),
       });

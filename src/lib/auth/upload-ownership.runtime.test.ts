@@ -78,6 +78,7 @@ test("FileUpload retains asset ID and URL while hiding raw errors and preserving
   assert.match(fileUpload, /name=\{assetIdName\} value=\{assetId\}/);
   assert.match(fileUpload, /setAssetId\(initiation\.assetId\)/);
   assert.match(fileUpload, /setUrl\(result\.url\)/);
+  assert.match(fileUpload, /contentType:\s*file\.type/);
   assert.match(fileUpload, /Upload failed\. Please try again\./);
   assert.doesNotMatch(fileUpload, /err instanceof Error|err\.message/);
   for (const source of [project, showreel]) {
