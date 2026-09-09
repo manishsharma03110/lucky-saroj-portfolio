@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { FormCard, FieldError, CheckboxField } from "@/components/admin/FormParts";
 import { createProject, updateProject, type ActionState } from "@/lib/actions/portfolio";
+import { MediaForm } from "@/components/admin/MediaForm";
 import { FileUpload } from "@/components/admin/FileUpload";
 import type { schema } from "@/lib/db";
 
@@ -43,7 +44,7 @@ export function ProjectForm({
   const [slug, setSlug] = useState(project?.slug ?? "");
 
   return (
-    <form action={formAction} className="space-y-6">
+    <MediaForm action={formAction} className="space-y-6">
       {project && <input type="hidden" name="revision" value={project.revision} />}
       <FormCard title="Project Details">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -107,18 +108,8 @@ export function ProjectForm({
              <FileUpload name="thumbnailUrl" assetIdName="thumbnailAssetId" label="Thumbnail Image" kind="image" defaultValue={project?.thumbnailUrl} defaultAssetId={mediaAssetIds?.thumbnail} />
         <FileUpload name="videoUrl" assetIdName="videoAssetId" label="Project Video" kind="video" defaultValue={project?.videoUrl} defaultAssetId={mediaAssetIds?.video} />
         <p className="-mt-3 text-xs text-[var(--color-muted)]">
-          Upload a video file directly, or leave empty and paste a YouTube/Vimeo link in Video URL below instead.
+          Upload a video file or paste a YouTube/Vimeo link above.
         </p>
-        <div>
-          <Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label>
-          <Input
-            id="externalVideoUrl"
-            name="externalVideoUrl"
-            placeholder="https://youtube.com/watch?v=..."
-            defaultValue={project?.videoUrl?.startsWith("http") && !project.videoUrl.includes("blob.vercel-storage.com") ? project.videoUrl : ""}
-          />
-        </div>
-        
         <div>
           <Label htmlFor="tools">Tools / Software Used</Label>
           <Input
@@ -175,6 +166,6 @@ export function ProjectForm({
           {pending ? "Saving..." : project ? "Save Changes" : "Publish Project"}
         </Button>
       </div>
-    </form>
+    </MediaForm>
   );
 }

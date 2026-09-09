@@ -6,6 +6,7 @@ import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { FormCard, CheckboxField } from "@/components/admin/FormParts";
 import { upsertShowreel } from "@/lib/actions/showreel";
+import { MediaForm } from "@/components/admin/MediaForm";
 import { FileUpload } from "@/components/admin/FileUpload";
 import type { ActionState } from "@/lib/actions/portfolio";
 import type { schema } from "@/lib/db";
@@ -18,7 +19,7 @@ export function ShowreelForm({ showreel, mediaAssetIds }: { showreel?: Showreel;
   const [state, formAction, pending] = useActionState(upsertShowreel, initialState);
 
   return (
-    <form action={formAction}>
+    <MediaForm action={formAction}>
       <input type="hidden" name="revision" value={showreel?.revision ?? ""} />
       <FormCard title="Showreel Details">
         <div>
@@ -27,15 +28,6 @@ export function ShowreelForm({ showreel, mediaAssetIds }: { showreel?: Showreel;
         </div>
                 <FileUpload name="thumbnailUrl" assetIdName="thumbnailAssetId" label="Showreel Thumbnail" kind="image" defaultValue={showreel?.thumbnailUrl} defaultAssetId={mediaAssetIds?.thumbnail} />
         <FileUpload name="videoUrl" assetIdName="videoAssetId" label="Showreel Video" kind="video" defaultValue={showreel?.videoUrl} defaultAssetId={mediaAssetIds?.video} />
-        <div>
-          <Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label>
-          <Input
-            id="externalVideoUrl"
-            name="externalVideoUrl"
-            placeholder="https://youtube.com/watch?v=..."
-            defaultValue={showreel?.videoUrl?.startsWith("http") && !showreel.videoUrl.includes("blob.vercel-storage.com") ? showreel.videoUrl : ""}
-          />
-        </div>
         <div>
           <Label htmlFor="duration">Duration</Label>
           <Input id="duration" name="duration" placeholder="1:32" defaultValue={showreel?.duration ?? ""} />
@@ -56,6 +48,6 @@ export function ShowreelForm({ showreel, mediaAssetIds }: { showreel?: Showreel;
           {pending ? "Saving..." : "Save Showreel"}
         </Button>
       </FormCard>
-    </form>
+    </MediaForm>
   );
 }

@@ -14,10 +14,10 @@ export async function upsertShowreel(_prev: ActionState, formData: FormData): Pr
   await requirePermission("showreel.update");
   const parsed = showreelSchema.safeParse({
     title: formData.get("title"),
-    videoUrl: (formData.get("videoUrl") as string) || (formData.get("externalVideoUrl") as string) || "",
-    videoAssetId: formData.get("videoAssetId") ?? "",
-    thumbnailUrl: formData.get("thumbnailUrl") ?? "",
-    thumbnailAssetId: formData.get("thumbnailAssetId") ?? "",
+    videoUrl: formData.get("videoUrl"),
+    videoAssetId: formData.get("videoAssetId"),
+    thumbnailUrl: formData.get("thumbnailUrl"),
+    thumbnailAssetId: formData.get("thumbnailAssetId"),
     duration: formData.get("duration") ?? "",
     isFeatured: formData.get("isFeatured"),
     status: formData.get("status"),

@@ -3,7 +3,8 @@
 import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { UploadCloud, X, Loader2, Play } from "lucide-react";
-import { Label } from "@/components/ui/Input";
+import { Input, Label } from "@/components/ui/Input";
+import { useUploadActivity } from "./MediaForm";
 
 type UploadInitiation = { assetId: string; pathname: string; kind: "image" | "video" };
 
@@ -23,6 +24,7 @@ export function FileUpload({
   defaultAssetId?: string | null;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const reportUpload = useUploadActivity();
   const [url, setUrl] = useState(defaultValue ?? "");
   const [assetId, setAssetId] = useState(defaultAssetId ?? "");
   const [uploading, setUploading] = useState(false);
@@ -33,6 +35,7 @@ export function FileUpload({
     if (!file) return;
     setError(null);
     setUploading(true);
+    reportUpload(true);
     setProgress(0);
     try {
       const initiationResponse = await fetch("/api/upload/initiate", {
@@ -57,6 +60,7 @@ export function FileUpload({
       setError("Upload failed. Please try again.");
     } finally {
       setUploading(false);
+      reportUpload(false);
     }
   }
 
@@ -108,6 +112,18 @@ export function FileUpload({
       )}
 
       <input ref={inputRef} type="file" accept={kind === "image" ? "image/*" : "video/*"} className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
+      {kind === "video" && (
+        <div className="mt-4">
+          <Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label>
+          <Input
+            id="externalVideoUrl"
+            name="externalVideoUrl"
+            placeholder="https://youtube.com/watch?v=..."
+            value={assetId || url.includes("blob.vercel-storage.com") ? "" : url}
+            onChange={(event) => { setUrl(event.target.value); setAssetId(""); }}
+          />
+        </div>
+      )}
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
     </div>
   );

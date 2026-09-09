@@ -7,6 +7,7 @@ import { FormCard } from "@/components/admin/FormParts";
 import { updateSettings } from "@/lib/actions/settings";
 import type { ActionState } from "@/lib/actions/portfolio";
 import type { schema } from "@/lib/db";
+import { MediaForm } from "@/components/admin/MediaForm";
 import { FileUpload } from "@/components/admin/FileUpload";
 
 type Settings = typeof schema.siteSettings.$inferSelect;
@@ -17,7 +18,7 @@ export function SettingsForm({ settings, heroImageAssetId }: { settings: Setting
   const [state, formAction, pending] = useActionState(updateSettings, initialState);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <MediaForm action={formAction} className="space-y-6">
       <input type="hidden" name="revision" value={settings.revision} />
       <FormCard title="General">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -162,6 +163,6 @@ export function SettingsForm({ settings, heroImageAssetId }: { settings: Setting
           {pending ? "Saving..." : "Save Settings"}
         </Button>
       </div>
-    </form>
+    </MediaForm>
   );
 }
