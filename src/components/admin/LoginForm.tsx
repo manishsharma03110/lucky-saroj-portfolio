@@ -3,8 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Label, Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
+import styles from "./Login.module.css";
 import { getSafeAdminCallbackUrl } from "@/lib/auth/safe-callback-url";
 
 export function LoginForm() {
@@ -34,23 +34,28 @@ export function LoginForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-5">
+    <form action={onSubmit} className={styles.form} aria-busy={pending}>
       <div>
-        <Label htmlFor="email">Email or Username</Label>
-        <Input id="email" name="email" type="text" placeholder="Enter your email or username" required />
-      </div>
-      <div>
-        <div className="mb-2 flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
+        <label className={styles.label} htmlFor="email">Email or Username</label>
+        <div className={styles.inputWrap}>
+          <Mail size={18} aria-hidden="true" />
+          <input className={styles.input} id="email" name="email" type="text" placeholder="Enter your email or username" autoComplete="username" aria-describedby={error ? "login-error" : undefined} aria-invalid={!!error} required />
         </div>
-        <Input id="password" name="password" type="password" placeholder="Enter your password" required />
+      </div>
+      <div>
+        <label className={styles.label} htmlFor="password">Password</label>
+        <div className={styles.inputWrap}>
+          <LockKeyhole size={18} aria-hidden="true" />
+          <input className={styles.input} id="password" name="password" type="password" placeholder="Enter your password" autoComplete="current-password" aria-describedby={error ? "login-error" : undefined} aria-invalid={!!error} required />
+        </div>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p id="login-error" role="alert" className={styles.error}>{error}</p>}
 
-      <Button type="submit" disabled={pending} className="w-full">
-        {pending ? "Signing in..." : "Login"}
-      </Button>
+      <button type="submit" disabled={pending} className={styles.submit}>
+        <span>{pending ? "Signing in..." : "Sign in"}</span>
+        {!pending && <ArrowRight size={18} aria-hidden="true" />}
+      </button>
     </form>
   );
 }
