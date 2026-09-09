@@ -4,6 +4,7 @@ import type { ApiAuthorization } from "@/lib/auth/admin-api";
 import type { AuthorizePendingMediaAssetUploadInput } from "@/lib/db/media-asset-service";
 import { createStorageKey } from "@/lib/media/ownership";
 import { uploadClientPayloadSchema, uploadCompletionPayloadSchema } from "./contracts";
+import { getPortfolioMediaBlobToken } from "./blob-token";
 
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
@@ -21,6 +22,7 @@ export function createUploadHandler({ authorizeAdmin, authorizePendingUpload, ha
     try {
       const body = (await request.json()) as HandleUploadBody;
       const jsonResponse = await handleBlobUpload({
+        token: getPortfolioMediaBlobToken(),
         body,
         request,
         onBeforeGenerateToken: async (pathname, clientPayload) => {

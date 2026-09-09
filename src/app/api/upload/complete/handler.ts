@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import type { FinalizePendingMediaAssetUploadInput } from "@/lib/db/media-asset-service";
 import { uploadCompletionPayloadSchema } from "../contracts";
 import { createStorageKey } from "@/lib/media/ownership";
+import { getPortfolioMediaBlobToken } from "../blob-token";
 
 type BlobUploadHandler = typeof import("@vercel/blob/client").handleUpload;
 type CompletionDependencies = {
@@ -15,6 +16,7 @@ export function createUploadCompletionHandler({ handleBlobUpload, finalizePendin
     try {
       const body = (await request.json()) as HandleUploadBody;
       const response = await handleBlobUpload({
+        token: getPortfolioMediaBlobToken(),
         body,
         request,
         onBeforeGenerateToken: async () => { throw new Error("Token generation is not accepted here."); },

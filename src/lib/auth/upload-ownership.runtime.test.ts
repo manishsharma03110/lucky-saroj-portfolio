@@ -1,9 +1,20 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { test } from "node:test";
+import { afterEach, beforeEach, test } from "node:test";
 import { NextResponse } from "next/server";
 import { createUploadInitiationHandler } from "@/app/api/upload/initiate/handler";
 import { createUploadCompletionHandler } from "@/app/api/upload/complete/handler";
+
+const portfolioToken = "synthetic-portfolio-media-test-token";
+let previousToken: string | undefined;
+beforeEach(() => {
+  previousToken = process.env.PORTFOLIO_MEDIA_READ_WRITE_TOKEN;
+  process.env.PORTFOLIO_MEDIA_READ_WRITE_TOKEN = portfolioToken;
+});
+afterEach(() => {
+  if (previousToken === undefined) delete process.env.PORTFOLIO_MEDIA_READ_WRITE_TOKEN;
+  else process.env.PORTFOLIO_MEDIA_READ_WRITE_TOKEN = previousToken;
+});
 
 const adminId = "11111111-1111-4111-8111-111111111111";
 const assetId = "22222222-2222-4222-8222-222222222222";
@@ -53,6 +64,7 @@ test("provider completion binds signed identity and normalizes mismatches", asyn
   const identity = { assetId, providerKey, kind: "image" };
   const make = (pathname: string, tokenPayload = JSON.stringify(identity), url = "https://blob.example.test/final") => createUploadCompletionHandler({
     handleBlobUpload: async (options) => {
+      assert.equal(options.token, portfolioToken);
       await options.onUploadCompleted?.({ blob: { url, downloadUrl: url, pathname, contentType: "image/jpeg", contentDisposition: "inline; filename=photo.jpg", etag: "mock-etag" }, tokenPayload });
       return { type: "blob.upload-completed", response: "ok" };
     },
