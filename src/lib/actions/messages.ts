@@ -16,18 +16,42 @@ export async function updateMessageStatus(
   expectedRevision: unknown,
   status: unknown
 ): Promise<{ status: "success"; revision: number } | { status: "error"; message: string }> {
-  await requirePermission("messages.update");
+  const operation = "messages.updateStatus";
+  console.info({ operation, result: "started" });
+  try { await requirePermission("messages.update"); }
+  catch (error) {
+    console.info({ operation, result: "authorization_check_failed" });
+    throw error;
+  }
   const parsedId = entityIdSchema.safeParse(id);
   const parsedRevision = revisionSchema.safeParse(expectedRevision);
   const parsedStatus = messageStatusSchema.safeParse(status);
-  if (!parsedId.success || !parsedRevision.success || !parsedStatus.success) return { status: "error", message: "Invalid message update." };
+  // Only validated scalar fields enter diagnostics; never include raw inputs or errors.
+  const diagnostic = {
+    operation,
+    ...(parsedId.success ? { messageId: parsedId.data } : {}),
+    ...(parsedRevision.success ? { expectedRevision: parsedRevision.data } : {}),
+    ...(parsedStatus.success ? { requestedStatus: parsedStatus.data } : {}),
+  };
+  if (!parsedId.success || !parsedRevision.success || !parsedStatus.success) {
+    console.info({ ...diagnostic, result: "validation_failed" });
+    return { status: "error", message: "Invalid message update." };
+  }
+  console.info({ ...diagnostic, result: "validated" });
   let revision: number;
   try { revision = await updateMessageStatusRevision(parsedId.data, parsedRevision.data, parsedStatus.data); }
   catch (error) {
+    console.info({ ...diagnostic, result: error instanceof StaleRevisionError ? "stale" : error instanceof ContentNotFoundError ? "not_found" : "mutation_failed" });
     if (error instanceof StaleRevisionError || error instanceof ContentNotFoundError) return { status: "error", message: error.message };
     throw error;
   }
-  revalidatePath("/admin/messages");
+  console.info({ ...diagnostic, result: "committed", returnedRevision: revision });
+  try { revalidatePath("/admin/messages"); }
+  catch (error) {
+    console.info({ ...diagnostic, result: "revalidation_failed", returnedRevision: revision });
+    throw error;
+  }
+  console.info({ ...diagnostic, result: "success", returnedRevision: revision });
   return { status: "success", revision };
 }
 

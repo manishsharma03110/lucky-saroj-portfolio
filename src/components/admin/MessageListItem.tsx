@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { updateMessageStatus, deleteMessage } from "@/lib/actions/messages";
 import type { schema } from "@/lib/db";
@@ -15,7 +15,14 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 export function MessageListItem({ message }: { message: ContactMessage }) {
+  // A refreshed server snapshot owns both status and revision. Remounting also
+  // prevents an older in-flight response from overwriting the new snapshot.
+  return <MessageStatusItem key={`${message.id}:${message.revision}:${message.status}`} message={message} />;
+}
+
+function MessageStatusItem({ message }: { message: ContactMessage }) {
   const [pending, startTransition] = useTransition();
+  const inFlight = useRef(false);
   const [revision, setRevision] = useState(message.revision);
   const [status, setStatus] = useState(message.status);
   const [error, setError] = useState<string>();
@@ -32,12 +39,20 @@ export function MessageListItem({ message }: { message: ContactMessage }) {
             value={status}
             disabled={pending}
             onChange={(e) => {
+              if (inFlight.current) return;
               const nextStatus = e.target.value as "new" | "read" | "replied" | "archived";
+              inFlight.current = true;
               setError(undefined);
               startTransition(async () => {
-                const result = await updateMessageStatus(message.id, revision, nextStatus);
-                if (result.status === "success") { setStatus(nextStatus); setRevision(result.revision); }
-                else setError(result.message);
+                try {
+                  const result = await updateMessageStatus(message.id, revision, nextStatus);
+                  if (result.status === "success") { setStatus(nextStatus); setRevision(result.revision); }
+                  else setError(result.message);
+                } catch {
+                  setError("Unable to update message status. Reload before retrying.");
+                } finally {
+                  inFlight.current = false;
+                }
               });
             }}
             className={`rounded-full border-0 px-2.5 py-1 text-xs font-medium ${STATUS_STYLES[status]}`}
@@ -47,7 +62,9 @@ export function MessageListItem({ message }: { message: ContactMessage }) {
             <option value="replied">Replied</option>
             <option value="archived">Archived</option>
           </select>
-          <DeleteButton confirmText={`Delete message from ${message.name}?`} onDelete={() => deleteMessage(message.id)} />
+          <fieldset disabled={pending}>
+            <DeleteButton confirmText={`Delete message from ${message.name}?`} onDelete={() => deleteMessage(message.id)} />
+          </fieldset>
         </div>
       </div>
       {error && <p className="mb-2 text-sm text-red-600">{error}</p>}
