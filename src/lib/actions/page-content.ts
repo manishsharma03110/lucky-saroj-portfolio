@@ -39,7 +39,7 @@ export async function updatePageContentAction(_prev: ActionState, formData: Form
     throw error;
   }
 
-  revalidatePath(`/admin/pages`);
-  revalidatePath(pageKey === "home" ? "/" : `/${pageKey}`);
+  revalidatePath("/admin/pages");
+  revalidatePath(`/${pageKey}`);
   return { status: "success", message: `${PAGE_CONTENT_CONFIG[pageKey].label} content updated.` };
 }
