@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Home,
+  FileText,
   FolderKanban,
   Tags,
   Briefcase,
@@ -31,6 +32,7 @@ const NAV_SECTIONS = [
     items: [
       { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
       { label: "Homepage", href: "/admin/home", icon: Home, permission: "settings.read" },
+      { label: "Page Content", href: "/admin/pages", icon: FileText, permission: "settings.read" },
       { label: "Portfolio", href: "/admin/portfolio", icon: FolderKanban, permission: "portfolio.read" },
       { label: "Categories", href: "/admin/categories", icon: Tags, permission: "categories.read" },
       { label: "Experience", href: "/admin/experience", icon: Briefcase, permission: "experience.read" },
