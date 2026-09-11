@@ -9,7 +9,7 @@ export const ABOUT_ID = "singleton:about";
 export type OrderedName = Readonly<{ name: string; displayOrder: number }>;
 export type ReplaceAboutInput = Readonly<{
   expectedRevision: number; name: string; headline: string | null; biography: string | null;
-  profileImageUrl: string | null; profileImageAssetId: string | null;
+  profileImageUrl?: string | null; profileImageAssetId?: string | null;
   yearsExperience: number; projectsCompleted: number; clientCount: number; viewsGenerated: string;
   skills: readonly OrderedName[]; tools: readonly OrderedName[];
 }>;
@@ -29,8 +29,8 @@ export async function replaceAbout(input: ReplaceAboutInput, testSynchronization
   validateChildren("Skill", input.skills); validateChildren("Tool", input.tools);
   return withCmsTransaction(async (tx) => {
     const profileImage = await prepareSiteImageSlot(tx, {
-      assetId: input.profileImageAssetId,
-      url: input.profileImageUrl,
+      assetId: input.profileImageAssetId ?? null,
+      url: input.profileImageUrl ?? null,
       kind: "image",
     });
     await synchronizeMutationTest(tx, testSynchronization);
