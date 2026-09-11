@@ -10,6 +10,7 @@ import {
   getExperiences,
   getSiteSettings,
 } from "@/lib/db/queries";
+import { getPageContent } from "@/lib/db/page-content-service";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -19,13 +20,15 @@ export const metadata = createPageMetadata({
 });
 
 export default async function AboutPage() {
-  const [profile, skills, tools, experiences, settings] = await Promise.all([
+  const [profile, skills, tools, experiences, settings, page] = await Promise.all([
     getAboutProfile(),
     getAboutSkills(),
     getAboutTools(),
     getExperiences(),
     getSiteSettings(),
+    getPageContent("about"),
   ]);
+  const copy = page.content;
 
   return (
     <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
@@ -36,6 +39,11 @@ export default async function AboutPage() {
         profileImageUrl={profile?.profileImageUrl}
         location={settings?.location}
         availability={settings?.availability}
+        eyebrow={copy.heroEyebrow}
+        primaryLabel={copy.heroPrimaryLabel}
+        primaryUrl={copy.heroPrimaryUrl}
+        secondaryLabel={copy.heroSecondaryLabel}
+        secondaryUrl={copy.heroSecondaryUrl}
       />
       <AboutStats
         years={profile?.yearsExperience ?? 0}
@@ -43,9 +51,9 @@ export default async function AboutPage() {
         clients={profile?.clientCount ?? 0}
         views={profile?.viewsGenerated ?? "0"}
       />
-      <Skills skills={skills} tools={tools} />
+      <Skills biography={profile?.biography} skills={skills} tools={tools} storyEyebrow={copy.storyEyebrow} storyHeading={copy.storyHeading} skillsLabel={copy.skillsLabel} toolsLabel={copy.toolsLabel} />
       <Journey experiences={experiences} />
-      <AboutCTA />
+      <AboutCTA eyebrow={copy.ctaEyebrow} heading={copy.ctaHeading} description={copy.ctaDescription} primaryLabel={copy.ctaPrimaryLabel} primaryUrl={copy.ctaPrimaryUrl} secondaryLabel={copy.ctaSecondaryLabel} secondaryUrl={copy.ctaSecondaryUrl} />
     </main>
   );
 }
