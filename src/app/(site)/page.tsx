@@ -6,9 +6,14 @@ import { SelectedWork } from "@/components/home/SelectedWork";
 import { ShowreelSection } from "@/components/home/ShowreelSection";
 import { TestimonialsPreview } from "@/components/home/TestimonialsPreview";
 import { getFeaturedShowreel, getSiteSettings } from "@/lib/db/queries";
+import { getHomePageContent } from "@/lib/db/home-content-service";
 
 export default async function HomePage() {
-  const [settings, showreel] = await Promise.all([getSiteSettings(), getFeaturedShowreel()]);
+  const [settings, showreel, content] = await Promise.all([
+    getSiteSettings(),
+    getFeaturedShowreel(),
+    getHomePageContent(),
+  ]);
 
   return (
     <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
@@ -19,12 +24,12 @@ export default async function HomePage() {
         heroImageUrl={settings?.heroImageUrl}
         hasShowreel={Boolean(showreel?.videoUrl)}
       />
-      <SelectedWork />
+      <SelectedWork content={content} />
       <ShowreelSection showreel={showreel} />
-      <EditingStyles />
-      <AboutPreview />
-      <TestimonialsPreview />
-      <FinalCTA />
+      <EditingStyles content={content} />
+      <AboutPreview content={content} />
+      <TestimonialsPreview content={content} />
+      <FinalCTA content={content} />
     </main>
   );
 }
