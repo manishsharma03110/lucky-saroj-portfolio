@@ -5,7 +5,7 @@ import type { schema } from "@/lib/db";
 
 type Experience = typeof schema.experiences.$inferSelect;
 
-export function ExperienceHero({ experiences }: { experiences: Experience[] }) {
+export function ExperienceHero({ experiences, eyebrow = "Experience", heading = "Crafting stories through experience and precision.", description = "Over the years, I’ve worked across different industries and creative environments — sharpening my skills, understanding stories deeper, and delivering impactful edits.", primaryLabel = "View My Work", primaryUrl = "/portfolio", secondaryLabel = "Let’s Connect", secondaryUrl = "/contact" }: { experiences: Experience[]; eyebrow?: string; heading?: string; description?: string; primaryLabel?: string; primaryUrl?: string; secondaryLabel?: string; secondaryUrl?: string }) {
   const current = experiences.find((experience) => experience.isCurrent || experience.endDate?.trim().toLowerCase() === "present");
 
   return (
@@ -15,10 +15,10 @@ export function ExperienceHero({ experiences }: { experiences: Experience[] }) {
       <span className="pointer-events-none absolute bottom-8 right-5 h-9 w-9 border-b border-r border-[var(--accent-primary)]/70 sm:right-8 lg:right-12" aria-hidden />
       <div className="relative mx-auto grid min-h-[29rem] w-full max-w-[1280px] gap-10 px-5 sm:px-8 md:grid-cols-[minmax(0,0.82fr)_minmax(0,1.08fr)] md:items-center md:gap-10 lg:gap-14 lg:px-12">
         <div>
-          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]"><span className="h-px w-10 bg-current" aria-hidden />Experience</p>
-          <h1 className="mt-7 max-w-[11ch] font-display text-[clamp(2.5rem,4.8vw,4.75rem)] font-semibold leading-[0.94] tracking-[-0.05em] text-[var(--text-primary)]">Crafting stories through experience and precision.</h1>
-          <p className="mt-7 max-w-[34rem] text-base leading-7 text-[var(--text-secondary)] sm:text-lg sm:leading-8">Over the years, I&rsquo;ve worked across different industries and creative environments — sharpening my skills, understanding stories deeper, and delivering impactful edits.</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button href="/portfolio" variant="cine-solid" withArrow className="!rounded-md !px-7 !py-3.5">View My Work</Button><Button href="/contact" variant="cine-outline" withArrow className="!rounded-md !px-7 !py-3.5">Let&rsquo;s Connect</Button></div>
+          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]"><span className="h-px w-10 bg-current" aria-hidden />{eyebrow}</p>
+          <h1 className="mt-7 max-w-[11ch] font-display text-[clamp(2.5rem,4.8vw,4.75rem)] font-semibold leading-[0.94] tracking-[-0.05em] text-[var(--text-primary)]">{heading}</h1>
+          <p className="mt-7 max-w-[34rem] text-base leading-7 text-[var(--text-secondary)] sm:text-lg sm:leading-8">{description}</p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row"><Button href={primaryUrl} variant="cine-solid" withArrow className="!rounded-md !px-7 !py-3.5">{primaryLabel}</Button><Button href={secondaryUrl} variant="cine-outline" withArrow className="!rounded-md !px-7 !py-3.5">{secondaryLabel}</Button></div>
         </div>
 
         <div className="relative pb-24 sm:pb-20 md:pb-24">
