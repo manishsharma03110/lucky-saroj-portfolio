@@ -1,6 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Play } from "lucide-react";
 import type { schema } from "@/lib/db";
+import { canUseOptimizedImage } from "@/lib/media/image-source";
 
 type Project = typeof schema.portfolioProjects.$inferSelect;
 
@@ -33,6 +35,7 @@ export function WorkCard({
     : usableVisual(project.posterUrl)
       ? project.posterUrl
       : null;
+  const optimizedVisual = canUseOptimizedImage(visualUrl);
   const large = size === "large";
   const metadata = [categoryName, project.year].filter(Boolean).join(" · ");
 
@@ -44,12 +47,22 @@ export function WorkCard({
       >
         <div className={`relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)] ${large ? "aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2.35/1]" : "aspect-[4/3] sm:aspect-[16/10]"}`}>
           {visualUrl ? (
-            <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.025]"
-              style={{ backgroundImage: `url('${visualUrl}')` }}
-              role="img"
-              aria-label={project.title}
-            />
+            optimizedVisual ? (
+              <Image
+                src={visualUrl}
+                alt={project.title}
+                fill
+                sizes={large ? "100vw" : "(min-width: 1024px) 50vw, 100vw"}
+                className="object-cover object-center transition-transform duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.025]"
+              />
+            ) : (
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.025]"
+                style={{ backgroundImage: `url('${visualUrl}')` }}
+                role="img"
+                aria-label={project.title}
+              />
+            )
           ) : (
             <div className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-secondary)_68%)]">
               <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:72px_72px]" aria-hidden />

@@ -1,6 +1,8 @@
+import Image from "next/image";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { resolveHeroImageUrl } from "@/lib/media/hero-image";
+import { canUseOptimizedImage } from "@/lib/media/image-source";
 
 export function Hero({
   heading,
@@ -16,15 +18,26 @@ export function Hero({
   hasShowreel: boolean;
 }) {
   const visualUrl = resolveHeroImageUrl(heroImageUrl);
+  const optimizedVisual = canUseOptimizedImage(visualUrl);
 
   return (
     <section className="relative isolate overflow-hidden border-b border-white/10 bg-[var(--background-primary)]">
-      <div className="absolute inset-0 -z-20 bg-[var(--surface-primary)]">
-        <div
-          className="h-full w-full scale-[1.01] bg-cover bg-[70%_center] motion-safe:transition-transform motion-safe:duration-[1600ms] sm:bg-center lg:bg-[60%_center]"
-          style={{ backgroundImage: `url('${visualUrl}')` }}
-          aria-hidden="true"
-        />
+      <div className="absolute inset-0 -z-20 overflow-hidden bg-[var(--surface-primary)]" aria-hidden="true">
+        {optimizedVisual ? (
+          <Image
+            src={visualUrl}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="scale-[1.01] object-cover object-[70%_center] motion-safe:transition-transform motion-safe:duration-[1600ms] sm:object-center lg:object-[60%_center]"
+          />
+        ) : (
+          <div
+            className="h-full w-full scale-[1.01] bg-cover bg-[70%_center] motion-safe:transition-transform motion-safe:duration-[1600ms] sm:bg-center lg:bg-[60%_center]"
+            style={{ backgroundImage: `url('${visualUrl}')` }}
+          />
+        )}
       </div>
       <div
         className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(8,9,11,0.98)_0%,rgba(8,9,11,0.88)_38%,rgba(8,9,11,0.38)_70%,rgba(8,9,11,0.22)_100%)] max-lg:bg-[linear-gradient(180deg,rgba(8,9,11,0.62)_0%,rgba(8,9,11,0.8)_42%,rgba(8,9,11,0.98)_78%)]"
