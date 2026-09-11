@@ -18,7 +18,15 @@ const NAV_LINKS = [
   { label: "Contact", href: "/contact" },
 ];
 
-export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText?: string; siteName?: string }) {
+export function Header({
+  logoText = "LS",
+  logoImageUrl,
+  siteName = "Lucky Saroj",
+}: {
+  logoText?: string;
+  logoImageUrl?: string | null;
+  siteName?: string;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -46,8 +54,13 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
     <header className="sticky top-0 z-50 bg-[var(--color-ink)] text-white">
       <Container className="flex h-16 max-w-[1560px] items-center justify-between px-5 sm:h-[4.5rem] sm:px-8 lg:h-20 lg:px-12">
         <Link href="/" className="flex min-h-11 items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md border border-white/20 font-display text-sm font-bold">
-            {logoText}
+          <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-white/20 font-display text-sm font-bold">
+            {logoImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoImageUrl} alt={`${siteName} logo`} className="h-full w-full object-contain" />
+            ) : (
+              logoText
+            )}
           </span>
           <span className="hidden flex-col leading-none sm:flex">
             <span className="font-display text-sm font-semibold uppercase tracking-wide">
