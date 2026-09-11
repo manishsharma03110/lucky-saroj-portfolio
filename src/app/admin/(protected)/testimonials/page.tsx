@@ -7,26 +7,33 @@ import { TestimonialForm } from "@/components/admin/TestimonialForm";
 import { TestimonialListItem } from "@/components/admin/TestimonialListItem";
 import { requirePermission } from "@/lib/auth/authorization";
 import { AuthorizationError } from "@/lib/auth/authorization-core";
+import contentStyles from "@/components/admin/AdminContent.module.css";
 
 export const metadata: Metadata = { title: "Testimonials" };
 
 export default async function AdminTestimonialsPage() {
-  await requirePermission("testimonials.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
+  await requirePermission("testimonials.read").catch((error) => {
+    if (error instanceof AuthorizationError) notFound();
+    throw error;
+  });
+
   const testimonials = await db.select().from(schema.testimonials).orderBy(desc(schema.testimonials.createdAt));
 
   return (
     <div>
-      <AdminPageHeader title="Testimonials" description="Manage client testimonials" />
+      <AdminPageHeader
+        eyebrow="Social proof"
+        title="Testimonials"
+        description="Manage client feedback, ratings, visibility, and homepage highlights."
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-3">
-          {testimonials.map((t) => (
-            <TestimonialListItem key={t.id} testimonial={t} />
+      <div className={contentStyles.twoColumnWide}>
+        <div className={contentStyles.listStack}>
+          {testimonials.map((testimonial) => (
+            <TestimonialListItem key={testimonial.id} testimonial={testimonial} />
           ))}
           {testimonials.length === 0 && (
-            <p className="rounded-2xl border border-[var(--color-line)] bg-white px-5 py-8 text-center text-sm text-[var(--color-muted)]">
-              No testimonials yet.
-            </p>
+            <div className={contentStyles.emptyState}>No testimonials yet. Add your first client testimonial from the form.</div>
           )}
         </div>
         <TestimonialForm />

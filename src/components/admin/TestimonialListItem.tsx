@@ -5,45 +5,43 @@ import { DeleteButton } from "@/components/admin/DeleteButton";
 import { deleteTestimonial } from "@/lib/actions/testimonials";
 import type { schema } from "@/lib/db";
 import { TestimonialForm } from "./TestimonialForm";
+import styles from "./AdminEditorial.module.css";
 
 type Testimonial = typeof schema.testimonials.$inferSelect;
 
 export function TestimonialListItem({ testimonial }: { testimonial: Testimonial }) {
   return (
-    <div className="rounded-2xl border border-[var(--color-line)] bg-white p-5">
-      <div className="mb-2 flex items-start justify-between gap-4">
-        <div>
-          <h3 className="font-display text-sm font-semibold text-[var(--color-ink)]">
-            {testimonial.clientName}
-          </h3>
-          <p className="text-xs text-[var(--color-muted)]">
-            {[testimonial.designation, testimonial.company].filter(Boolean).join(", ")}
-          </p>
+    <article className={styles.testimonialCard}>
+      <div className={styles.cardHeader}>
+        <div className={styles.identity}>
+          <h3>{testimonial.clientName}</h3>
+          <p>{[testimonial.designation, testimonial.company].filter(Boolean).join(", ") || "Client"}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span
-            className={
-              "rounded-full px-2.5 py-1 text-xs font-medium " +
-              (testimonial.status === "published"
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-neutral-100 text-neutral-500")
-            }
-          >
-            {testimonial.status}
+        <div className={styles.cardActions}>
+          <span className={testimonial.status === "published" ? styles.statusPublished : styles.statusDraft}>
+            {testimonial.status === "published" ? "Published" : "Draft"}
           </span>
-          <DeleteButton confirmText={`Delete testimonial from ${testimonial.clientName}?`} onDelete={() => deleteTestimonial(testimonial.id)} />
+          <DeleteButton
+            confirmText={`Delete testimonial from ${testimonial.clientName}?`}
+            onDelete={() => deleteTestimonial(testimonial.id)}
+          />
         </div>
       </div>
-      <div className="mb-2 flex gap-0.5 text-[var(--color-accent)]">
-        {Array.from({ length: testimonial.rating }).map((_, i) => (
-          <Star key={i} size={12} fill="currentColor" strokeWidth={0} />
+
+      <div className={styles.rating} aria-label={`${testimonial.rating} out of 5 stars`}>
+        {Array.from({ length: testimonial.rating }).map((_, index) => (
+          <Star key={index} size={13} fill="currentColor" strokeWidth={0} />
         ))}
       </div>
-      <p className="text-sm text-[var(--color-muted)]">{testimonial.testimonialText}</p>
-      <details className="mt-3">
-        <summary className="cursor-pointer text-sm text-[var(--color-accent)]">Edit</summary>
-        <div className="mt-3"><TestimonialForm testimonial={testimonial} /></div>
+
+      <p className={styles.quote}>{testimonial.testimonialText}</p>
+
+      <details className={styles.disclosure}>
+        <summary>Edit testimonial</summary>
+        <div className={styles.disclosureBody}>
+          <TestimonialForm testimonial={testimonial} />
+        </div>
       </details>
-    </div>
+    </article>
   );
 }

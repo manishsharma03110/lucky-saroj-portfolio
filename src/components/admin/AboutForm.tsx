@@ -7,6 +7,7 @@ import { FormCard, FieldError } from "@/components/admin/FormParts";
 import { updateAboutProfile } from "@/lib/actions/about";
 import type { ActionState } from "@/lib/actions/portfolio";
 import type { schema } from "@/lib/db";
+import styles from "./AdminEditorial.module.css";
 
 type Profile = typeof schema.aboutProfile.$inferSelect;
 type Skill = typeof schema.aboutSkills.$inferSelect;
@@ -26,41 +27,42 @@ export function AboutForm({
   const [state, formAction, pending] = useActionState(updateAboutProfile, initialState);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className={styles.sectionStack}>
       <input type="hidden" name="revision" value={profile.revision} />
+
       <FormCard title="Profile">
         <div>
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" defaultValue={profile?.name ?? "Lucky Saroj"} required />
+          <Input id="name" name="name" defaultValue={profile.name ?? "Lucky Saroj"} required />
           <FieldError message={state.fieldErrors?.name} />
         </div>
         <div>
           <Label htmlFor="headline">Headline</Label>
-          <Input id="headline" name="headline" defaultValue={profile?.headline ?? ""} />
+          <Input id="headline" name="headline" defaultValue={profile.headline ?? ""} />
         </div>
         <div>
           <Label htmlFor="biography">Biography</Label>
-          <Textarea id="biography" name="biography" rows={5} defaultValue={profile?.biography ?? ""} />
+          <Textarea id="biography" name="biography" rows={6} defaultValue={profile.biography ?? ""} />
         </div>
       </FormCard>
 
       <FormCard title="Stats">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="yearsExperience">Years of Experience</Label>
-            <Input id="yearsExperience" name="yearsExperience" type="number" min={0} defaultValue={profile?.yearsExperience ?? 0} />
+            <Input id="yearsExperience" name="yearsExperience" type="number" min={0} defaultValue={profile.yearsExperience ?? 0} />
           </div>
           <div>
             <Label htmlFor="projectsCompleted">Projects Completed</Label>
-            <Input id="projectsCompleted" name="projectsCompleted" type="number" min={0} defaultValue={profile?.projectsCompleted ?? 0} />
+            <Input id="projectsCompleted" name="projectsCompleted" type="number" min={0} defaultValue={profile.projectsCompleted ?? 0} />
           </div>
           <div>
             <Label htmlFor="clientCount">Happy Clients</Label>
-            <Input id="clientCount" name="clientCount" type="number" min={0} defaultValue={profile?.clientCount ?? 0} />
+            <Input id="clientCount" name="clientCount" type="number" min={0} defaultValue={profile.clientCount ?? 0} />
           </div>
           <div>
             <Label htmlFor="viewsGenerated">Views Generated</Label>
-            <Input id="viewsGenerated" name="viewsGenerated" defaultValue={profile?.viewsGenerated ?? "0"} />
+            <Input id="viewsGenerated" name="viewsGenerated" defaultValue={profile.viewsGenerated ?? "0"} />
           </div>
         </div>
       </FormCard>
@@ -68,20 +70,20 @@ export function AboutForm({
       <FormCard title="Skills & Tools">
         <div>
           <Label htmlFor="skills">Skills</Label>
-          <Input id="skills" name="skills" defaultValue={skills.map((s) => s.name).join(", ")} placeholder="Storytelling, Pacing, Sound Design" />
-          <p className="mt-1 text-xs text-[var(--color-muted)]">Comma-separated</p>
+          <Input id="skills" name="skills" defaultValue={skills.map((skill) => skill.name).join(", ")} placeholder="Storytelling, Pacing, Sound Design" />
+          <p className={styles.helper}>Use commas to separate individual skills.</p>
         </div>
         <div>
           <Label htmlFor="tools">Tools / Software</Label>
-          <Input id="tools" name="tools" defaultValue={tools.map((t) => t.name).join(", ")} placeholder="Premiere Pro, After Effects" />
-          <p className="mt-1 text-xs text-[var(--color-muted)]">Comma-separated</p>
+          <Input id="tools" name="tools" defaultValue={tools.map((tool) => tool.name).join(", ")} placeholder="Premiere Pro, After Effects" />
+          <p className={styles.helper}>Use commas to separate individual tools.</p>
         </div>
       </FormCard>
 
-      {state.status === "error" && state.message && <p className="text-sm text-red-600">{state.message}</p>}
-      {state.status === "success" && state.message && <p className="text-sm text-emerald-600">{state.message}</p>}
+      {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}
+      {state.status === "success" && state.message && <p className={styles.feedbackSuccess}>{state.message}</p>}
 
-      <div className="flex justify-end">
+      <div className={styles.saveBar}>
         <Button type="submit" disabled={pending}>
           {pending ? "Saving..." : "Save Changes"}
         </Button>
