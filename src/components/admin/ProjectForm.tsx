@@ -10,6 +10,7 @@ import { createProject, updateProject, type ActionState } from "@/lib/actions/po
 import { MediaForm } from "@/components/admin/MediaForm";
 import { FileUpload } from "@/components/admin/FileUpload";
 import type { schema } from "@/lib/db";
+import styles from "@/components/admin/AdminEditorial.module.css";
 
 type Project = typeof schema.portfolioProjects.$inferSelect;
 type ProjectTool = typeof schema.projectTools.$inferSelect;
@@ -26,12 +27,7 @@ function slugify(input: string) {
     .replace(/-+/g, "-");
 }
 
-export function ProjectForm({
-  project,
-  tools,
-  categories,
-  mediaAssetIds,
-}: {
+export function ProjectForm({ project, tools, categories, mediaAssetIds }: {
   project?: Project;
   tools?: ProjectTool[];
   categories: Category[];
@@ -44,37 +40,19 @@ export function ProjectForm({
   const [slug, setSlug] = useState(project?.slug ?? "");
 
   return (
-    <MediaForm action={formAction} className="space-y-6">
+    <MediaForm action={formAction} className={styles.formGrid}>
       {project && <input type="hidden" name="revision" value={project.revision} />}
+
       <FormCard title="Project Details">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <Label htmlFor="title">Project Title</Label>
-            <Input
-              id="title"
-              name="title"
-              placeholder="Enter project title"
-              defaultValue={project?.title}
-              required
-              onChange={(e) => {
-                if (autoSlug) setSlug(slugify(e.target.value));
-              }}
-            />
+            <Input id="title" name="title" placeholder="Enter project title" defaultValue={project?.title} required onChange={(event) => { if (autoSlug) setSlug(slugify(event.target.value)); }} />
             <FieldError message={state.fieldErrors?.title} />
           </div>
           <div>
             <Label htmlFor="slug">Slug (URL)</Label>
-            <Input
-              id="slug"
-              name="slug"
-              placeholder="project-url-slug"
-              value={slug}
-              onChange={(e) => {
-                setAutoSlug(false);
-                setSlug(slugify(e.target.value));
-              }}
-              required
-            />
+            <Input id="slug" name="slug" placeholder="project-url-slug" value={slug} onChange={(event) => { setAutoSlug(false); setSlug(slugify(event.target.value)); }} required />
             <FieldError message={state.fieldErrors?.slug} />
           </div>
           <div>
@@ -89,11 +67,7 @@ export function ProjectForm({
             <Label htmlFor="categoryId">Category</Label>
             <Select id="categoryId" name="categoryId" defaultValue={project?.categoryId ?? ""}>
               <option value="">Select category</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
             </Select>
           </div>
           <div>
@@ -105,20 +79,14 @@ export function ProjectForm({
           </div>
         </div>
 
-             <FileUpload name="thumbnailUrl" assetIdName="thumbnailAssetId" label="Thumbnail Image" kind="image" defaultValue={project?.thumbnailUrl} defaultAssetId={mediaAssetIds?.thumbnail} />
+        <FileUpload name="thumbnailUrl" assetIdName="thumbnailAssetId" label="Thumbnail Image" kind="image" defaultValue={project?.thumbnailUrl} defaultAssetId={mediaAssetIds?.thumbnail} />
         <FileUpload name="videoUrl" assetIdName="videoAssetId" label="Project Video" kind="video" defaultValue={project?.videoUrl} defaultAssetId={mediaAssetIds?.video} />
-        <p className="-mt-3 text-xs text-[var(--color-muted)]">
-          Upload a video file or paste a YouTube/Vimeo link above.
-        </p>
+        <p className={styles.helper}>Upload a video file or paste a YouTube/Vimeo link above.</p>
+
         <div>
           <Label htmlFor="tools">Tools / Software Used</Label>
-          <Input
-            id="tools"
-            name="tools"
-            placeholder="Premiere Pro, After Effects, DaVinci Resolve"
-            defaultValue={tools?.map((t) => t.name).join(", ") ?? ""}
-          />
-          <p className="mt-1 text-xs text-[var(--color-muted)]">Comma-separated</p>
+          <Input id="tools" name="tools" placeholder="Premiere Pro, After Effects, DaVinci Resolve" defaultValue={tools?.map((tool) => tool.name).join(", ") ?? ""} />
+          <p className={styles.helper}>Comma-separated</p>
         </div>
 
         <CheckboxField name="isFeatured" label="Featured project (shown on homepage)" defaultChecked={project?.isFeatured} />
@@ -154,17 +122,14 @@ export function ProjectForm({
         </div>
       </FormCard>
 
-      {state.status === "error" && state.message && (
-        <p className="text-sm text-red-600">{state.message}</p>
-      )}
+      {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}
+      {state.status === "success" && state.message && <p className={styles.feedbackSuccess}>{state.message}</p>}
 
-      <div className="flex items-center justify-end gap-3">
-        <Button type="button" variant="secondary" onClick={() => router.push("/admin/portfolio")}>
-          Cancel
-        </Button>
-        <Button type="submit" disabled={pending}>
-          {pending ? "Saving..." : project ? "Save Changes" : "Publish Project"}
-        </Button>
+      <div className={styles.saveBar}>
+        <div className="flex items-center gap-3">
+          <Button type="button" variant="secondary" onClick={() => router.push("/admin/portfolio")} disabled={pending}>Cancel</Button>
+          <Button type="submit" disabled={pending}>{pending ? "Saving..." : project ? "Save Changes" : "Publish Project"}</Button>
+        </div>
       </div>
     </MediaForm>
   );
