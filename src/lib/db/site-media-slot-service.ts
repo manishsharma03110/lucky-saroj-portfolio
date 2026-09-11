@@ -11,6 +11,9 @@ export const SITE_IMAGE_SLOTS = [
   "logo_image",
   "favicon",
   "og_image",
+  "services_hero_image",
+  "experience_hero_image",
+  "contact_hero_image",
 ] as const;
 
 export type SiteImageSlot = (typeof SITE_IMAGE_SLOTS)[number];
