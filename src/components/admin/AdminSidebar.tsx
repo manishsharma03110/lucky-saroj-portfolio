@@ -54,10 +54,6 @@ export function AdminSidebar({ userName, permissions }: { userName?: string | nu
   const allowed = new Set(permissions);
 
   useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     if (!mobileOpen) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -93,6 +89,7 @@ export function AdminSidebar({ userName, permissions }: { userName?: string | nu
                         href={item.href}
                         aria-current={active ? "page" : undefined}
                         className={cn(styles.navItem, active && styles.navItemActive)}
+                        onClick={() => setMobileOpen(false)}
                       >
                         <Icon size={17} strokeWidth={1.8} />
                         <span>{item.label}</span>
