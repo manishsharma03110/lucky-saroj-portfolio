@@ -7,6 +7,8 @@ import { FormCard, FieldError } from "@/components/admin/FormParts";
 import { updateAboutProfile } from "@/lib/actions/about";
 import type { ActionState } from "@/lib/actions/portfolio";
 import type { schema } from "@/lib/db";
+import { MediaForm } from "@/components/admin/MediaForm";
+import { FileUpload } from "@/components/admin/FileUpload";
 import styles from "./AdminEditorial.module.css";
 
 type Profile = typeof schema.aboutProfile.$inferSelect;
@@ -19,18 +21,29 @@ export function AboutForm({
   profile,
   skills,
   tools,
+  profileImageAssetId,
 }: {
   profile: Profile;
   skills: Skill[];
   tools: Tool[];
+  profileImageAssetId?: string | null;
 }) {
   const [state, formAction, pending] = useActionState(updateAboutProfile, initialState);
 
   return (
-    <form action={formAction} className={styles.sectionStack}>
+    <MediaForm action={formAction} className={styles.sectionStack}>
       <input type="hidden" name="revision" value={profile.revision} />
 
       <FormCard title="Profile">
+        <FileUpload
+          name="profileImageUrl"
+          assetIdName="profileImageAssetId"
+          label="Profile Image"
+          kind="image"
+          defaultValue={profile.profileImageUrl}
+          defaultAssetId={profileImageAssetId}
+        />
+        <p className={styles.helper}>Upload, replace, or remove the profile image used on the About page.</p>
         <div>
           <Label htmlFor="name">Name</Label>
           <Input id="name" name="name" defaultValue={profile.name ?? "Lucky Saroj"} required />
@@ -88,6 +101,6 @@ export function AboutForm({
           {pending ? "Saving..." : "Save Changes"}
         </Button>
       </div>
-    </form>
+    </MediaForm>
   );
 }
