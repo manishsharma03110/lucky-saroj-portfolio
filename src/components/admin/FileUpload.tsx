@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { UploadCloud, X, Loader2, Play } from "lucide-react";
 import { Input, Label } from "@/components/ui/Input";
+import { getUploadAcceptValue, validateUploadFilePolicy } from "@/lib/media/upload-policy";
 import { useUploadActivity } from "./MediaForm";
 
 type UploadInitiation = { assetId: string; pathname: string; kind: "image" | "video" };
@@ -34,6 +35,15 @@ export function FileUpload({
   async function handleFile(file: File | undefined) {
     if (!file) return;
     setError(null);
+    const policy = validateUploadFilePolicy({ kind, contentType: file.type, size: file.size });
+    if (!policy.ok) {
+      setError(policy.reason === "invalid_type"
+        ? `Unsupported ${kind} format.`
+        : `${kind === "image" ? "Image" : "Video"} file is too large or empty.`);
+      if (inputRef.current) inputRef.current.value = "";
+      return;
+    }
+
     setUploading(true);
     reportUpload(true);
     setProgress(0);
@@ -41,7 +51,7 @@ export function FileUpload({
       const initiationResponse = await fetch("/api/upload/initiate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ kind, originalFilename: file.name }),
+        body: JSON.stringify({ kind, originalFilename: file.name, contentType: file.type, size: file.size }),
       });
       if (!initiationResponse.ok) throw new Error("Upload initiation failed.");
       const initiation = await initiationResponse.json() as UploadInitiation;
@@ -111,7 +121,7 @@ export function FileUpload({
         </button>
       )}
 
-      <input ref={inputRef} type="file" accept={kind === "image" ? "image/*" : "video/*"} className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
+      <input ref={inputRef} type="file" accept={getUploadAcceptValue(kind)} className="hidden" onChange={(e) => handleFile(e.target.files?.[0])} />
       {kind === "video" && (
         <div className="mt-4">
           <Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label>

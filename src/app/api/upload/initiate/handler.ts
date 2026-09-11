@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { ApiAuthorization } from "@/lib/auth/admin-api";
 import type { PersistedMediaAsset, PendingMediaAssetInput } from "@/lib/db/media-asset-service";
+import { validateUploadFilePolicy } from "@/lib/media/upload-policy";
 import { uploadInitiationSchema } from "../contracts";
 
 type InitiationDependencies = {
@@ -14,6 +15,10 @@ export function createUploadInitiationHandler({ authorizeAdmin, createPendingAss
     if (!authorization.ok) return authorization.response;
     try {
       const input = uploadInitiationSchema.parse(await request.json());
+      const policy = validateUploadFilePolicy({ kind: input.kind, contentType: input.contentType, size: input.size });
+      if (!policy.ok) {
+        return NextResponse.json({ error: "Selected file is not allowed." }, { status: 400 });
+      }
       const asset = await createPendingAsset({
         kind: input.kind,
         originalFilename: input.originalFilename,

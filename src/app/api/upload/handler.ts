@@ -3,11 +3,9 @@ import { NextResponse } from "next/server";
 import type { ApiAuthorization } from "@/lib/auth/admin-api";
 import type { AuthorizePendingMediaAssetUploadInput } from "@/lib/db/media-asset-service";
 import { createStorageKey } from "@/lib/media/ownership";
+import { getAllowedUploadContentTypes, getMaximumUploadSize } from "@/lib/media/upload-policy";
 import { uploadClientPayloadSchema, uploadCompletionPayloadSchema } from "./contracts";
 import { getPortfolioMediaBlobToken } from "./blob-token";
-
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const ALLOWED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/quicktime"];
 
 type UploadHandlerDependencies = {
   authorizeAdmin: () => Promise<ApiAuthorization>;
@@ -32,10 +30,10 @@ export function createUploadHandler({ authorizeAdmin, authorizePendingUpload, ha
           await authorizePendingUpload({ assetId: intent.assetId, expectedProviderKey: providerKey, kind: intent.kind, uploaderAdminId: authorization.admin.id });
           const tokenPayload = uploadCompletionPayloadSchema.parse({ assetId: intent.assetId, providerKey, kind: intent.kind });
           return {
-            allowedContentTypes: intent.kind === "video" ? ALLOWED_VIDEO_TYPES : ALLOWED_IMAGE_TYPES,
+            allowedContentTypes: [...getAllowedUploadContentTypes(intent.kind)],
             addRandomSuffix: false,
             allowOverwrite: false,
-            maximumSizeInBytes: intent.kind === "video" ? 200 * 1024 * 1024 : 10 * 1024 * 1024,
+            maximumSizeInBytes: getMaximumUploadSize(intent.kind),
             tokenPayload: JSON.stringify(tokenPayload),
             callbackUrl: new URL("/api/upload/complete", request.url).toString(),
           };

@@ -5,6 +5,8 @@ import { uploadKindSchema } from "@/lib/validations/upload";
 export const uploadInitiationSchema = z.object({
   kind: uploadKindSchema,
   originalFilename: originalFilenameSchema,
+  contentType: z.string().min(1).max(100),
+  size: z.number().int().positive(),
 }).strict();
 
 export const uploadClientPayloadSchema = z.object({
