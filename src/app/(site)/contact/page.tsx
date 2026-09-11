@@ -1,16 +1,17 @@
+import type { Metadata } from "next";
 import { ContactInfo } from "@/components/contact/ContactInfo";
 import { ContactFormShell } from "@/components/contact/page/ContactFormShell";
 import { ContactHero } from "@/components/contact/page/ContactHero";
 import { ContactPortfolioCTA } from "@/components/contact/page/ContactPortfolioCTA";
 import { getAboutProfile, getServices, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
-import { createPageMetadata } from "@/lib/seo";
+import { getPageSeo } from "@/lib/db/page-seo-service";
+import { createCmsPageMetadata } from "@/lib/seo";
 
-export const metadata = createPageMetadata({
-  title: "Contact",
-  description: "Contact Lucky Saroj to discuss video editing, post-production, documentary, commercial or social content projects.",
-  path: "/contact",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, settings] = await Promise.all([getPageSeo("contact"), getSiteSettings()]);
+  return createCmsPageMetadata(seo, settings?.ogImageUrl);
+}
 
 export default async function ContactPage() {
   const [settings, profile, services, page] = await Promise.all([
