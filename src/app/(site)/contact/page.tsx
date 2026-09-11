@@ -3,6 +3,7 @@ import { ContactFormShell } from "@/components/contact/page/ContactFormShell";
 import { ContactHero } from "@/components/contact/page/ContactHero";
 import { ContactPortfolioCTA } from "@/components/contact/page/ContactPortfolioCTA";
 import { getAboutProfile, getServices, getSiteSettings } from "@/lib/db/queries";
+import { getPageContent } from "@/lib/db/page-content-service";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -12,11 +13,13 @@ export const metadata = createPageMetadata({
 });
 
 export default async function ContactPage() {
-  const [settings, profile, services] = await Promise.all([
+  const [settings, profile, services, page] = await Promise.all([
     getSiteSettings(),
     getAboutProfile(),
     getServices(),
+    getPageContent("contact"),
   ]);
+  const copy = page.content;
   const socialLinks = [
     { label: "Instagram", href: settings?.instagramUrl },
     { label: "X / Twitter", href: settings?.twitterUrl },
@@ -28,7 +31,7 @@ export default async function ContactPage() {
 
   return (
     <main className="overflow-hidden bg-[var(--background-primary)]">
-      <ContactHero />
+      <ContactHero eyebrow={copy.heroEyebrow} titleBefore={copy.heroTitleBefore} titleAccent={copy.heroTitleAccent} titleAfter={copy.heroTitleAfter} description={copy.heroDescription} />
 
       <section className="bg-[var(--background-primary)] py-12 sm:py-16" aria-labelledby="contact-details-heading">
         <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12">
@@ -48,7 +51,7 @@ export default async function ContactPage() {
           </div>
         </div>
       </section>
-      <ContactPortfolioCTA />
+      <ContactPortfolioCTA heading={copy.portfolioCtaHeading} description={copy.portfolioCtaDescription} label={copy.portfolioCtaLabel} url={copy.portfolioCtaUrl} />
     </main>
   );
 }
