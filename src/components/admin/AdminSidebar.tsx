@@ -6,6 +6,7 @@ import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
+  Home,
   FolderKanban,
   Tags,
   Briefcase,
@@ -29,6 +30,7 @@ const NAV_SECTIONS = [
     label: "Content",
     items: [
       { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
+      { label: "Homepage", href: "/admin/home", icon: Home, permission: "settings.read" },
       { label: "Portfolio", href: "/admin/portfolio", icon: FolderKanban, permission: "portfolio.read" },
       { label: "Categories", href: "/admin/categories", icon: Tags, permission: "categories.read" },
       { label: "Experience", href: "/admin/experience", icon: Briefcase, permission: "experience.read" },
