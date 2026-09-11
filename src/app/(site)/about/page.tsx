@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AboutHero } from "@/components/about/AboutHero";
 import { AboutStats } from "@/components/about/AboutStats";
 import { Skills } from "@/components/about/Skills";
@@ -11,13 +12,13 @@ import {
   getSiteSettings,
 } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
-import { createPageMetadata } from "@/lib/seo";
+import { getPageSeo } from "@/lib/db/page-seo-service";
+import { createCmsPageMetadata } from "@/lib/seo";
 
-export const metadata = createPageMetadata({
-  title: "About",
-  description: "Meet Lucky Saroj, a video editor and visual storyteller focused on documentaries, commercials, social content and motion-led post-production.",
-  path: "/about",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, settings] = await Promise.all([getPageSeo("about"), getSiteSettings()]);
+  return createCmsPageMetadata(seo, settings?.ogImageUrl);
+}
 
 export default async function AboutPage() {
   const [profile, skills, tools, experiences, settings, page] = await Promise.all([
