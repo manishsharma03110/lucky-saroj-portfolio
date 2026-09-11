@@ -5,7 +5,7 @@ import { ProjectCTA } from "@/components/portfolio/detail/ProjectCTA";
 import { ProjectHero } from "@/components/portfolio/detail/ProjectHero";
 import { ProjectGallery, ProjectMedia } from "@/components/portfolio/detail/ProjectMedia";
 import { ProjectNavigation } from "@/components/portfolio/detail/ProjectNavigation";
-import { getAdjacentProjects, getProjectBySlug } from "@/lib/db/queries";
+import { getAdjacentProjects, getProjectBySlug, getSiteSettings } from "@/lib/db/queries";
 import { createPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
@@ -14,18 +14,28 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const data = await getProjectBySlug(slug);
+  const [data, settings] = await Promise.all([getProjectBySlug(slug), getSiteSettings()]);
   if (!data || data.project.status !== "published") {
     return { robots: { index: false, follow: false } };
   }
 
   const title = data.project.seoTitle ?? data.project.title;
   const description = data.project.seoDescription ?? data.project.description ?? `Watch ${data.project.title}, a video editing project by Lucky Saroj.`;
+  const keywords = [
+    data.project.title,
+    data.category?.name,
+    data.project.clientName,
+    data.project.year ? String(data.project.year) : null,
+    "video editing",
+    "Lucky Saroj",
+  ].filter((value): value is string => Boolean(value));
   return createPageMetadata({
     title,
     description,
     path: `/portfolio/${data.project.slug}`,
-    image: data.project.thumbnailUrl ?? data.project.posterUrl,
+    image: data.project.thumbnailUrl ?? data.project.posterUrl ?? settings?.ogImageUrl,
+    keywords,
+    robotsIndex: true,
   });
 }
 
