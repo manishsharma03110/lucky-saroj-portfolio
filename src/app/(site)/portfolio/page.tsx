@@ -1,5 +1,4 @@
 import { ArrowUpRight } from "lucide-react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CategoryFilter } from "@/components/portfolio/CategoryFilter";
@@ -7,8 +6,13 @@ import { PortfolioCTA } from "@/components/portfolio/PortfolioCTA";
 import { PortfolioHero } from "@/components/portfolio/PortfolioHero";
 import { hasUsableVisual, ProjectCard } from "@/components/portfolio/ProjectCard";
 import { getCategories, getProjectBySlug, getPublishedProjects } from "@/lib/db/queries";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Portfolio" };
+export const metadata = createPageMetadata({
+  title: "Portfolio",
+  description: "Explore selected video editing work by Lucky Saroj across documentaries, commercials, social reels and visual storytelling projects.",
+  path: "/portfolio",
+});
 
 const COLLECTION_LAYOUTS = ["lg:col-span-7", "lg:col-span-5 lg:pt-20", "lg:col-span-5", "lg:col-span-7 lg:pt-14"] as const;
 

@@ -1,11 +1,15 @@
-import type { Metadata } from "next";
 import { ContactInfo } from "@/components/contact/ContactInfo";
 import { ContactFormShell } from "@/components/contact/page/ContactFormShell";
 import { ContactHero } from "@/components/contact/page/ContactHero";
 import { ContactPortfolioCTA } from "@/components/contact/page/ContactPortfolioCTA";
 import { getAboutProfile, getServices, getSiteSettings } from "@/lib/db/queries";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Contact" };
+export const metadata = createPageMetadata({
+  title: "Contact",
+  description: "Contact Lucky Saroj to discuss video editing, post-production, documentary, commercial or social content projects.",
+  path: "/contact",
+});
 
 export default async function ContactPage() {
   const [settings, profile, services] = await Promise.all([

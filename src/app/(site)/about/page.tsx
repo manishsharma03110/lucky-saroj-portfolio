@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { AboutHero } from "@/components/about/AboutHero";
 import { AboutStats } from "@/components/about/AboutStats";
 import { Skills } from "@/components/about/Skills";
@@ -11,8 +10,13 @@ import {
   getExperiences,
   getSiteSettings,
 } from "@/lib/db/queries";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "About" };
+export const metadata = createPageMetadata({
+  title: "About",
+  description: "Meet Lucky Saroj, a video editor and visual storyteller focused on documentaries, commercials, social content and motion-led post-production.",
+  path: "/about",
+});
 
 export default async function AboutPage() {
   const [profile, skills, tools, experiences, settings] = await Promise.all([

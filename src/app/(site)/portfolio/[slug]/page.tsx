@@ -6,6 +6,7 @@ import { ProjectHero } from "@/components/portfolio/detail/ProjectHero";
 import { ProjectGallery, ProjectMedia } from "@/components/portfolio/detail/ProjectMedia";
 import { ProjectNavigation } from "@/components/portfolio/detail/ProjectNavigation";
 import { getAdjacentProjects, getProjectBySlug } from "@/lib/db/queries";
+import { createPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -14,11 +15,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const data = await getProjectBySlug(slug);
-  if (!data || data.project.status !== "published") return {};
-  return {
-    title: data.project.seoTitle ?? data.project.title,
-    description: data.project.seoDescription ?? data.project.description ?? undefined,
-  };
+  if (!data || data.project.status !== "published") {
+    return { robots: { index: false, follow: false } };
+  }
+
+  const title = data.project.seoTitle ?? data.project.title;
+  const description = data.project.seoDescription ?? data.project.description ?? `Watch ${data.project.title}, a video editing project by Lucky Saroj.`;
+  return createPageMetadata({
+    title,
+    description,
+    path: `/portfolio/${data.project.slug}`,
+    image: data.project.thumbnailUrl ?? data.project.posterUrl,
+  });
 }
 
 export default async function ProjectDetailPage({

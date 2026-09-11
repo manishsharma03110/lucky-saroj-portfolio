@@ -1,11 +1,15 @@
-import type { Metadata } from "next";
 import { ExperienceCapabilities } from "@/components/experience/ExperienceCapabilities";
 import { ExperienceHero } from "@/components/experience/ExperienceHero";
 import { ExperienceList } from "@/components/experience/ExperienceList";
 import { Button } from "@/components/ui/Button";
 import { getAboutSkills, getExperiences } from "@/lib/db/queries";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Experience" };
+export const metadata = createPageMetadata({
+  title: "Experience",
+  description: "Explore Lucky Saroj's video editing experience, creative capabilities and professional journey across story-driven post-production work.",
+  path: "/experience",
+});
 
 export default async function ExperiencePage() {
   const [experiences, skills] = await Promise.all([getExperiences(), getAboutSkills()]);

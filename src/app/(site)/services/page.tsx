@@ -1,11 +1,15 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import { ServicesShowcase } from "@/components/services/ServicesShowcase";
 import { ProcessTimeline } from "@/components/services/ProcessTimeline";
 import { ServicesTools } from "@/components/services/ServicesTools";
 import { getAboutTools, getServices } from "@/lib/db/queries";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Services" };
+export const metadata = createPageMetadata({
+  title: "Services",
+  description: "Video editing and post-production services for YouTube documentaries, commercials, social reels and story-driven digital content.",
+  path: "/services",
+});
 
 export default async function ServicesPage() {
   const [services, tools] = await Promise.all([getServices(false), getAboutTools()]);
