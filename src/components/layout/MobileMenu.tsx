@@ -16,11 +16,42 @@ export function MobileMenu({
   links: { label: string; href: string }[];
   pathname: string;
 }) {
+  const navRef = useRef<HTMLElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
   const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (open) requestAnimationFrame(() => firstLinkRef.current?.focus());
+    if (!open) return;
+
+    const frame = requestAnimationFrame(() => firstLinkRef.current?.focus());
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Tab" || !navRef.current) return;
+
+      const focusable = Array.from(
+        navRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => !element.hasAttribute("hidden"));
+
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open]);
 
   const isActive = (href: string) =>
@@ -30,6 +61,7 @@ export function MobileMenu({
     <AnimatePresence>
       {open && (
         <motion.nav
+          ref={navRef}
           id="mobile-navigation"
           initial={reduceMotion ? false : { height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
