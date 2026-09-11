@@ -5,11 +5,11 @@ import { assetIdSchema } from "@/lib/media/ownership";
 
 const boundedExternalUrl = externalWebUrlSchema.refine((value) => value.length <= 300, "URL must be at most 300 characters.");
 const optionalUrl = z.union([z.literal(""), boundedExternalUrl]);
-const optionalHeroImageUrl = z.union([z.literal(""), mediaReferenceSchema]).refine(
+const optionalImageUrl = z.union([z.literal(""), mediaReferenceSchema]).refine(
   (value) => value.length <= 2048,
-  "Hero image reference is too long."
+  "Image reference is too long."
 );
-const optionalHeroImageAssetId = z.union([z.literal(""), assetIdSchema]);
+const optionalImageAssetId = z.union([z.literal(""), assetIdSchema]);
 const optionalWhatsApp = z.union([
   z.literal(""),
   boundedExternalUrl,
@@ -19,6 +19,10 @@ const optionalWhatsApp = z.union([
 export const settingsSchema = z.object({
   siteName: z.string().trim().min(1).max(120),
   logoText: z.string().trim().min(1).max(10),
+  logoImageUrl: optionalImageUrl,
+  logoImageAssetId: optionalImageAssetId,
+  favicon: optionalImageUrl,
+  faviconAssetId: optionalImageAssetId,
   contactEmail: boundedContactEmailSchema,
   contactPhone: z.string().trim().max(40),
   whatsapp: optionalWhatsApp,
@@ -29,8 +33,8 @@ export const settingsSchema = z.object({
   heroHeading: z.string().trim().max(160),
   heroSubheading: z.string().trim().max(200),
   heroDescription: z.string().trim().max(600),
-  heroImageUrl: optionalHeroImageUrl,
-  heroImageAssetId: optionalHeroImageAssetId,
+  heroImageUrl: optionalImageUrl,
+  heroImageAssetId: optionalImageAssetId,
   statYears: z.string().trim().max(20),
   statProjects: z.string().trim().max(20),
   statClients: z.string().trim().max(20),
@@ -44,6 +48,8 @@ export const settingsSchema = z.object({
   vimeoUrl: optionalUrl,
   seoTitle: z.string().trim().max(200),
   seoDescription: z.string().trim().max(300).optional().or(z.literal("")),
+  ogImageUrl: optionalImageUrl,
+  ogImageAssetId: optionalImageAssetId,
 });
 
 export type SettingsInput = z.infer<typeof settingsSchema>;
