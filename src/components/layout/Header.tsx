@@ -22,10 +22,16 @@ export function Header({
   logoText = "LS",
   logoImageUrl,
   siteName = "Lucky Saroj",
+  roleLabel = "Video Editor",
+  ctaLabel = "Let’s Talk",
+  ctaUrl = "/contact",
 }: {
   logoText?: string;
   logoImageUrl?: string | null;
   siteName?: string;
+  roleLabel?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -66,7 +72,7 @@ export function Header({
             <span className="font-display text-sm font-semibold uppercase tracking-wide">
               {siteName}
             </span>
-            <span className="timecode !text-white/50">Video Editor</span>
+            <span className="timecode !text-white/50">{roleLabel}</span>
           </span>
         </Link>
 
@@ -90,8 +96,8 @@ export function Header({
         </nav>
 
         <div className="hidden lg:block">
-          <Button href="/contact" className="!px-5 !py-2.5">
-            Let&rsquo;s Talk
+          <Button href={ctaUrl} className="!px-5 !py-2.5">
+            {ctaLabel}
           </Button>
         </div>
 
