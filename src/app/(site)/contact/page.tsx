@@ -32,7 +32,15 @@ export default async function ContactPage() {
 
   return (
     <main className="overflow-hidden bg-[var(--background-primary)]">
-      <ContactHero eyebrow={copy.heroEyebrow} titleBefore={copy.heroTitleBefore} titleAccent={copy.heroTitleAccent} titleAfter={copy.heroTitleAfter} description={copy.heroDescription} />
+      <ContactHero
+        eyebrow={copy.heroEyebrow}
+        titleBefore={copy.heroTitleBefore}
+        titleAccent={copy.heroTitleAccent}
+        titleAfter={copy.heroTitleAfter}
+        description={copy.heroDescription}
+        heroImageUrl={copy.heroImageUrl}
+        heroImageAlt={copy.heroImageAlt}
+      />
 
       <section className="bg-[var(--background-primary)] py-12 sm:py-16" aria-labelledby="contact-details-heading">
         <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12">
