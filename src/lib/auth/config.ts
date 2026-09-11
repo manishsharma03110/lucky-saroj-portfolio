@@ -6,6 +6,12 @@ import { eq } from "drizzle-orm";
 import { edgeAuthConfig } from "./edge-config";
 import { authorizeAdminCredentials } from "./credentials";
 import { applyAdminJwt, projectAdminSession } from "./callbacks";
+import {
+  clearAdminLoginFailures,
+  getAdminLoginRateLimitKey,
+  isAdminLoginRateLimited,
+  recordAdminLoginFailure,
+} from "./login-rate-limit";
 
 export const authConfig: NextAuthConfig = {
   ...edgeAuthConfig,
@@ -19,8 +25,11 @@ export const authConfig: NextAuthConfig = {
         email: { label: "Email or username", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      authorize: async (raw) => {
-        return authorizeAdminCredentials(raw, {
+      authorize: async (raw, request) => {
+        const rateLimitKey = getAdminLoginRateLimitKey(request, raw);
+        if (isAdminLoginRateLimited(rateLimitKey)) return null;
+
+        const admin = await authorizeAdminCredentials(raw, {
           findByEmail: async (email) => {
             const users = await db
               .select({
@@ -38,6 +47,14 @@ export const authConfig: NextAuthConfig = {
           },
           verifyPassword: bcrypt.compare,
         });
+
+        if (!admin) {
+          recordAdminLoginFailure(rateLimitKey);
+          return null;
+        }
+
+        clearAdminLoginFailures(rateLimitKey);
+        return admin;
       },
     }),
   ],

@@ -1,8 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 
-// Edge-safe config used by middleware — no providers here, since the
-// Credentials provider needs the (Node-only) better-sqlite3 DB client and
-// Next.js middleware runs on the Edge runtime.
+// Edge-safe config used by the admin route proxy. Providers stay out of this
+// layer because credential verification requires the Node runtime and database access.
 export const edgeAuthConfig: NextAuthConfig = {
   pages: {
     signIn: "/admin/login",
