@@ -2,6 +2,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 import { withCmsTransaction } from "./index";
 import { ContentNotFoundError, StaleRevisionError } from "./mutation-errors";
+import { prepareSiteImageSlot, synchronizeSiteImageSlot, type SiteImageSlot } from "./site-media-slot-service";
 import { defaultPageContent, PAGE_CONTENT_KEYS, type PageContentKey } from "@/lib/page-content";
 
 export type PageContentRecord = Readonly<{
@@ -9,6 +10,12 @@ export type PageContentRecord = Readonly<{
   content: Record<string, string>;
   revision: number;
 }>;
+
+const PAGE_HERO_SLOTS: Partial<Record<PageContentKey, SiteImageSlot>> = {
+  services: "services_hero_image",
+  experience: "experience_hero_image",
+  contact: "contact_hero_image",
+};
 
 function normalizeContent(pageKey: PageContentKey, value: unknown): Record<string, string> {
   const defaults = defaultPageContent(pageKey);
@@ -55,17 +62,30 @@ export async function getAllPageContent(): Promise<PageContentRecord[]> {
   }
 }
 
-export async function updatePageContent(pageKey: PageContentKey, content: Record<string, string>, expectedRevision: number): Promise<number> {
+export async function updatePageContent(
+  pageKey: PageContentKey,
+  content: Record<string, string>,
+  expectedRevision: number,
+  heroImageAssetId?: string | null
+): Promise<number> {
   return withCmsTransaction(async (tx) => {
-    const serialized = JSON.stringify(normalizeContent(pageKey, content));
+    const normalized = normalizeContent(pageKey, content);
+    const heroSlot = PAGE_HERO_SLOTS[pageKey];
+    const heroImage = heroSlot
+      ? await prepareSiteImageSlot(tx, { assetId: heroImageAssetId || null, url: normalized.heroImageUrl || null, kind: "image" })
+      : null;
+    const serialized = JSON.stringify(normalized);
     const updated = await tx.db.update<{ revision: number }>(sql`
       UPDATE page_content SET content=${serialized}::jsonb, revision=revision+1
       WHERE page_key=${pageKey} AND revision=${expectedRevision}
       RETURNING revision
     `);
-    if (updated.rows[0]) return updated.rows[0].revision;
-    const exists = await tx.db.select(sql`SELECT 1 FROM page_content WHERE page_key=${pageKey}`);
-    if (!exists.rows[0]) throw new ContentNotFoundError();
-    throw new StaleRevisionError();
+    if (!updated.rows[0]) {
+      const exists = await tx.db.select(sql`SELECT 1 FROM page_content WHERE page_key=${pageKey}`);
+      if (!exists.rows[0]) throw new ContentNotFoundError();
+      throw new StaleRevisionError();
+    }
+    if (heroSlot && heroImage) await synchronizeSiteImageSlot(tx, heroSlot, heroImage);
+    return updated.rows[0].revision;
   });
 }
