@@ -1,16 +1,17 @@
+import type { Metadata } from "next";
 import { ExperienceCapabilities } from "@/components/experience/ExperienceCapabilities";
 import { ExperienceHero } from "@/components/experience/ExperienceHero";
 import { ExperienceList } from "@/components/experience/ExperienceList";
 import { Button } from "@/components/ui/Button";
-import { getAboutSkills, getExperiences } from "@/lib/db/queries";
+import { getAboutSkills, getExperiences, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
-import { createPageMetadata } from "@/lib/seo";
+import { getPageSeo } from "@/lib/db/page-seo-service";
+import { createCmsPageMetadata } from "@/lib/seo";
 
-export const metadata = createPageMetadata({
-  title: "Experience",
-  description: "Explore Lucky Saroj's video editing experience, creative capabilities and professional journey across story-driven post-production work.",
-  path: "/experience",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, settings] = await Promise.all([getPageSeo("experience"), getSiteSettings()]);
+  return createCmsPageMetadata(seo, settings?.ogImageUrl);
+}
 
 export default async function ExperiencePage() {
   const [experiences, skills, page] = await Promise.all([getExperiences(), getAboutSkills(), getPageContent("experience")]);
