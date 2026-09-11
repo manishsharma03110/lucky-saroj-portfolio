@@ -1,15 +1,36 @@
-export const PAGE_CONTENT_KEYS = ["about", "services", "experience", "portfolio", "contact"] as const;
+export const PAGE_CONTENT_KEYS = ["global", "about", "services", "experience", "portfolio", "contact"] as const;
 export type PageContentKey = (typeof PAGE_CONTENT_KEYS)[number];
 
 export type PageContentField = Readonly<{
   key: string;
   label: string;
-  kind?: "input" | "textarea" | "url";
+  kind?: "input" | "textarea" | "url" | "image";
   maxLength?: number;
   defaultValue: string;
 }>;
 
 export const PAGE_CONTENT_CONFIG: Record<PageContentKey, { label: string; fields: readonly PageContentField[] }> = {
+  global: {
+    label: "Header & Footer",
+    fields: [
+      { key: "headerRoleLabel", label: "Header Role Label", defaultValue: "Video Editor" },
+      { key: "headerCtaLabel", label: "Header CTA Label", defaultValue: "Let’s Talk" },
+      { key: "headerCtaUrl", label: "Header CTA URL", kind: "url", defaultValue: "/contact" },
+      { key: "footerEyebrow", label: "Footer Eyebrow", defaultValue: "Have a project in mind?" },
+      { key: "footerHeadingLine1", label: "Footer Heading Line 1", defaultValue: "Let’s create" },
+      { key: "footerHeadingLine2", label: "Footer Heading Line 2", defaultValue: "something" },
+      { key: "footerHeadingAccent", label: "Footer Accent Line", defaultValue: "worth watching." },
+      { key: "footerCtaDescription", label: "Footer CTA Description", kind: "textarea", maxLength: 500, defaultValue: "Share the project and what you want the final edit to communicate." },
+      { key: "footerCtaLabel", label: "Footer CTA Label", defaultValue: "Start a project" },
+      { key: "footerCtaUrl", label: "Footer CTA URL", kind: "url", defaultValue: "/contact" },
+      { key: "footerRoleLabel", label: "Footer Role Label", defaultValue: "Video Editor & Visual Storyteller" },
+      { key: "footerExploreLabel", label: "Explore Column Label", defaultValue: "Explore" },
+      { key: "footerExpertiseLabel", label: "Expertise Column Label", defaultValue: "Expertise" },
+      { key: "footerSocialEyebrow", label: "Social Eyebrow", defaultValue: "Social presence" },
+      { key: "footerSocialHeading", label: "Social Heading", defaultValue: "Follow my work" },
+      { key: "footerCopyrightRole", label: "Copyright Role Label", defaultValue: "Video Editor" },
+    ],
+  },
   about: {
     label: "About Page",
     fields: [
@@ -37,6 +58,8 @@ export const PAGE_CONTENT_CONFIG: Record<PageContentKey, { label: string; fields
       { key: "heroEyebrow", label: "Hero Eyebrow", defaultValue: "Services" },
       { key: "heroHeading", label: "Hero Heading", kind: "textarea", maxLength: 240, defaultValue: "How I can help tell your story" },
       { key: "heroDescription", label: "Hero Description", kind: "textarea", maxLength: 600, defaultValue: "From YouTube documentaries to fast-paced social reels, I offer end-to-end post-production so you can focus on creating — I’ll handle the edit." },
+      { key: "heroImageUrl", label: "Services Hero Image", kind: "image", defaultValue: "" },
+      { key: "heroImageAlt", label: "Services Hero Image Alt Text", maxLength: 240, defaultValue: "Video editor working at a desktop editing setup" },
       { key: "processEyebrow", label: "Process Eyebrow", defaultValue: "How we work" },
       { key: "processHeading", label: "Process Heading", defaultValue: "My Process" },
       { key: "process1Title", label: "Process 1 Title", defaultValue: "Brief & Footage" },
@@ -55,6 +78,8 @@ export const PAGE_CONTENT_CONFIG: Record<PageContentKey, { label: string; fields
       { key: "heroEyebrow", label: "Hero Eyebrow", defaultValue: "Experience" },
       { key: "heroHeading", label: "Hero Heading", kind: "textarea", maxLength: 240, defaultValue: "Crafting stories through experience and precision." },
       { key: "heroDescription", label: "Hero Description", kind: "textarea", maxLength: 600, defaultValue: "Over the years, I’ve worked across different industries and creative environments — sharpening my skills, understanding stories deeper, and delivering impactful edits." },
+      { key: "heroImageUrl", label: "Experience Hero Image", kind: "image", defaultValue: "" },
+      { key: "heroImageAlt", label: "Experience Hero Image Alt Text", maxLength: 240, defaultValue: "Video editor working at a professional editing workstation" },
       { key: "heroPrimaryLabel", label: "Hero Primary Button", defaultValue: "View My Work" },
       { key: "heroPrimaryUrl", label: "Hero Primary URL", kind: "url", defaultValue: "/portfolio" },
       { key: "heroSecondaryLabel", label: "Hero Secondary Button", defaultValue: "Let’s Connect" },
@@ -95,6 +120,8 @@ export const PAGE_CONTENT_CONFIG: Record<PageContentKey, { label: string; fields
       { key: "heroTitleAccent", label: "Hero Accent Word", defaultValue: "impactful" },
       { key: "heroTitleAfter", label: "Hero Title After Accent", defaultValue: "together." },
       { key: "heroDescription", label: "Hero Description", kind: "textarea", maxLength: 600, defaultValue: "Have a project in mind or want to discuss an idea? I’d love to hear from you. Let’s bring your story to life." },
+      { key: "heroImageUrl", label: "Contact Hero Image", kind: "image", defaultValue: "" },
+      { key: "heroImageAlt", label: "Contact Hero Image Alt Text", maxLength: 240, defaultValue: "Video editor working at a professional editing workstation" },
       { key: "portfolioCtaHeading", label: "Portfolio CTA Heading", defaultValue: "Have a project to discuss?" },
       { key: "portfolioCtaDescription", label: "Portfolio CTA Description", kind: "textarea", defaultValue: "Explore the work and see how different stories have been shaped." },
       { key: "portfolioCtaLabel", label: "Portfolio CTA Button", defaultValue: "View My Work" },
