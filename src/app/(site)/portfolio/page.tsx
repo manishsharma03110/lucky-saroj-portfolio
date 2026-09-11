@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -5,15 +6,15 @@ import { CategoryFilter } from "@/components/portfolio/CategoryFilter";
 import { PortfolioCTA } from "@/components/portfolio/PortfolioCTA";
 import { PortfolioHero } from "@/components/portfolio/PortfolioHero";
 import { hasUsableVisual, ProjectCard } from "@/components/portfolio/ProjectCard";
-import { getCategories, getProjectBySlug, getPublishedProjects } from "@/lib/db/queries";
+import { getCategories, getProjectBySlug, getPublishedProjects, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
-import { createPageMetadata } from "@/lib/seo";
+import { getPageSeo } from "@/lib/db/page-seo-service";
+import { createCmsPageMetadata } from "@/lib/seo";
 
-export const metadata = createPageMetadata({
-  title: "Portfolio",
-  description: "Explore selected video editing work by Lucky Saroj across documentaries, commercials, social reels and visual storytelling projects.",
-  path: "/portfolio",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, settings] = await Promise.all([getPageSeo("portfolio"), getSiteSettings()]);
+  return createCmsPageMetadata(seo, settings?.ogImageUrl);
+}
 
 const COLLECTION_LAYOUTS = ["lg:col-span-7", "lg:col-span-5 lg:pt-20", "lg:col-span-5", "lg:col-span-7 lg:pt-14"] as const;
 
