@@ -6,7 +6,7 @@ export const DEFAULT_SITE_DESCRIPTION =
   "Portfolio of Lucky Saroj, a freelance video editor specializing in YouTube documentaries, commercials, reels and motion graphics.";
 export const FALLBACK_SITE_ORIGIN = "https://lucky-saroj-portfolio.vercel.app";
 
-type SeoEnvironment = {
+type SeoEnvironment = Record<string, string | undefined> & {
   NEXT_PUBLIC_SITE_URL?: string;
   VERCEL_PROJECT_PRODUCTION_URL?: string;
 };

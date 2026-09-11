@@ -25,5 +25,9 @@ test("page metadata keeps one canonical path and matching social metadata", () =
   });
   assert.deepEqual(metadata.alternates, { canonical: "/portfolio" });
   assert.equal(metadata.openGraph?.url, "/portfolio");
-  assert.equal(metadata.twitter?.card, "summary");
+  assert.deepEqual(metadata.twitter, {
+    card: "summary",
+    title: "Portfolio",
+    description: "Selected video editing work.",
+  });
 });
