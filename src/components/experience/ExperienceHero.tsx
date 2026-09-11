@@ -5,8 +5,31 @@ import type { schema } from "@/lib/db";
 
 type Experience = typeof schema.experiences.$inferSelect;
 
-export function ExperienceHero({ experiences, eyebrow = "Experience", heading = "Crafting stories through experience and precision.", description = "Over the years, I’ve worked across different industries and creative environments — sharpening my skills, understanding stories deeper, and delivering impactful edits.", primaryLabel = "View My Work", primaryUrl = "/portfolio", secondaryLabel = "Let’s Connect", secondaryUrl = "/contact" }: { experiences: Experience[]; eyebrow?: string; heading?: string; description?: string; primaryLabel?: string; primaryUrl?: string; secondaryLabel?: string; secondaryUrl?: string }) {
+export function ExperienceHero({
+  experiences,
+  eyebrow = "Experience",
+  heading = "Crafting stories through experience and precision.",
+  description = "Over the years, I’ve worked across different industries and creative environments — sharpening my skills, understanding stories deeper, and delivering impactful edits.",
+  heroImageUrl,
+  heroImageAlt = "Video editor working at a professional editing workstation",
+  primaryLabel = "View My Work",
+  primaryUrl = "/portfolio",
+  secondaryLabel = "Let’s Connect",
+  secondaryUrl = "/contact",
+}: {
+  experiences: Experience[];
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  heroImageUrl?: string | null;
+  heroImageAlt?: string;
+  primaryLabel?: string;
+  primaryUrl?: string;
+  secondaryLabel?: string;
+  secondaryUrl?: string;
+}) {
   const current = experiences.find((experience) => experience.isCurrent || experience.endDate?.trim().toLowerCase() === "present");
+  const imageUrl = heroImageUrl || "/uploads/About/about-hero-editor.png";
 
   return (
     <section className="relative overflow-hidden border-b border-white/10 bg-[var(--background-primary)] py-14 sm:py-16 lg:py-20">
@@ -23,7 +46,7 @@ export function ExperienceHero({ experiences, eyebrow = "Experience", heading = 
 
         <div className="relative pb-24 sm:pb-20 md:pb-24">
           <div className="relative min-h-72 overflow-hidden border border-white/10 bg-[var(--surface-primary)] sm:min-h-96 md:min-h-[29rem]">
-            <Image src="/uploads/About/about-hero-editor.png" alt="Video editor working at a professional editing workstation" fill preload sizes="(max-width: 767px) 100vw, 57vw" className="object-cover object-center" />
+            <Image src={imageUrl} alt={heroImageAlt} fill preload sizes="(max-width: 767px) 100vw, 57vw" className="object-cover object-center" />
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,11,0.67),transparent_31%),linear-gradient(to_top,rgba(8,9,11,0.46),transparent_46%)]" aria-hidden />
             <span className="pointer-events-none absolute right-0 top-0 h-10 w-10 border-r border-t border-[var(--accent-primary)]/85" aria-hidden />
           </div>
