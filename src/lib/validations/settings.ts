@@ -19,10 +19,10 @@ const optionalWhatsApp = z.union([
 export const settingsSchema = z.object({
   siteName: z.string().trim().min(1).max(120),
   logoText: z.string().trim().min(1).max(10),
-  logoImageUrl: optionalImageUrl,
-  logoImageAssetId: optionalImageAssetId,
-  favicon: optionalImageUrl,
-  faviconAssetId: optionalImageAssetId,
+  logoImageUrl: optionalImageUrl.optional(),
+  logoImageAssetId: optionalImageAssetId.optional(),
+  favicon: optionalImageUrl.optional(),
+  faviconAssetId: optionalImageAssetId.optional(),
   contactEmail: boundedContactEmailSchema,
   contactPhone: z.string().trim().max(40),
   whatsapp: optionalWhatsApp,
@@ -48,8 +48,8 @@ export const settingsSchema = z.object({
   vimeoUrl: optionalUrl,
   seoTitle: z.string().trim().max(200),
   seoDescription: z.string().trim().max(300).optional().or(z.literal("")),
-  ogImageUrl: optionalImageUrl,
-  ogImageAssetId: optionalImageAssetId,
+  ogImageUrl: optionalImageUrl.optional(),
+  ogImageAssetId: optionalImageAssetId.optional(),
 });
 
 export type SettingsInput = z.infer<typeof settingsSchema>;
