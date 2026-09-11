@@ -59,12 +59,19 @@ export function createPageMetadata(input: {
   description: string;
   path: string;
   image?: string | null;
+  keywords?: string[];
+  robotsIndex?: boolean;
 }): Metadata {
   const images = normalizeSocialImage(input.image);
+  const robotsIndex = input.robotsIndex ?? true;
   return {
     title: input.title,
     description: input.description,
+    ...(input.keywords && input.keywords.length > 0 ? { keywords: input.keywords } : {}),
     alternates: { canonical: input.path },
+    robots: robotsIndex
+      ? { index: true, follow: true }
+      : { index: false, follow: false, nocache: true },
     openGraph: {
       type: "website",
       siteName: SITE_NAME,
