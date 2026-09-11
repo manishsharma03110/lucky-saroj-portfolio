@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown, MessageSquare } from "lucide-react";
 
-export function PopupContactSelect({ id, name, placeholder, options, describedBy, onValueChange }: { id: string; name: string; placeholder: string; options: readonly string[]; describedBy?: string; onValueChange?: (value: string) => void }) {
+export function PopupContactSelect({ id, name, placeholder, options, describedBy, invalid = false, onValueChange }: { id: string; name: string; placeholder: string; options: readonly string[]; describedBy?: string; invalid?: boolean; onValueChange?: (value: string) => void }) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -53,7 +53,7 @@ export function PopupContactSelect({ id, name, placeholder, options, describedBy
   return (
     <div ref={rootRef} className="relative min-w-0">
       <input type="hidden" name={name} value={value} />
-      <button ref={buttonRef} id={id} type="button" role="combobox" aria-controls={listId} aria-expanded={open} aria-haspopup="listbox" aria-activedescendant={open ? `${listId}-${activeIndex}` : undefined} aria-describedby={describedBy} aria-required="true" onClick={() => setOpen((current) => !current)} onKeyDown={handleKeyDown} className={`flex min-h-[2.875rem] w-full items-center gap-3 rounded-[7px] border bg-black/20 px-4 text-left text-xs transition-[border-color,box-shadow,background-color] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/25 motion-reduce:transition-none sm:text-sm [@media(max-height:800px)]:sm:min-h-11 ${open ? "border-[var(--accent-primary)]/80 bg-[var(--surface-primary)] shadow-[0_0_22px_rgba(59,130,246,0.11)]" : "border-white/18 hover:border-white/30"}`}>
+      <button ref={buttonRef} id={id} type="button" role="combobox" aria-controls={listId} aria-expanded={open} aria-haspopup="listbox" aria-activedescendant={open ? `${listId}-${activeIndex}` : undefined} aria-describedby={describedBy} aria-required="true" aria-invalid={invalid || undefined} onClick={() => setOpen((current) => !current)} onKeyDown={handleKeyDown} className={`flex min-h-[2.875rem] w-full items-center gap-3 rounded-[7px] border bg-black/20 px-4 text-left text-xs transition-[border-color,box-shadow,background-color] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/25 motion-reduce:transition-none sm:text-sm [@media(max-height:800px)]:sm:min-h-11 ${open ? "border-[var(--accent-primary)]/80 bg-[var(--surface-primary)] shadow-[0_0_22px_rgba(59,130,246,0.11)]" : invalid ? "border-red-400/60 hover:border-red-400/75" : "border-white/18 hover:border-white/30"}`}>
         <MessageSquare size={17} className="shrink-0 text-[var(--accent-primary)]" aria-hidden="true" />
         <span className={value ? "min-w-0 flex-1 truncate text-white" : "min-w-0 flex-1 truncate text-white/55"}>{value || placeholder}</span>
         <ChevronDown size={17} className={`shrink-0 text-white/80 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`} aria-hidden="true" />
