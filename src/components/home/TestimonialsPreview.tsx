@@ -1,5 +1,6 @@
 import { Quote } from "lucide-react";
 import { getPublishedTestimonials } from "@/lib/db/queries";
+import type { HomePageContent } from "@/lib/db/home-content-service";
 
 function Attribution({
   name,
@@ -20,7 +21,7 @@ function Attribution({
   );
 }
 
-export async function TestimonialsPreview() {
+export async function TestimonialsPreview({ content }: { content: HomePageContent }) {
   const testimonials = await getPublishedTestimonials(true);
   if (testimonials.length === 0) return null;
 
@@ -34,12 +35,12 @@ export async function TestimonialsPreview() {
         <div className={`grid items-stretch gap-5 ${secondary ? "lg:grid-cols-[minmax(0,1.62fr)_minmax(280px,0.78fr)] lg:gap-6" : ""}`}>
           <div className="min-w-0">
             <header className="mb-8 max-w-3xl sm:mb-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Client perspective</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{content.testimonialsEyebrow}</p>
               <h2 className="mt-4 text-[2.25rem] font-semibold leading-[1] tracking-[-0.045em] text-[var(--text-primary)] sm:text-4xl lg:text-5xl">
-                The work, in their words.
+                {content.testimonialsHeading}
               </h2>
               <p className="mt-4 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-                Real feedback from published client testimonials.
+                {content.testimonialsDescription}
               </p>
             </header>
 
