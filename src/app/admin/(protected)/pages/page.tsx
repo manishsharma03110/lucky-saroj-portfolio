@@ -16,24 +16,31 @@ const SLOT_FOR_PAGE: Record<string, string> = {
   contact: "contact_hero_image",
 };
 
-export default async function AdminPagesPage() {
-  await requirePermission("settings.read").catch((error) => {
-    if (error instanceof AuthorizationError) notFound();
-    throw error;
-  });
-  const [pages, referenceRows] = await Promise.all([
-    getAllPageContent(),
-    db.execute<{ assetId: string; slot: string }>(sql`
+async function getPageHeroReferences() {
+  try {
+    const result = await db.execute<{ assetId: string; slot: string }>(sql`
       SELECT asset_id AS "assetId", slot
       FROM media_asset_references
       WHERE owner_type='site_settings'
         AND site_settings_id='singleton:settings'
         AND slot IN ('services_hero_image','experience_hero_image','contact_hero_image')
-    `),
-  ]);
+    `);
+    return result.rows;
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && (error as { code?: unknown }).code === "42P01") return [];
+    throw error;
+  }
+}
+
+export default async function AdminPagesPage() {
+  await requirePermission("settings.read").catch((error) => {
+    if (error instanceof AuthorizationError) notFound();
+    throw error;
+  });
+  const [pages, referenceRows] = await Promise.all([getAllPageContent(), getPageHeroReferences()]);
   const assetForPage = (pageKey: string) => {
     const slot = SLOT_FOR_PAGE[pageKey];
-    return slot ? referenceRows.rows.find((row) => row.slot === slot)?.assetId ?? null : null;
+    return slot ? referenceRows.find((row) => row.slot === slot)?.assetId ?? null : null;
   };
 
   return (
