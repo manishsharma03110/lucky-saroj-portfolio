@@ -5,8 +5,25 @@ import { motion, useReducedMotion } from "framer-motion";
 
 const reveal = { hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0 } };
 
-export function ContactHero({ eyebrow = "Contact", titleBefore = "Let’s create something", titleAccent = "impactful", titleAfter = "together.", description = "Have a project in mind or want to discuss an idea? I’d love to hear from you. Let’s bring your story to life." }: { eyebrow?: string; titleBefore?: string; titleAccent?: string; titleAfter?: string; description?: string }) {
+export function ContactHero({
+  eyebrow = "Contact",
+  titleBefore = "Let’s create something",
+  titleAccent = "impactful",
+  titleAfter = "together.",
+  description = "Have a project in mind or want to discuss an idea? I’d love to hear from you. Let’s bring your story to life.",
+  heroImageUrl,
+  heroImageAlt = "Video editor working at a professional editing workstation",
+}: {
+  eyebrow?: string;
+  titleBefore?: string;
+  titleAccent?: string;
+  titleAfter?: string;
+  description?: string;
+  heroImageUrl?: string | null;
+  heroImageAlt?: string;
+}) {
   const reduceMotion = useReducedMotion();
+  const imageUrl = heroImageUrl || "/uploads/About/about-hero-editor.png";
 
   return (
     <section className="relative overflow-hidden border-b border-white/10 bg-[var(--background-primary)]" aria-labelledby="contact-title">
@@ -22,7 +39,7 @@ export function ContactHero({ eyebrow = "Contact", titleBefore = "Let’s create
 
         <motion.div className="min-w-0" initial={reduceMotion ? false : "hidden"} animate="visible" variants={reveal} transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : 0.12, ease: [0.22, 1, 0.36, 1] }}>
           <div className="group relative aspect-[16/10] overflow-hidden rounded-md border border-white/10 bg-[var(--surface-primary)] sm:aspect-[16/9] lg:aspect-[16/10]">
-            <Image src="/uploads/About/about-hero-editor.png" alt="Video editor working at a professional editing workstation" fill preload sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover object-[52%_center] transition-transform duration-1000 ease-out group-hover:scale-[1.015] motion-reduce:transition-none" />
+            <Image src={imageUrl} alt={heroImageAlt} fill preload sizes="(min-width: 1024px) 58vw, 100vw" className="object-cover object-[52%_center] transition-transform duration-1000 ease-out group-hover:scale-[1.015] motion-reduce:transition-none" />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[var(--background-primary)]/45 via-transparent to-[var(--background-primary)]/10" aria-hidden />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--background-primary)]/55 via-transparent to-transparent" aria-hidden />
             <span className="absolute left-5 top-5 size-8 border-l border-t border-[var(--accent-primary)]/75" aria-hidden />
