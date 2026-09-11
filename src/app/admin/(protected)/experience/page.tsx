@@ -6,26 +6,33 @@ import { ExperienceForm } from "@/components/admin/ExperienceForm";
 import { ExperienceListItem } from "@/components/admin/ExperienceListItem";
 import { requirePermission } from "@/lib/auth/authorization";
 import { AuthorizationError } from "@/lib/auth/authorization-core";
+import styles from "@/components/admin/AdminContent.module.css";
 
 export const metadata: Metadata = { title: "Experience" };
 
 export default async function AdminExperiencePage() {
-  await requirePermission("experience.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
+  await requirePermission("experience.read").catch((error) => {
+    if (error instanceof AuthorizationError) notFound();
+    throw error;
+  });
+
   const experiences = await db.select().from(schema.experiences).orderBy(schema.experiences.displayOrder);
 
   return (
     <div>
-      <AdminPageHeader title="Experience" description="Manage your professional journey timeline" />
+      <AdminPageHeader
+        eyebrow="Career"
+        title="Experience"
+        description="Manage your professional history, roles, and career highlights."
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
-        <div className="space-y-3">
-          {experiences.map((exp) => (
-            <ExperienceListItem key={exp.id} experience={exp} />
+      <div className={styles.twoColumnWide}>
+        <div className={styles.listStack}>
+          {experiences.map((experience) => (
+            <ExperienceListItem key={experience.id} experience={experience} />
           ))}
           {experiences.length === 0 && (
-            <p className="rounded-2xl border border-[var(--color-line)] bg-white px-5 py-8 text-center text-sm text-[var(--color-muted)]">
-              No experience entries yet.
-            </p>
+            <div className={styles.emptyState}>No experience entries yet. Add your first role from the form.</div>
           )}
         </div>
 

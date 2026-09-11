@@ -1,0 +1,524 @@
+.primaryAction {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid rgba(96, 165, 250, 0.4);
+  border-radius: 10px;
+  background: #3b82f6;
+  padding: 0 17px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.primaryAction:hover {
+  border-color: rgba(96, 165, 250, 0.62);
+  background: #60a5fa;
+  transform: translateY(-1px);
+}
+
+.primaryAction:active {
+  background: #2563eb;
+  transform: translateY(0);
+}
+
+.tableCard,
+.formCard,
+.itemCard,
+.emptyState {
+  border: 1px solid #242832;
+  background: #121419;
+}
+
+.tableCard,
+.formCard,
+.itemCard {
+  border-radius: 14px;
+}
+
+.tableCard {
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.table thead {
+  border-bottom: 1px solid #242832;
+  background: #0d0f13;
+}
+
+.table th {
+  padding: 13px 18px;
+  color: #626975;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  transition: background-color 180ms ease;
+}
+
+.table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.table td {
+  padding: 15px 18px;
+  color: #9298a3;
+  vertical-align: middle;
+}
+
+.tableTitle {
+  color: #f5f7fa !important;
+  font-weight: 600;
+}
+
+.muted {
+  color: #9298a3;
+}
+
+.slug {
+  color: #626975;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+}
+
+.statusPublished,
+.statusDraft,
+.featuredBadge,
+.activeBadge,
+.currentBadge {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  border-radius: 7px;
+  padding: 0 9px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.statusPublished,
+.activeBadge {
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  background: rgba(16, 185, 129, 0.08);
+  color: #6ee7b7;
+}
+
+.statusDraft {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  color: #9298a3;
+}
+
+.featuredBadge,
+.currentBadge {
+  border: 1px solid rgba(59, 130, 246, 0.24);
+  background: rgba(59, 130, 246, 0.08);
+  color: #60a5fa;
+}
+
+.actionGroup {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.iconAction,
+.tableCard button[aria-label="Delete"],
+.itemCard button[aria-label="Delete"] {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #9298a3;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+}
+
+.iconAction:hover {
+  border-color: rgba(59, 130, 246, 0.22);
+  background: rgba(59, 130, 246, 0.08);
+  color: #60a5fa;
+}
+
+.tableCard button[aria-label="Delete"]:hover,
+.itemCard button[aria-label="Delete"]:hover {
+  border-color: rgba(248, 113, 113, 0.24);
+  background: rgba(248, 113, 113, 0.08);
+  color: #fca5a5;
+}
+
+.tableCard button[role="switch"] {
+  background: #242832;
+}
+
+.tableCard button[role="switch"][aria-checked="true"] {
+  background: #3b82f6;
+}
+
+.emptyState {
+  display: grid;
+  min-height: 150px;
+  place-items: center;
+  border-radius: 14px;
+  padding: 28px;
+  color: #626975;
+  font-size: 13px;
+  text-align: center;
+}
+
+.tableCard .emptyState {
+  min-height: 130px;
+  border: 0;
+  border-top: 1px solid #242832;
+  border-radius: 0;
+}
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 22px;
+  align-items: start;
+}
+
+.twoColumnWide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  gap: 22px;
+  align-items: start;
+}
+
+.listStack {
+  display: grid;
+  gap: 12px;
+}
+
+.itemCard {
+  padding: 18px;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.itemCard:hover {
+  border-color: rgba(255, 255, 255, 0.13);
+  background: #14171d;
+}
+
+.itemTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.itemIdentity {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.itemIcon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.08);
+  color: #60a5fa;
+}
+
+.itemCopy {
+  min-width: 0;
+}
+
+.itemCopy h3 {
+  margin: 0;
+  color: #f5f7fa;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.itemCopy p {
+  margin: 5px 0 0;
+  color: #9298a3;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.itemMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.itemActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 5px;
+}
+
+.editDisclosure {
+  margin-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 12px;
+}
+
+.editDisclosure > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 7px;
+  color: #60a5fa;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.editDisclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.editDisclosure > summary:hover {
+  color: #93c5fd;
+}
+
+.editBody {
+  margin-top: 14px;
+}
+
+.dateLabel {
+  margin: 0 0 5px;
+  color: #60a5fa;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.company {
+  margin-top: 3px !important;
+  color: #60a5fa !important;
+  font-weight: 550;
+}
+
+.formCard {
+  padding: 20px;
+}
+
+.formHeader {
+  margin: 0 0 18px;
+  color: #f5f7fa;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.formBody {
+  display: grid;
+  gap: 18px;
+}
+
+.formCard label {
+  color: #d5d9e0;
+}
+
+.formCard input:not([type="checkbox"]),
+.formCard textarea,
+.formCard select {
+  border-color: #242832;
+  border-radius: 9px;
+  background: #0d0f13;
+  color: #f5f7fa;
+  box-shadow: none;
+}
+
+.formCard input:not([type="checkbox"])::placeholder,
+.formCard textarea::placeholder {
+  color: #626975;
+}
+
+.formCard input:not([type="checkbox"]):hover,
+.formCard textarea:hover,
+.formCard select:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.formCard input:not([type="checkbox"]):focus,
+.formCard textarea:focus,
+.formCard select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.formCard select option {
+  background: #0d0f13;
+  color: #f5f7fa;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #d5d9e0;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.checkboxRow input {
+  width: 16px;
+  height: 16px;
+  accent-color: #3b82f6;
+}
+
+.formCard button[type="submit"] {
+  min-height: 44px;
+  border-radius: 10px;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.formCard button[type="submit"]:hover:not(:disabled) {
+  background: #60a5fa;
+}
+
+.formCard button[type="submit"]:active:not(:disabled) {
+  background: #2563eb;
+}
+
+.fieldError,
+.formError {
+  margin-top: 6px;
+  color: #fca5a5;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1050px) {
+  .twoColumn,
+  .twoColumnWide {
+    grid-template-columns: 1fr;
+  }
+
+  .formCard {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 760px) {
+  .primaryAction {
+    width: 100%;
+  }
+
+  .tableCard {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .table,
+  .table tbody {
+    display: block;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tr {
+    display: grid;
+    gap: 0;
+    margin-bottom: 10px;
+    border: 1px solid #242832 !important;
+    border-radius: 12px;
+    background: #121419;
+    padding: 8px 14px;
+  }
+
+  .table td {
+    display: grid;
+    grid-template-columns: minmax(86px, 0.38fr) 1fr;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+    padding: 11px 0;
+  }
+
+  .table td:last-child {
+    border-bottom: 0;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    color: #626975;
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .actionGroup {
+    justify-content: flex-start;
+  }
+
+  .itemTop {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .itemCard,
+  .formCard {
+    padding: 16px;
+  }
+
+  .itemIdentity {
+    gap: 11px;
+  }
+
+  .itemIcon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .itemTop {
+    flex-direction: column;
+  }
+
+  .itemActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .table td {
+    grid-template-columns: 78px 1fr;
+  }
+}

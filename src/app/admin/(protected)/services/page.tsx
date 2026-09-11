@@ -6,26 +6,33 @@ import { ServiceForm } from "@/components/admin/ServiceForm";
 import { ServiceListItem } from "@/components/admin/ServiceListItem";
 import { requirePermission } from "@/lib/auth/authorization";
 import { AuthorizationError } from "@/lib/auth/authorization-core";
+import styles from "@/components/admin/AdminContent.module.css";
 
 export const metadata: Metadata = { title: "Services" };
 
 export default async function AdminServicesPage() {
-  await requirePermission("services.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
+  await requirePermission("services.read").catch((error) => {
+    if (error instanceof AuthorizationError) notFound();
+    throw error;
+  });
+
   const services = await db.select().from(schema.services).orderBy(schema.services.displayOrder);
 
   return (
     <div>
-      <AdminPageHeader title="Services" description="Manage the services you offer" />
+      <AdminPageHeader
+        eyebrow="Content"
+        title="Services"
+        description="Manage the capabilities and services shown across your portfolio."
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-3">
-          {services.map((s) => (
-            <ServiceListItem key={s.id} service={s} />
+      <div className={styles.twoColumn}>
+        <div className={styles.listStack}>
+          {services.map((service) => (
+            <ServiceListItem key={service.id} service={service} />
           ))}
           {services.length === 0 && (
-            <p className="rounded-2xl border border-[var(--color-line)] bg-white px-5 py-8 text-center text-sm text-[var(--color-muted)]">
-              No services yet.
-            </p>
+            <div className={styles.emptyState}>No services yet. Add your first service from the form.</div>
           )}
         </div>
 

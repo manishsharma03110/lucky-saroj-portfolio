@@ -6,41 +6,53 @@ import { CategoryForm } from "@/components/admin/CategoryForm";
 import { DeleteCategoryButton } from "@/components/admin/DeleteCategoryButton";
 import { requirePermission } from "@/lib/auth/authorization";
 import { AuthorizationError } from "@/lib/auth/authorization-core";
+import styles from "@/components/admin/AdminContent.module.css";
 
 export const metadata: Metadata = { title: "Categories" };
 
 export default async function AdminCategoriesPage() {
-  await requirePermission("categories.read").catch((error) => { if (error instanceof AuthorizationError) notFound(); throw error; });
+  await requirePermission("categories.read").catch((error) => {
+    if (error instanceof AuthorizationError) notFound();
+    throw error;
+  });
+
   const categories = await db.select().from(schema.portfolioCategories).orderBy(schema.portfolioCategories.displayOrder);
 
   return (
     <div>
-      <AdminPageHeader title="Portfolio Categories" description="Organize your projects into categories" />
+      <AdminPageHeader
+        eyebrow="Portfolio"
+        title="Portfolio Categories"
+        description="Organize projects with a clear, reusable category structure."
+      />
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_320px]">
-        <div className="overflow-hidden rounded-2xl border border-[var(--color-line)] bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-[var(--color-line)] bg-[var(--color-paper-dim)] text-xs uppercase tracking-wide text-[var(--color-muted)]">
+      <div className={styles.twoColumn}>
+        <div className={styles.tableCard}>
+          <table className={styles.table}>
+            <thead>
               <tr>
-                <th className="px-5 py-3 font-medium">Name</th>
-                <th className="px-5 py-3 font-medium">Slug</th>
-                <th className="px-5 py-3 font-medium text-right">Actions</th>
+                <th>Name</th>
+                <th>Slug</th>
+                <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--color-line)]">
-              {categories.map((c) => (
-                <tr key={c.id}>
-                  <td className="px-5 py-3 font-medium text-[var(--color-ink)]">{c.name}</td>
-                  <td className="px-5 py-3 text-[var(--color-muted)]">{c.slug}</td>
-                  <td className="px-5 py-3 text-right">
-                    <DeleteCategoryButton id={c.id} name={c.name} />
+            <tbody>
+              {categories.map((category) => (
+                <tr key={category.id}>
+                  <td data-label="Name" className={styles.tableTitle}>{category.name}</td>
+                  <td data-label="Slug"><span className={styles.slug}>{category.slug}</span></td>
+                  <td data-label="Actions">
+                    <div className={styles.actionGroup}>
+                      <DeleteCategoryButton id={category.id} name={category.name} />
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
           {categories.length === 0 && (
-            <p className="px-5 py-8 text-center text-sm text-[var(--color-muted)]">No categories yet.</p>
+            <div className={styles.emptyState}>No categories yet. Create one to organize your portfolio.</div>
           )}
         </div>
 
