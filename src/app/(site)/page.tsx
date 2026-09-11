@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AboutPreview } from "@/components/home/AboutPreview";
 import { EditingStyles } from "@/components/home/EditingStyles";
 import { FinalCTA } from "@/components/home/FinalCTA";
@@ -7,6 +8,13 @@ import { ShowreelSection } from "@/components/home/ShowreelSection";
 import { TestimonialsPreview } from "@/components/home/TestimonialsPreview";
 import { getFeaturedShowreel, getSiteSettings } from "@/lib/db/queries";
 import { getHomePageContent } from "@/lib/db/home-content-service";
+import { getPageSeo } from "@/lib/db/page-seo-service";
+import { createCmsPageMetadata } from "@/lib/seo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, settings] = await Promise.all([getPageSeo("home"), getSiteSettings()]);
+  return createCmsPageMetadata(seo, settings?.ogImageUrl);
+}
 
 export default async function HomePage() {
   const [settings, showreel, content] = await Promise.all([
