@@ -24,6 +24,8 @@ export default async function ExperiencePage() {
         eyebrow={copy.heroEyebrow}
         heading={copy.heroHeading}
         description={copy.heroDescription}
+        heroImageUrl={copy.heroImageUrl}
+        heroImageAlt={copy.heroImageAlt}
         primaryLabel={copy.heroPrimaryLabel}
         primaryUrl={copy.heroPrimaryUrl}
         secondaryLabel={copy.heroSecondaryLabel}
