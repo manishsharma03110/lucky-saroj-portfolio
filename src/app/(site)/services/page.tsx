@@ -1,16 +1,17 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { ServicesShowcase } from "@/components/services/ServicesShowcase";
 import { ProcessTimeline } from "@/components/services/ProcessTimeline";
 import { ServicesTools } from "@/components/services/ServicesTools";
-import { getAboutTools, getServices } from "@/lib/db/queries";
+import { getAboutTools, getServices, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
-import { createPageMetadata } from "@/lib/seo";
+import { getPageSeo } from "@/lib/db/page-seo-service";
+import { createCmsPageMetadata } from "@/lib/seo";
 
-export const metadata = createPageMetadata({
-  title: "Services",
-  description: "Video editing and post-production services for YouTube documentaries, commercials, social reels and story-driven digital content.",
-  path: "/services",
-});
+export async function generateMetadata(): Promise<Metadata> {
+  const [seo, settings] = await Promise.all([getPageSeo("services"), getSiteSettings()]);
+  return createCmsPageMetadata(seo, settings?.ogImageUrl);
+}
 
 export default async function ServicesPage() {
   const [services, tools, page] = await Promise.all([getServices(false), getAboutTools(), getPageContent("services")]);
