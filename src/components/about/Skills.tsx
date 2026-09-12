@@ -46,13 +46,13 @@ export function Skills({ biography, skills, tools, storyEyebrow = "My story", st
   if (!biography && skills.length === 0 && tools.length === 0) return null;
 
   return (
-    <section className="bg-[var(--background-primary)] py-12 sm:py-16 lg:py-20">
+    <section className="bg-[var(--background-primary)] py-14 sm:py-16 lg:py-24">
       <div className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 sm:px-8 md:grid-cols-2 lg:gap-16 lg:px-12 2xl:px-16">
         {biography && (
           <div className="md:col-span-2 lg:col-span-1 lg:pr-4">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{storyEyebrow}</p>
-            <h2 className="mt-4 max-w-[12ch] font-display text-[clamp(2.35rem,3.3vw,3.25rem)] font-semibold leading-none tracking-[-0.045em] text-[var(--text-primary)]">{storyHeading}</h2>
-            <p className="mt-6 max-w-[680px] whitespace-pre-line text-[0.97rem] leading-7 text-[var(--text-secondary)]">{biography}</p>
+            <h2 className="mt-4 max-w-[14ch] font-display text-[clamp(2.25rem,3.2vw,3.5rem)] font-semibold leading-[1.02] tracking-[-0.045em] text-[var(--text-primary)]">{storyHeading}</h2>
+            <p className="mt-6 max-w-[38rem] whitespace-pre-line text-base leading-7 text-[var(--text-secondary)]">{biography}</p>
           </div>
         )}
 
@@ -62,7 +62,7 @@ export function Skills({ biography, skills, tools, storyEyebrow = "My story", st
             <ul className="mt-5 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
               {skills.map((skill) => {
                 const Icon = iconForSkill(skill.name);
-                return <li key={skill.id} className="flex min-h-12 min-w-0 items-center gap-3 border-b border-white/10 py-3 text-sm leading-5 text-[var(--text-primary)]"><span className="flex h-8 w-8 shrink-0 items-center justify-center text-[var(--accent-primary)]"><Icon size={17} strokeWidth={1.5} aria-hidden /></span><span className="min-w-0">{skill.name}</span></li>;
+                return <li key={skill.id} className="flex min-h-12 min-w-0 items-center gap-3 border-b border-white/10 py-3 text-base leading-6 text-[var(--text-primary)]"><span className="flex h-8 w-8 shrink-0 items-center justify-center text-[var(--accent-primary)]"><Icon size={17} strokeWidth={1.5} aria-hidden /></span><span className="min-w-0">{skill.name}</span></li>;
               })}
             </ul>
           </div>
@@ -74,7 +74,7 @@ export function Skills({ biography, skills, tools, storyEyebrow = "My story", st
             <ul className="mt-5 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
               {tools.map((tool) => {
                 const Icon = iconForTool(tool.name);
-                return <li key={tool.id} className="flex min-h-12 min-w-0 items-center gap-3 border-b border-white/10 py-3 text-sm leading-5 text-[var(--text-primary)]"><span className="flex h-8 w-8 shrink-0 items-center justify-center text-[0.65rem] font-bold text-[var(--accent-primary)]">{Icon ? <Icon size={17} strokeWidth={1.5} aria-hidden /> : monogram(tool.name)}</span><span className="min-w-0">{tool.name}</span></li>;
+                return <li key={tool.id} className="flex min-h-12 min-w-0 items-center gap-3 border-b border-white/10 py-3 text-base leading-6 text-[var(--text-primary)]"><span className="flex h-8 w-8 shrink-0 items-center justify-center text-[0.65rem] font-bold text-[var(--accent-primary)]">{Icon ? <Icon size={17} strokeWidth={1.5} aria-hidden /> : monogram(tool.name)}</span><span className="min-w-0">{tool.name}</span></li>;
               })}
             </ul>
           </div>
