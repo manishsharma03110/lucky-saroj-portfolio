@@ -13,17 +13,13 @@
 }
 
 .saveBar {
-  position: sticky;
-  bottom: 16px;
-  z-index: 12;
   display: flex;
   justify-content: flex-end;
-  margin-top: 18px;
+  margin-top: 0;
   border: 1px solid #242832;
   border-radius: 12px;
-  background: rgba(13, 15, 19, 0.94);
+  background: #0d0f13;
   padding: 12px;
-  backdrop-filter: blur(14px);
 }
 
 .saveBar button {
@@ -333,7 +329,7 @@
     justify-content: space-between;
   }
 
-  .saveBar {
-    bottom: 8px;
+  .saveBar button {
+    width: 100%;
   }
 }
