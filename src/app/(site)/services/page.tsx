@@ -46,9 +46,9 @@ export default async function ServicesPage() {
           </div>
         </div>
       </section>
-      <ServicesShowcase services={services} />
+      <ServicesShowcase services={services} copy={{ eyebrow: copy.showcaseEyebrow, heading: copy.showcaseHeading, description: copy.showcaseDescription, emptyLabel: copy.emptyServicesLabel }} />
       <ProcessTimeline eyebrow={copy.processEyebrow} heading={copy.processHeading} steps={processSteps} />
-      {uniqueTools.length > 0 && <ServicesTools tools={uniqueTools} />}
+      {uniqueTools.length > 0 && <ServicesTools tools={uniqueTools} eyebrow={copy.toolsEyebrow} heading={copy.toolsHeading} />}
     </main>
   );
 }
