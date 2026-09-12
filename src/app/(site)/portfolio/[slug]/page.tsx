@@ -6,29 +6,17 @@ import { ProjectHero } from "@/components/portfolio/detail/ProjectHero";
 import { ProjectGallery, ProjectMedia } from "@/components/portfolio/detail/ProjectMedia";
 import { ProjectNavigation } from "@/components/portfolio/detail/ProjectNavigation";
 import { getAdjacentProjects, getProjectBySlug, getSiteSettings } from "@/lib/db/queries";
+import { getPageContent } from "@/lib/db/page-content-service";
 import { createPageMetadata } from "@/lib/seo";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const [data, settings] = await Promise.all([getProjectBySlug(slug), getSiteSettings()]);
-  if (!data || data.project.status !== "published") {
-    return { robots: { index: false, follow: false } };
-  }
+  if (!data || data.project.status !== "published") return { robots: { index: false, follow: false } };
 
   const title = data.project.seoTitle ?? data.project.title;
   const description = data.project.seoDescription ?? data.project.description ?? `Watch ${data.project.title}, a video editing project by Lucky Saroj.`;
-  const keywords = [
-    data.project.title,
-    data.category?.name,
-    data.project.clientName,
-    data.project.year ? String(data.project.year) : null,
-    "video editing",
-    "Lucky Saroj",
-  ].filter((value): value is string => Boolean(value));
+  const keywords = [data.project.title, data.category?.name, data.project.clientName, data.project.year ? String(data.project.year) : null, "video editing", "Lucky Saroj"].filter((value): value is string => Boolean(value));
   return createPageMetadata({
     title,
     description,
@@ -39,17 +27,14 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProjectDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const data = await getProjectBySlug(slug);
+  const [data, portfolioPage] = await Promise.all([getProjectBySlug(slug), getPageContent("portfolio")]);
   if (!data || data.project.status !== "published") notFound();
 
   const { project, category, tools, media } = data;
   const { prev, next } = await getAdjacentProjects(slug);
+  const copy = portfolioPage.content;
 
   return (
     <>
@@ -60,7 +45,15 @@ export default async function ProjectDetailPage({
       <ProjectGallery project={project} media={media} />
       <ProjectTools tools={tools} />
       <ProjectNavigation previous={prev} next={next} />
-      <ProjectCTA />
+      <ProjectCTA
+        eyebrow={copy.detailCtaEyebrow}
+        heading={copy.detailCtaHeading}
+        description={copy.detailCtaDescription}
+        primaryLabel={copy.detailCtaPrimaryLabel}
+        primaryUrl={copy.detailCtaPrimaryUrl}
+        secondaryLabel={copy.detailCtaSecondaryLabel}
+        secondaryUrl={copy.detailCtaSecondaryUrl}
+      />
     </>
   );
 }
