@@ -23,8 +23,8 @@ CREATE INDEX IF NOT EXISTS activity_logs_resource_created_at_idx
 CREATE INDEX IF NOT EXISTS activity_logs_action_created_at_idx
   ON activity_logs (action, created_at DESC);
 
-INSERT INTO permissions (key, resource, action, description)
-VALUES ('activity.read', 'activity', 'read', 'View CMS activity and change history')
+INSERT INTO permissions (id, key, resource, action, description)
+VALUES ('20000000-0000-4000-8000-000000000033', 'activity.read', 'activity', 'read', 'View CMS activity and change history')
 ON CONFLICT (key) DO UPDATE SET
   resource = EXCLUDED.resource,
   action = EXCLUDED.action,
