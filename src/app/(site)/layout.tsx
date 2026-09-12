@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ContactPopup } from "@/components/contact/ContactPopup";
+import quality from "@/components/ui/SiteQuality.module.css";
 import { getSiteBranding, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 
@@ -28,7 +29,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   ]);
   const global = globalPage.content;
   return (
-    <div className="public-site contents">
+    <div className={`public-site ${quality.boundary}`}>
+      <a href="#site-main-content" className={quality.skipLink}>Skip to content</a>
       <Header
         logoText={settings?.logoText}
         logoImageUrl={branding?.logoImageUrl}
@@ -38,7 +40,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         ctaUrl={global.headerCtaUrl}
         navLabels={{ home: global.navHomeLabel, about: global.navAboutLabel, portfolio: global.navPortfolioLabel, services: global.navServicesLabel, experience: global.navExperienceLabel, contact: global.navContactLabel }}
       />
-      <main className="flex-1">{children}</main>
+      <main id="site-main-content" tabIndex={-1} className={`flex-1 ${quality.main}`}>{children}</main>
       <Footer content={global} />
       <ContactPopup copy={global} optionsConfig={contactPage.content.contactOptionsConfig} />
     </div>
