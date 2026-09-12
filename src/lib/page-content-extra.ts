@@ -1,4 +1,5 @@
 import type { PageContentField, PageContentKey } from "./page-content";
+import { DEFAULT_CONTACT_OPTIONS_SERIALIZED } from "@/lib/contact/contact-options-config";
 
 export const PAGE_CONTENT_EXTRA_FIELDS: Partial<Record<PageContentKey, readonly PageContentField[]>> = {
   global: [
@@ -71,6 +72,7 @@ export const PAGE_CONTENT_EXTRA_FIELDS: Partial<Record<PageContentKey, readonly 
     { key: "workingTermsLabel", label: "Working Terms Section Label", defaultValue: "Working terms" },
     { key: "paymentTermsLabel", label: "Payment Terms Label", defaultValue: "Payment terms" },
     { key: "turnaroundTimeLabel", label: "Turnaround Time Label", defaultValue: "Turnaround time" },
+    { key: "contactOptionsConfig", label: "Contact Form Select Options", kind: "contact-options", maxLength: 12000, defaultValue: DEFAULT_CONTACT_OPTIONS_SERIALIZED },
   ],
 };
 
