@@ -34,7 +34,15 @@ export default async function ExperiencePage() {
         secondaryLabel={copy.heroSecondaryLabel}
         secondaryUrl={copy.heroSecondaryUrl}
       />
-      <ExperienceList experiences={experiences} />
+      <ExperienceList
+        experiences={experiences}
+        eyebrow={copy.listEyebrow}
+        heading={copy.listHeading}
+        description={copy.listDescription}
+        emptyText={copy.listEmptyText}
+        presentLabel={copy.presentLabel}
+        currentBadgeLabel={copy.currentBadgeLabel}
+      />
       <ExperienceCapabilities skills={skills} heading={copy.capabilitiesHeading} />
 
       <section className="bg-[var(--background-primary)] py-14 sm:py-18 lg:py-20">
