@@ -26,13 +26,16 @@ export default async function ExperiencePage() {
         description={copy.heroDescription}
         heroImageUrl={copy.heroImageUrl}
         heroImageAlt={copy.heroImageAlt}
+        currentRoleLabel={copy.currentRoleLabel}
+        locationLabel={copy.locationLabel}
+        entriesLabel={copy.entriesLabel}
         primaryLabel={copy.heroPrimaryLabel}
         primaryUrl={copy.heroPrimaryUrl}
         secondaryLabel={copy.heroSecondaryLabel}
         secondaryUrl={copy.heroSecondaryUrl}
       />
       <ExperienceList experiences={experiences} />
-      <ExperienceCapabilities skills={skills} />
+      <ExperienceCapabilities skills={skills} heading={copy.capabilitiesHeading} />
 
       <section className="bg-[var(--background-primary)] py-14 sm:py-18 lg:py-20">
         <div className="relative mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12">
