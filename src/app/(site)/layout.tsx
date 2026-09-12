@@ -20,7 +20,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [settings, branding, globalPage] = await Promise.all([getSiteSettings(), getSiteBranding(), getPageContent("global")]);
+  const [settings, branding, globalPage, contactPage] = await Promise.all([
+    getSiteSettings(),
+    getSiteBranding(),
+    getPageContent("global"),
+    getPageContent("contact"),
+  ]);
   const global = globalPage.content;
   return (
     <div className="public-site contents">
@@ -35,7 +40,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       />
       <main className="flex-1">{children}</main>
       <Footer content={global} />
-      <ContactPopup copy={global} />
+      <ContactPopup copy={global} optionsConfig={contactPage.content.contactOptionsConfig} />
     </div>
   );
 }
