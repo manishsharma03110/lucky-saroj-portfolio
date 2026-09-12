@@ -17,6 +17,7 @@ import {
   Film,
   MessageSquareText,
   Mail,
+  History,
   Settings,
   LogOut,
   Menu,
@@ -50,7 +51,10 @@ const NAV_SECTIONS = [
   },
   {
     label: "System",
-    items: [{ label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings.read" }],
+    items: [
+      { label: "Activity", href: "/admin/activity", icon: History, permission: "activity.read" },
+      { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings.read" },
+    ],
   },
 ];
 

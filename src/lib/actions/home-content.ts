@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth/authorization";
+import { recordActivitySafely } from "@/lib/audit/activity-log";
 import { homePageContentSchema } from "@/lib/validations/home-content";
 import { revisionSchema } from "@/lib/validations/revision";
 import { updateHomePageContent } from "@/lib/db/home-content-service";
@@ -10,7 +11,7 @@ import type { ActionState } from "./portfolio";
 import { fieldErrorsFromIssues, SAFE_VALIDATION_MESSAGE } from "@/lib/validations/action-errors";
 
 export async function saveHomePageContent(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  await requirePermission("settings.update");
+  const auth = await requirePermission("settings.update");
   const parsed = homePageContentSchema.safeParse(Object.fromEntries(formData.entries()));
   const revision = revisionSchema.safeParse(formData.get("revision"));
   if (!parsed.success || !revision.success) {
@@ -25,6 +26,7 @@ export async function saveHomePageContent(_prev: ActionState, formData: FormData
     }
     throw error;
   }
+  await recordActivitySafely({ actor: auth.admin, action: "update", resource: "home", resourceId: "singleton:home", summary: "Updated homepage content.", metadata: { previousRevision: revision.data } });
   revalidatePath("/");
   revalidatePath("/admin/home");
   return { status: "success", message: "Homepage content updated." };
