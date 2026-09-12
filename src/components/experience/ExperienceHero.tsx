@@ -12,6 +12,9 @@ export function ExperienceHero({
   description = "Over the years, I’ve worked across different industries and creative environments — sharpening my skills, understanding stories deeper, and delivering impactful edits.",
   heroImageUrl,
   heroImageAlt = "Video editor working at a professional editing workstation",
+  currentRoleLabel = "Current role",
+  locationLabel = "Location",
+  entriesLabel = "Experience entries",
   primaryLabel = "View My Work",
   primaryUrl = "/portfolio",
   secondaryLabel = "Let’s Connect",
@@ -23,6 +26,9 @@ export function ExperienceHero({
   description?: string;
   heroImageUrl?: string | null;
   heroImageAlt?: string;
+  currentRoleLabel?: string;
+  locationLabel?: string;
+  entriesLabel?: string;
   primaryLabel?: string;
   primaryUrl?: string;
   secondaryLabel?: string;
@@ -51,9 +57,9 @@ export function ExperienceHero({
             <span className="pointer-events-none absolute right-0 top-0 h-10 w-10 border-r border-t border-[var(--accent-primary)]/85" aria-hidden />
           </div>
           <dl className="absolute inset-x-3 bottom-3 grid grid-cols-1 border border-white/15 bg-[var(--background-primary)]/95 shadow-2xl shadow-black/40 sm:inset-x-5 sm:grid-cols-3 md:inset-x-4">
-            <div className="flex min-w-0 items-center gap-3 px-4 py-4 sm:px-5"><Briefcase size={19} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden /><div className="min-w-0"><dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Current role</dt><dd className="mt-1 truncate text-sm font-medium text-[var(--text-primary)]">{current?.role ?? "—"}</dd></div></div>
-            <div className="flex min-w-0 items-center gap-3 border-t border-white/10 px-4 py-4 sm:border-l sm:border-t-0 sm:px-5"><MapPin size={19} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden /><div className="min-w-0"><dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Location</dt><dd className="mt-1 truncate text-sm font-medium text-[var(--text-primary)]">{current?.location ?? "—"}</dd></div></div>
-            <div className="flex min-w-0 items-center gap-3 border-t border-white/10 px-4 py-4 sm:border-l sm:border-t-0 sm:px-5"><CalendarDays size={19} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden /><div><dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">Experience entries</dt><dd className="mt-1 text-sm font-medium text-[var(--text-primary)]">{experiences.length}</dd></div></div>
+            <div className="flex min-w-0 items-center gap-3 px-4 py-4 sm:px-5"><Briefcase size={19} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden /><div className="min-w-0"><dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{currentRoleLabel}</dt><dd className="mt-1 truncate text-sm font-medium text-[var(--text-primary)]">{current?.role ?? "—"}</dd></div></div>
+            <div className="flex min-w-0 items-center gap-3 border-t border-white/10 px-4 py-4 sm:border-l sm:border-t-0 sm:px-5"><MapPin size={19} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden /><div className="min-w-0"><dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{locationLabel}</dt><dd className="mt-1 truncate text-sm font-medium text-[var(--text-primary)]">{current?.location ?? "—"}</dd></div></div>
+            <div className="flex min-w-0 items-center gap-3 border-t border-white/10 px-4 py-4 sm:border-l sm:border-t-0 sm:px-5"><CalendarDays size={19} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden /><div><dt className="text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{entriesLabel}</dt><dd className="mt-1 text-sm font-medium text-[var(--text-primary)]">{experiences.length}</dd></div></div>
           </dl>
         </div>
       </div>
