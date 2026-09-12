@@ -161,35 +161,59 @@ export default async function AdminDashboardPage() {
       </section>
 
       <section className={styles.mainGrid}>
-        <article className={styles.panel}>
-          <div className={styles.sectionHeading}>
-            <div>
-              <p>Inbox</p>
-              <h2>Recent enquiries</h2>
+        <div className={styles.mainStack}>
+          <article className={styles.panel}>
+            <div className={styles.sectionHeading}>
+              <div>
+                <p>Inbox</p>
+                <h2>Recent enquiries</h2>
+              </div>
+              <Link href="/admin/messages" className={styles.sectionLink}>View all <ArrowUpRight size={14} aria-hidden="true" /></Link>
             </div>
-            <Link href="/admin/messages" className={styles.sectionLink}>View all <ArrowUpRight size={14} aria-hidden="true" /></Link>
-          </div>
-          <div className={styles.enquiryList}>
-            {recentMessages.map((message) => (
-              <Link href="/admin/messages" key={message.id} className={`${styles.enquiryRow} ${message.status === "new" ? styles.enquiryNew : ""}`}>
-                <div className={styles.enquiryTop}>
-                  <div className={styles.enquiryIdentity}>
-                    <strong>{message.name}</strong>
-                    <span className={`${styles.statusBadge} ${styles[`status${message.status.charAt(0).toUpperCase()}${message.status.slice(1)}` as keyof typeof styles] || ""}`}>{message.status}</span>
+            <div className={styles.enquiryList}>
+              {recentMessages.map((message) => (
+                <Link href="/admin/messages" key={message.id} className={`${styles.enquiryRow} ${message.status === "new" ? styles.enquiryNew : ""}`}>
+                  <div className={styles.enquiryTop}>
+                    <div className={styles.enquiryIdentity}>
+                      <strong>{message.name}</strong>
+                      <span className={`${styles.statusBadge} ${styles[`status${message.status.charAt(0).toUpperCase()}${message.status.slice(1)}` as keyof typeof styles] || ""}`}>{message.status}</span>
+                    </div>
+                    <time dateTime={message.createdAt.toISOString()}>{formatSubmittedAt(message.createdAt)}</time>
                   </div>
-                  <time dateTime={message.createdAt.toISOString()}>{formatSubmittedAt(message.createdAt)}</time>
-                </div>
-                <div className={styles.enquiryMeta}>
-                  <span><Mail size={13} aria-hidden="true" /> {message.email}</span>
-                  {message.phone && <span><Phone size={13} aria-hidden="true" /> {message.phone}</span>}
-                  {message.projectType && <span><FolderKanban size={13} aria-hidden="true" /> {message.projectType}</span>}
-                </div>
-                <p>{message.message}</p>
-              </Link>
-            ))}
-            {recentMessages.length === 0 && <div className={styles.emptyState}><MessageCircle size={22} /><p>No enquiries yet.</p></div>}
-          </div>
-        </article>
+                  <div className={styles.enquiryMeta}>
+                    <span><Mail size={13} aria-hidden="true" /> {message.email}</span>
+                    {message.phone && <span><Phone size={13} aria-hidden="true" /> {message.phone}</span>}
+                    {message.projectType && <span><FolderKanban size={13} aria-hidden="true" /> {message.projectType}</span>}
+                  </div>
+                  <p>{message.message}</p>
+                </Link>
+              ))}
+              {recentMessages.length === 0 && <div className={styles.emptyState}><MessageCircle size={22} /><p>No enquiries yet.</p></div>}
+            </div>
+          </article>
+
+          <article className={styles.panel}>
+            <div className={styles.sectionHeading}>
+              <div><p>Portfolio</p><h2>Recent projects</h2></div>
+              <Link href="/admin/portfolio" className={styles.sectionLink}>Manage portfolio <ArrowUpRight size={14} aria-hidden="true" /></Link>
+            </div>
+            <div className={styles.projectGrid}>
+              {recentProjects.map((project) => (
+                <Link href={`/admin/portfolio/${project.id}/edit`} key={project.id} className={styles.projectCard}>
+                  <div>
+                    <strong>{project.title}</strong>
+                    <span>{project.year ?? "Year not set"}</span>
+                  </div>
+                  <div className={styles.projectFlags}>
+                    {project.isFeatured && <span className={styles.featuredBadge}><Star size={12} aria-hidden="true" /> Featured</span>}
+                    <span className={project.status === "published" ? styles.publishedBadge : styles.draftBadge}>{project.status}</span>
+                  </div>
+                </Link>
+              ))}
+              {recentProjects.length === 0 && <div className={styles.emptyState}><FolderKanban size={22} /><p>No projects yet.</p></div>}
+            </div>
+          </article>
+        </div>
 
         <aside className={styles.sideStack}>
           <article className={styles.panel}>
@@ -221,28 +245,6 @@ export default async function AdminDashboardPage() {
             </div>
           </article>
         </aside>
-      </section>
-
-      <section className={styles.panel}>
-        <div className={styles.sectionHeading}>
-          <div><p>Portfolio</p><h2>Recent projects</h2></div>
-          <Link href="/admin/portfolio" className={styles.sectionLink}>Manage portfolio <ArrowUpRight size={14} aria-hidden="true" /></Link>
-        </div>
-        <div className={styles.projectGrid}>
-          {recentProjects.map((project) => (
-            <Link href={`/admin/portfolio/${project.id}/edit`} key={project.id} className={styles.projectCard}>
-              <div>
-                <strong>{project.title}</strong>
-                <span>{project.year ?? "Year not set"}</span>
-              </div>
-              <div className={styles.projectFlags}>
-                {project.isFeatured && <span className={styles.featuredBadge}><Star size={12} aria-hidden="true" /> Featured</span>}
-                <span className={project.status === "published" ? styles.publishedBadge : styles.draftBadge}>{project.status}</span>
-              </div>
-            </Link>
-          ))}
-          {recentProjects.length === 0 && <div className={styles.emptyState}><FolderKanban size={22} /><p>No projects yet.</p></div>}
-        </div>
       </section>
     </div>
   );
