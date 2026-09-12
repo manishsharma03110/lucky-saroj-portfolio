@@ -36,6 +36,14 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         roleLabel={global.headerRoleLabel}
         ctaLabel={global.headerCtaLabel}
         ctaUrl={global.headerCtaUrl}
+        navLabels={{
+          home: global.navHomeLabel,
+          about: global.navAboutLabel,
+          portfolio: global.navPortfolioLabel,
+          services: global.navServicesLabel,
+          experience: global.navExperienceLabel,
+          contact: global.navContactLabel,
+        }}
       />
       <main className="flex-1">{children}</main>
       <Footer content={global} />
