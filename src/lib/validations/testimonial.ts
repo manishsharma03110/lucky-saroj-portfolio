@@ -7,7 +7,7 @@ const optionalAssetId = assetIdSchema.optional().or(z.literal(""));
 const optionalMediaReference = z.union([z.literal(""), mediaReferenceSchema]).refine(
   (value) => value.length <= 500,
   "Media reference must be at most 500 characters."
-);
+).optional();
 
 export const testimonialSchema = z.object({
   clientName: z.string().trim().min(1, "Client name is required").max(120),
