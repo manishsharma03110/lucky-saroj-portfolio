@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth/authorization";
 import { PAGE_CONTENT_CONFIG, PAGE_CONTENT_KEYS, type PageContentKey } from "@/lib/page-content";
+import { pageContentFields } from "@/lib/page-content-extra";
 import { revisionSchema } from "@/lib/validations/revision";
 import { mediaReferenceSchema } from "@/lib/validations/urls";
 import { assetIdSchema } from "@/lib/media/ownership";
@@ -27,7 +28,7 @@ export async function updatePageContentAction(_prev: ActionState, formData: Form
 
   const content: Record<string, string> = {};
   let hasImageField = false;
-  for (const field of PAGE_CONTENT_CONFIG[pageKey].fields) {
+  for (const field of pageContentFields(pageKey, PAGE_CONTENT_CONFIG[pageKey].fields)) {
     const raw = formData.get(field.key);
     const value = typeof raw === "string" ? raw.trim() : "";
     const maxLength = field.maxLength ?? (field.kind === "textarea" ? 1000 : field.kind === "image" ? 2048 : 300);
@@ -42,16 +43,12 @@ export async function updatePageContentAction(_prev: ActionState, formData: Form
 
   const rawAssetId = hasImageField ? formData.get("heroImageAssetId") : null;
   const heroImageAssetId = typeof rawAssetId === "string" ? rawAssetId.trim() : "";
-  if (heroImageAssetId && !assetIdSchema.safeParse(heroImageAssetId).success) {
-    return { status: "error", message: "The uploaded page image is invalid. Please upload it again." };
-  }
+  if (heroImageAssetId && !assetIdSchema.safeParse(heroImageAssetId).success) return { status: "error", message: "The uploaded page image is invalid. Please upload it again." };
 
   try {
     await updatePageContent(pageKey, content, revision.data, heroImageAssetId || null);
   } catch (error) {
-    if (error instanceof MediaAssetBindingError || error instanceof MediaAssetNotAttachableError || error instanceof MediaAssetNotFoundError) {
-      return { status: "error", message: "The uploaded page image is invalid or no longer available." };
-    }
+    if (error instanceof MediaAssetBindingError || error instanceof MediaAssetNotAttachableError || error instanceof MediaAssetNotFoundError) return { status: "error", message: "The uploaded page image is invalid or no longer available." };
     if (error instanceof StaleRevisionError) return { status: "error", message: error.message };
     throw error;
   }
