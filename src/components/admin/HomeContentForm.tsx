@@ -17,6 +17,23 @@ export function HomeContentForm({ content }: { content: HomePageContent }) {
     <form action={formAction} className={styles.sectionStack}>
       <input type="hidden" name="revision" value={content.revision} />
 
+      <FormCard title="Hero Section">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div><Label htmlFor="heroPrimaryLabel">Primary CTA Label</Label><Input id="heroPrimaryLabel" name="heroPrimaryLabel" defaultValue={content.heroPrimaryLabel} /></div>
+          <div><Label htmlFor="heroPrimaryUrl">Primary CTA URL</Label><Input id="heroPrimaryUrl" name="heroPrimaryUrl" defaultValue={content.heroPrimaryUrl} /></div>
+          <div><Label htmlFor="heroShowreelLabel">Showreel CTA Label</Label><Input id="heroShowreelLabel" name="heroShowreelLabel" defaultValue={content.heroShowreelLabel} /></div>
+          <div><Label htmlFor="heroShowreelUrl">Showreel CTA URL / Anchor</Label><Input id="heroShowreelUrl" name="heroShowreelUrl" defaultValue={content.heroShowreelUrl} /></div>
+        </div>
+        <div><Label htmlFor="heroImageAlt">Hero Image Alt Text</Label><Input id="heroImageAlt" name="heroImageAlt" defaultValue={content.heroImageAlt} placeholder="Leave blank when the hero image is decorative" /></div>
+      </FormCard>
+
+      <FormCard title="Showreel Section">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div><Label htmlFor="showreelEyebrow">Eyebrow</Label><Input id="showreelEyebrow" name="showreelEyebrow" defaultValue={content.showreelEyebrow} /></div>
+          <div><Label htmlFor="showreelRuntimeLabel">Runtime Label</Label><Input id="showreelRuntimeLabel" name="showreelRuntimeLabel" defaultValue={content.showreelRuntimeLabel} /></div>
+        </div>
+      </FormCard>
+
       <FormCard title="Selected Work Section">
         <div><Label htmlFor="selectedWorkEyebrow">Eyebrow</Label><Input id="selectedWorkEyebrow" name="selectedWorkEyebrow" defaultValue={content.selectedWorkEyebrow} /></div>
         <div><Label htmlFor="selectedWorkHeading">Heading</Label><Input id="selectedWorkHeading" name="selectedWorkHeading" defaultValue={content.selectedWorkHeading} /></div>
@@ -41,6 +58,12 @@ export function HomeContentForm({ content }: { content: HomePageContent }) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div><Label htmlFor="aboutCtaLabel">CTA Label</Label><Input id="aboutCtaLabel" name="aboutCtaLabel" defaultValue={content.aboutCtaLabel} /></div>
           <div><Label htmlFor="aboutCtaUrl">CTA URL</Label><Input id="aboutCtaUrl" name="aboutCtaUrl" defaultValue={content.aboutCtaUrl} /></div>
+          <div><Label htmlFor="aboutStatYearsLabel">Years Stat Label</Label><Input id="aboutStatYearsLabel" name="aboutStatYearsLabel" defaultValue={content.aboutStatYearsLabel} /></div>
+          <div><Label htmlFor="aboutStatProjectsLabel">Projects Stat Label</Label><Input id="aboutStatProjectsLabel" name="aboutStatProjectsLabel" defaultValue={content.aboutStatProjectsLabel} /></div>
+          <div><Label htmlFor="aboutStatClientsLabel">Clients Stat Label</Label><Input id="aboutStatClientsLabel" name="aboutStatClientsLabel" defaultValue={content.aboutStatClientsLabel} /></div>
+          <div><Label htmlFor="aboutStatViewsLabel">Views Stat Label</Label><Input id="aboutStatViewsLabel" name="aboutStatViewsLabel" defaultValue={content.aboutStatViewsLabel} /></div>
+          <div><Label htmlFor="aboutPortraitFallbackLabel">Portrait Fallback Label</Label><Input id="aboutPortraitFallbackLabel" name="aboutPortraitFallbackLabel" defaultValue={content.aboutPortraitFallbackLabel} /></div>
+          <div><Label htmlFor="aboutProfileImageAlt">Profile Image Alt Text</Label><Input id="aboutProfileImageAlt" name="aboutProfileImageAlt" defaultValue={content.aboutProfileImageAlt} placeholder="Falls back to profile name" /></div>
         </div>
         <p className={styles.helper}>Headline and biography continue to come from About Me so the same profile content stays consistent across the site.</p>
       </FormCard>
