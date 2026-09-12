@@ -56,7 +56,7 @@ export default async function ContactPage() {
               turnaroundTime={settings?.turnaroundTime}
               socialLinks={socialLinks}
             />
-            <ContactFormShell projectCategories={services.map((service) => service.name)} />
+            <ContactFormShell projectCategories={services.map((service) => service.name)} content={copy} />
           </div>
         </div>
       </section>
