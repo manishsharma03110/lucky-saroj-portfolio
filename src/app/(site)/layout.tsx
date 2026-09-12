@@ -12,7 +12,6 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   const socialImage = settings?.ogImageUrl || undefined;
-
   return {
     icons: settings?.favicon ? { icon: settings.favicon } : undefined,
     openGraph: socialImage ? { images: [{ url: socialImage }] } : undefined,
@@ -21,11 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [settings, branding, globalPage] = await Promise.all([
-    getSiteSettings(),
-    getSiteBranding(),
-    getPageContent("global"),
-  ]);
+  const [settings, branding, globalPage] = await Promise.all([getSiteSettings(), getSiteBranding(), getPageContent("global")]);
   const global = globalPage.content;
   return (
     <div className="public-site contents">
@@ -36,18 +31,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         roleLabel={global.headerRoleLabel}
         ctaLabel={global.headerCtaLabel}
         ctaUrl={global.headerCtaUrl}
-        navLabels={{
-          home: global.navHomeLabel,
-          about: global.navAboutLabel,
-          portfolio: global.navPortfolioLabel,
-          services: global.navServicesLabel,
-          experience: global.navExperienceLabel,
-          contact: global.navContactLabel,
-        }}
+        navLabels={{ home: global.navHomeLabel, about: global.navAboutLabel, portfolio: global.navPortfolioLabel, services: global.navServicesLabel, experience: global.navExperienceLabel, contact: global.navContactLabel }}
       />
       <main className="flex-1">{children}</main>
       <Footer content={global} />
-      <ContactPopup />
+      <ContactPopup copy={global} />
     </div>
   );
 }
