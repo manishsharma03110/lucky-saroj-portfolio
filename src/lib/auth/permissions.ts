@@ -12,6 +12,7 @@ export const PERMISSION_KEYS = [
   "testimonials.read", "testimonials.create", "testimonials.update", "testimonials.delete",
   "messages.read", "messages.update", "messages.delete",
   "settings.read", "settings.update", "media.upload",
+  "activity.read",
   "admin_users.manage", "roles.manage",
 ] as const;
 export type PermissionKey = (typeof PERMISSION_KEYS)[number];
