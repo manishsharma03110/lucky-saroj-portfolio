@@ -6,6 +6,7 @@ import { Hero } from "@/components/home/Hero";
 import { SelectedWork } from "@/components/home/SelectedWork";
 import { ShowreelSection } from "@/components/home/ShowreelSection";
 import { TestimonialsPreview } from "@/components/home/TestimonialsPreview";
+import { MotionReveal } from "@/components/ui/MotionReveal";
 import { getFeaturedShowreel, getSiteSettings } from "@/lib/db/queries";
 import { getHomePageContent } from "@/lib/db/home-content-service";
 import { getPageSeo } from "@/lib/db/page-seo-service";
@@ -37,12 +38,12 @@ export default async function HomePage() {
         showreelUrl={content.heroShowreelUrl}
         hasShowreel={Boolean(showreel?.videoUrl)}
       />
-      <SelectedWork content={content} />
-      <ShowreelSection showreel={showreel} content={content} />
-      <EditingStyles content={content} />
-      <AboutPreview content={content} />
-      <TestimonialsPreview content={content} />
-      <FinalCTA content={content} />
+      <MotionReveal><SelectedWork content={content} /></MotionReveal>
+      <MotionReveal delay={70}><ShowreelSection showreel={showreel} content={content} /></MotionReveal>
+      <MotionReveal delay={90}><EditingStyles content={content} /></MotionReveal>
+      <MotionReveal delay={90}><AboutPreview content={content} /></MotionReveal>
+      <MotionReveal delay={90}><TestimonialsPreview content={content} /></MotionReveal>
+      <MotionReveal delay={70}><FinalCTA content={content} /></MotionReveal>
     </main>
   );
 }
