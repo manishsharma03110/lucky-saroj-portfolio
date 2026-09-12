@@ -9,7 +9,7 @@ import { PopupContactForm } from "./PopupContactForm";
 const SESSION_KEY = "contact-popup-shown";
 export const CONTACT_POPUP_HERO_IMAGE = "/uploads/contact/contact-popup-hero.png";
 
-export function ContactPopup({ copy }: { copy: Record<string, string> }) {
+export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, string>; optionsConfig?: string }) {
   const [open, setOpen] = useState(false);
   const [imageAvailable, setImageAvailable] = useState(true);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -72,7 +72,7 @@ export function ContactPopup({ copy }: { copy: Record<string, string> }) {
                 <p id="contact-popup-description" className="mt-3 max-w-[25rem] text-[0.72rem] leading-[1.45] text-white/72 [@media(max-height:700px)]:sm:mt-2 [@media(max-height:700px)]:sm:text-[0.68rem]">{copy.popupDescription}</p>
               </div>
             </div>
-            <PopupContactForm copy={copy} />
+            <PopupContactForm copy={copy} optionsConfig={optionsConfig} />
           </motion.div>
         </motion.div>
       )}
