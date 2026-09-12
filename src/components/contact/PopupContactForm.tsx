@@ -10,7 +10,6 @@ const initialState: ContactFormState = { status: "idle" };
 const fieldClass = "min-h-[2.875rem] w-full rounded-[7px] border border-white/18 bg-black/20 py-2 pl-11 pr-4 text-xs text-white placeholder:text-white/55 transition-[border-color,box-shadow,background-color] hover:border-white/30 focus:border-[var(--accent-primary)]/80 focus:bg-[var(--surface-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-primary)]/25 motion-reduce:transition-none sm:text-sm [@media(max-height:800px)]:sm:min-h-11";
 const errorClass = "mt-1.5 text-xs text-red-300";
 type PopupIcon = ComponentType<{ size?: number; className?: string; "aria-hidden"?: boolean }>;
-
 type PopupCopy = Record<string, string>;
 
 function PopupField({ id, name, label, icon: Icon, error, ...props }: { id: string; name: string; label: string; icon: PopupIcon; error?: string } & InputHTMLAttributes<HTMLInputElement>) {
@@ -22,9 +21,7 @@ export function PopupContactForm({ copy }: { copy: PopupCopy }) {
   const [projectType, setProjectType] = useState("");
   const [budget, setBudget] = useState("");
 
-  if (state.status === "success") {
-    return <div className="flex min-h-[390px] flex-col items-center justify-center px-6 py-14 text-center" role="status" aria-live="polite"><span className="flex h-16 w-16 items-center justify-center rounded-full border border-[var(--accent-primary)]/45 bg-[var(--accent-primary)]/10"><CheckCircle2 size={32} className="text-[var(--accent-primary)]" aria-hidden="true" /></span><h3 className="mt-6 font-display text-3xl font-semibold text-white">{copy.popupSuccessHeading}</h3><p className="mt-3 max-w-md text-sm leading-6 text-white/65">{state.message}</p></div>;
-  }
+  if (state.status === "success") return <div className="flex min-h-[390px] flex-col items-center justify-center px-6 py-14 text-center" role="status" aria-live="polite"><span className="flex h-16 w-16 items-center justify-center rounded-full border border-[var(--accent-primary)]/45 bg-[var(--accent-primary)]/10"><CheckCircle2 size={32} className="text-[var(--accent-primary)]" aria-hidden="true" /></span><h3 className="mt-6 font-display text-3xl font-semibold text-white">{copy.popupSuccessHeading}</h3><p className="mt-3 max-w-md text-sm leading-6 text-white/65">{state.message}</p></div>;
 
   return (
     <form action={formAction} className="relative -mt-px space-y-2 bg-[linear-gradient(to_bottom,var(--background-primary)_0%,var(--background-primary)_4rem)] px-5 pb-4 pt-2 sm:px-7 sm:pb-5 [@media(max-height:800px)]:sm:space-y-1.5 [@media(max-height:800px)]:sm:pb-3" aria-label={copy.popupFormAriaLabel} aria-busy={pending}>
