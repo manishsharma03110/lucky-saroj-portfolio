@@ -3,21 +3,37 @@ import type { schema } from "@/lib/db";
 
 type Experience = typeof schema.experiences.$inferSelect;
 
-export function ExperienceList({ experiences }: { experiences: Experience[] }) {
+export function ExperienceList({
+  experiences,
+  eyebrow,
+  heading,
+  description,
+  emptyText,
+  presentLabel,
+  currentBadgeLabel,
+}: {
+  experiences: Experience[];
+  eyebrow: string;
+  heading: string;
+  description: string;
+  emptyText: string;
+  presentLabel: string;
+  currentBadgeLabel: string;
+}) {
   return (
     <section className="bg-[var(--background-primary)] py-14 sm:py-20 lg:py-24" aria-labelledby="experience-list-title">
       <div className="mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-12">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-primary)]">Professional journey</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent-primary)]">{eyebrow}</p>
         <div className="grid gap-5 border-b border-white/10 pb-8 sm:grid-cols-[0.9fr_1.1fr] sm:items-end">
-          <h2 id="experience-list-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-[var(--text-primary)] sm:text-5xl">My professional experience.</h2>
-          <p className="max-w-lg text-sm leading-7 text-[var(--text-secondary)] sm:justify-self-end">A timeline of my roles and responsibilities that have shaped my journey as a video editor.</p>
+          <h2 id="experience-list-title" className="mt-4 font-display text-4xl font-semibold tracking-[-0.045em] text-[var(--text-primary)] sm:text-5xl">{heading}</h2>
+          <p className="max-w-lg text-sm leading-7 text-[var(--text-secondary)] sm:justify-self-end">{description}</p>
         </div>
 
-        {experiences.length === 0 ? <p className="py-12 text-base text-[var(--text-secondary)]">Experience details will appear here when they are added.</p> : (
+        {experiences.length === 0 ? <p className="py-12 text-base text-[var(--text-secondary)]">{emptyText}</p> : (
           <ol className="mt-10 space-y-5 sm:mt-12">
             {experiences.map((experience, index) => {
               const current = experience.isCurrent || experience.endDate?.trim().toLowerCase() === "present";
-              const endDate = current ? "Present" : experience.endDate;
+              const endDate = current ? presentLabel : experience.endDate;
               return (
                 <li key={experience.id} className="group/timeline grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] gap-x-3 gap-y-4 lg:grid-cols-[140px_48px_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-0">
                   <div className="col-start-2 row-start-1 flex flex-wrap items-baseline gap-x-2 lg:col-start-1 lg:block lg:pr-1 lg:text-right">
@@ -31,7 +47,7 @@ export function ExperienceList({ experiences }: { experiences: Experience[] }) {
                   <article className="group relative col-start-2 row-start-2 grid min-w-0 w-full gap-6 overflow-hidden rounded-md border border-white/10 bg-[var(--surface-primary)] px-6 py-6 transition-colors duration-300 hover:border-[var(--accent-primary)]/40 hover:bg-[var(--surface-primary)] motion-reduce:transition-none sm:px-8 sm:py-7 lg:col-start-3 lg:row-start-1 lg:grid-cols-[minmax(14rem,0.72fr)_1px_minmax(0,1.28fr)] lg:gap-8">
                     <span className="absolute left-0 top-0 h-full w-px bg-[var(--accent-primary)]/65" aria-hidden />
                     <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-3"><h3 className="break-words font-display text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)] sm:text-3xl">{experience.role}</h3>{current && <span className="rounded-sm border border-[var(--accent-primary)]/45 bg-[var(--accent-primary)]/10 px-2 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-primary)]">Current</span>}</div>
+                      <div className="flex flex-wrap items-center gap-3"><h3 className="break-words font-display text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)] sm:text-3xl">{experience.role}</h3>{current && <span className="rounded-sm border border-[var(--accent-primary)]/45 bg-[var(--accent-primary)]/10 px-2 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-primary)]">{currentBadgeLabel}</span>}</div>
                       <p className="mt-3 break-words text-base font-medium text-[var(--text-secondary)]">{experience.company}</p>
                       {experience.location && <p className="mt-3 flex items-center gap-2 break-words text-sm text-[var(--text-muted)]"><MapPin size={14} strokeWidth={1.6} aria-hidden />{experience.location}</p>}
                     </div>
