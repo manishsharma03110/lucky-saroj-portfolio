@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/Input";
 import { submitFullContactForm, type ContactFormState } from "@/lib/actions/contact";
-import { BUDGET_RANGES, PROJECT_TIMELINES, VIDEO_TYPES } from "./contactConfig";
+import { activeContactOptionLabels, parseContactOptionsConfig } from "@/lib/contact/contact-options-config";
 import { ContactSelect } from "./ContactSelect";
 
 const initialState: ContactFormState = { status: "idle" };
@@ -20,6 +20,10 @@ export function ContactForm({ projectCategories = [], content = {} }: { projectC
   const [state, formAction, pending] = useActionState(submitFullContactForm, initialState);
   const otherCategoryLabel = content.formOtherCategoryLabel || "Other";
   const categoryOptions = Array.from(new Set([...projectCategories, otherCategoryLabel]));
+  const optionConfig = parseContactOptionsConfig(content.contactOptionsConfig);
+  const budgetOptions = activeContactOptionLabels(optionConfig, "budgetRanges");
+  const videoTypeOptions = activeContactOptionLabels(optionConfig, "videoTypes");
+  const timelineOptions = activeContactOptionLabels(optionConfig, "projectTimelines");
   const copy = {
     ariaLabel: content.formAriaLabel || "Project inquiry form",
     required: content.formRequiredLabel || "Required fields",
@@ -83,7 +87,7 @@ export function ContactForm({ projectCategories = [], content = {} }: { projectC
         </div>
         <div>
           <label htmlFor="budgetRange" className={labelClasses}>{copy.budgetLabel} <RequiredMark /></label>
-          <ContactSelect id="budgetRange" name="budgetRange" placeholder={copy.budgetPlaceholder} options={BUDGET_RANGES} required disabled={pending} invalid={Boolean(state.fieldErrors?.budgetRange)} describedBy={state.fieldErrors?.budgetRange ? "budget-error" : undefined} />
+          <ContactSelect id="budgetRange" name="budgetRange" placeholder={copy.budgetPlaceholder} options={budgetOptions} required disabled={pending} invalid={Boolean(state.fieldErrors?.budgetRange)} describedBy={state.fieldErrors?.budgetRange ? "budget-error" : undefined} />
           {state.fieldErrors?.budgetRange && <p id="budget-error" className={errorClasses}>{state.fieldErrors.budgetRange}</p>}
         </div>
       </div>
@@ -96,7 +100,7 @@ export function ContactForm({ projectCategories = [], content = {} }: { projectC
         </div>
         <div>
           <label htmlFor="videoType" className={labelClasses}>{copy.videoTypeLabel} <RequiredMark /></label>
-          <ContactSelect id="videoType" name="videoType" placeholder={copy.videoTypePlaceholder} options={VIDEO_TYPES} required disabled={pending} invalid={Boolean(state.fieldErrors?.videoType)} describedBy={state.fieldErrors?.videoType ? "video-type-error" : undefined} />
+          <ContactSelect id="videoType" name="videoType" placeholder={copy.videoTypePlaceholder} options={videoTypeOptions} required disabled={pending} invalid={Boolean(state.fieldErrors?.videoType)} describedBy={state.fieldErrors?.videoType ? "video-type-error" : undefined} />
           {state.fieldErrors?.videoType && <p id="video-type-error" className={errorClasses}>{state.fieldErrors.videoType}</p>}
         </div>
       </div>
@@ -104,7 +108,7 @@ export function ContactForm({ projectCategories = [], content = {} }: { projectC
       <div className="grid gap-5 md:grid-cols-2">
         <div>
           <label htmlFor="projectTimeline" className={labelClasses}>{copy.timelineLabel}</label>
-          <ContactSelect id="projectTimeline" name="projectTimeline" placeholder={copy.timelinePlaceholder} options={PROJECT_TIMELINES} disabled={pending} invalid={Boolean(state.fieldErrors?.projectTimeline)} describedBy={state.fieldErrors?.projectTimeline ? "timeline-error" : undefined} />
+          <ContactSelect id="projectTimeline" name="projectTimeline" placeholder={copy.timelinePlaceholder} options={timelineOptions} disabled={pending} invalid={Boolean(state.fieldErrors?.projectTimeline)} describedBy={state.fieldErrors?.projectTimeline ? "timeline-error" : undefined} />
           {state.fieldErrors?.projectTimeline && <p id="timeline-error" className={errorClasses}>{state.fieldErrors.projectTimeline}</p>}
         </div>
         <div>
