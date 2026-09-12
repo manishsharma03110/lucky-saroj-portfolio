@@ -25,6 +25,9 @@ export default async function ServicesPage() {
   }));
   const heroImageUrl = copy.heroImageUrl || "/uploads/About/about-hero-editor.png";
   const heroImageAlt = copy.heroImageAlt || "Video editor working at a desktop editing setup";
+  const activeServiceLabel = services.length === 1
+    ? (copy.activeServiceSingular || "Active service")
+    : (copy.activeServicePlural || "Active services");
 
   return (
     <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
@@ -39,7 +42,7 @@ export default async function ServicesPage() {
           <div className="relative aspect-[16/11] overflow-hidden rounded-[10px] border border-white/10 bg-[var(--background-secondary)] sm:aspect-[16/10] md:aspect-[4/3]">
             <Image src={heroImageUrl} alt={heroImageAlt} fill preload sizes="(max-width: 767px) 100vw, 55vw" className="object-cover object-center" />
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(8,9,11,0.7),transparent_30%),linear-gradient(to_top,rgba(8,9,11,0.48),transparent_45%)]" aria-hidden />
-            <div className="absolute bottom-5 right-5 border-l border-[var(--accent-primary)]/60 bg-[var(--background-primary)]/90 px-4 py-3 backdrop-blur-sm"><span className="font-display text-2xl font-semibold text-[var(--accent-primary)]">{services.length}</span><span className="ml-3 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--text-primary)]">{services.length === 1 ? "Active service" : "Active services"}</span></div>
+            <div className="absolute bottom-5 right-5 border-l border-[var(--accent-primary)]/60 bg-[var(--background-primary)]/90 px-4 py-3 backdrop-blur-sm"><span className="font-display text-2xl font-semibold text-[var(--accent-primary)]">{services.length}</span><span className="ml-3 text-[0.68rem] uppercase tracking-[0.14em] text-[var(--text-primary)]">{activeServiceLabel}</span></div>
           </div>
         </div>
       </section>
