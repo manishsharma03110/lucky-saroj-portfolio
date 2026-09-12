@@ -6,6 +6,7 @@ import { CategoryFilter } from "@/components/portfolio/CategoryFilter";
 import { PortfolioCTA } from "@/components/portfolio/PortfolioCTA";
 import { PortfolioHero } from "@/components/portfolio/PortfolioHero";
 import { hasUsableVisual, ProjectCard } from "@/components/portfolio/ProjectCard";
+import { PageMotionBoundary } from "@/components/ui/PageMotionBoundary";
 import { getCategories, getProjectBySlug, getPublishedProjects, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 import { getPageSeo } from "@/lib/db/page-seo-service";
@@ -35,10 +36,9 @@ export default async function PortfolioPage({ searchParams }: { searchParams: Pr
   const hasCaseStudy = Boolean(featured?.project.description && (featured.project.challenge || featured.project.approach || featured.project.result));
 
   return (
-    <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
+    <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
       <PortfolioHero projectCount={projects.length} categoryName={activeCategory?.name} eyebrow={copy.heroEyebrow} heading={copy.heroHeading} description={copy.heroDescription} />
       <section className="border-b border-white/10 bg-[var(--background-primary)] py-5 sm:py-6"><div className="mx-auto w-full max-w-[1560px] px-5 sm:px-8 lg:px-12 2xl:px-16"><Suspense fallback={null}><CategoryFilter categories={categories} allLabel={copy.filterAllLabel} ariaLabel={copy.filterAriaLabel} /></Suspense></div></section>
-
       <section className="py-12 sm:py-16 lg:py-20 2xl:py-24">
         <div className="mx-auto w-full max-w-[1560px] px-5 sm:px-8 lg:px-12 2xl:px-16">
           {featured ? <>
@@ -52,6 +52,6 @@ export default async function PortfolioPage({ searchParams }: { searchParams: Pr
         </div>
       </section>
       <PortfolioCTA eyebrow={copy.ctaEyebrow} heading={copy.ctaHeading} description={copy.ctaDescription} label={copy.ctaLabel} url={copy.ctaUrl} />
-    </main>
+    </PageMotionBoundary>
   );
 }

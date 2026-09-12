@@ -5,6 +5,7 @@ import { ProjectCTA } from "@/components/portfolio/detail/ProjectCTA";
 import { ProjectHero } from "@/components/portfolio/detail/ProjectHero";
 import { ProjectGallery, ProjectMedia } from "@/components/portfolio/detail/ProjectMedia";
 import { ProjectNavigation } from "@/components/portfolio/detail/ProjectNavigation";
+import { PageMotionBoundary } from "@/components/ui/PageMotionBoundary";
 import { getAdjacentProjects, getProjectBySlug, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 import { createPageMetadata } from "@/lib/seo";
@@ -32,7 +33,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const mediaCopy = { selectedProjectLabel: copy.detailSelectedProjectLabel, mediaEyebrow: copy.detailMediaEyebrow, mediaHeading: copy.detailMediaHeading, previewAltSuffix: copy.detailPreviewAltSuffix, mediaAltSuffix: copy.detailMediaAltSuffix };
 
   return (
-    <>
+    <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
       <ProjectHero project={project} categoryName={category?.name} />
       <ProjectMedia project={project} categoryName={category?.name} media={media} copy={mediaCopy} />
       <ProjectOverview project={project} categoryName={category?.name} copy={detailCopy} />
@@ -41,6 +42,6 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       <ProjectTools tools={tools} copy={detailCopy} />
       <ProjectNavigation previous={prev} next={next} ariaLabel={copy.detailNavigationAriaLabel} previousLabel={copy.detailPreviousLabel} nextLabel={copy.detailNextLabel} />
       <ProjectCTA eyebrow={copy.detailCtaEyebrow} heading={copy.detailCtaHeading} description={copy.detailCtaDescription} primaryLabel={copy.detailCtaPrimaryLabel} primaryUrl={copy.detailCtaPrimaryUrl} secondaryLabel={copy.detailCtaSecondaryLabel} secondaryUrl={copy.detailCtaSecondaryUrl} />
-    </>
+    </PageMotionBoundary>
   );
 }
