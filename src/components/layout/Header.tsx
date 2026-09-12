@@ -8,6 +8,7 @@ import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils/cn";
 import { MobileMenu } from "./MobileMenu";
+import motionStyles from "@/components/ui/DynamicMotion.module.css";
 
 export function Header({
   logoText = "LS",
@@ -28,6 +29,7 @@ export function Header({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const navLinks = [
     { label: navLabels.home || "Home", href: "/" },
@@ -37,6 +39,13 @@ export function Header({
     { label: navLabels.experience || "Experience", href: "/experience" },
     { label: navLabels.contact || "Contact", href: "/contact" },
   ];
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -58,10 +67,10 @@ export function Header({
     href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--color-ink)] text-white">
+    <header className={cn("sticky top-0 z-50 text-white", motionStyles.glassHeader, scrolled && motionStyles.glassHeaderScrolled)}>
       <Container className="flex h-16 max-w-[1560px] items-center justify-between px-5 sm:h-[4.5rem] sm:px-8 lg:h-20 lg:px-12">
-        <Link href="/" className="flex min-h-11 items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-white/20 font-display text-sm font-bold">
+        <Link href="/" className={cn("flex min-h-11 items-center gap-3", motionStyles.logoLink)}>
+          <span className={cn("flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-white/20 font-display text-sm font-bold", motionStyles.logoMark)}>
             {logoImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoImageUrl} alt={`${siteName} logo`} className="h-full w-full object-contain" />
@@ -84,8 +93,9 @@ export function Header({
                 href={link.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "text-[0.9375rem] font-medium transition-colors hover:text-[var(--color-accent)]",
-                  active ? "text-[var(--color-accent)]" : "text-white/80"
+                  "text-[0.9375rem] font-medium hover:text-[var(--color-accent)]",
+                  motionStyles.navLink,
+                  active ? cn("text-[var(--color-accent)]", motionStyles.navLinkActive) : "text-white/80"
                 )}
               >
                 {link.label}
@@ -95,13 +105,13 @@ export function Header({
         </nav>
 
         <div className="hidden lg:block">
-          <Button href={ctaUrl} className="!px-5 !py-2.5">{ctaLabel}</Button>
+          <Button href={ctaUrl} className="!px-5 !py-2.5 motion-safe:transition-transform motion-safe:duration-300 hover:-translate-y-0.5">{ctaLabel}</Button>
         </div>
 
         <button
           ref={menuButtonRef}
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-md text-white transition-colors hover:text-[var(--color-accent)] lg:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-md text-white transition-all duration-300 hover:bg-white/[0.04] hover:text-[var(--color-accent)] lg:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="mobile-navigation"

@@ -1,0 +1,105 @@
+.dynamicShell {
+  position: relative;
+}
+
+.dynamicShell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 78% 8%, rgba(59, 130, 246, 0.08), transparent 28%),
+    radial-gradient(circle at 18% 88%, rgba(59, 130, 246, 0.045), transparent 30%);
+  opacity: 0.9;
+  animation: adminAmbient 14s ease-in-out infinite alternate;
+}
+
+.dynamicContent {
+  position: relative;
+  z-index: 1;
+  animation: adminEnter 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dynamicShell :global(form),
+.dynamicShell :global(table),
+.dynamicShell :global([class*="panel"]),
+.dynamicShell :global([class*="Panel"]),
+.dynamicShell :global([class*="card"]),
+.dynamicShell :global([class*="Card"]) {
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    background-color 260ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dynamicShell :global([class*="panel"]:hover),
+  .dynamicShell :global([class*="Panel"]:hover),
+  .dynamicShell :global([class*="card"]:hover),
+  .dynamicShell :global([class*="Card"]:hover) {
+    transform: translateY(-2px);
+    border-color: rgba(59, 130, 246, 0.2);
+    box-shadow: 0 18px 46px rgba(0, 0, 0, 0.18);
+  }
+}
+
+.dynamicShell :global(input),
+.dynamicShell :global(textarea),
+.dynamicShell :global(select),
+.dynamicShell :global(button),
+.dynamicShell :global(a) {
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.dynamicShell :global(input:focus),
+.dynamicShell :global(textarea:focus),
+.dynamicShell :global(select:focus) {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+}
+
+.dynamicShell :global(tbody tr) {
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dynamicShell :global(tbody tr:hover) {
+    background: rgba(59, 130, 246, 0.025);
+  }
+}
+
+@keyframes adminAmbient {
+  from { transform: translate3d(-1%, -1%, 0) scale(0.99); opacity: 0.65; }
+  to { transform: translate3d(1%, 1%, 0) scale(1.015); opacity: 1; }
+}
+
+@keyframes adminEnter {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dynamicShell::before,
+  .dynamicContent,
+  .dynamicShell :global(form),
+  .dynamicShell :global(table),
+  .dynamicShell :global([class*="panel"]),
+  .dynamicShell :global([class*="Panel"]),
+  .dynamicShell :global([class*="card"]),
+  .dynamicShell :global([class*="Card"]),
+  .dynamicShell :global(input),
+  .dynamicShell :global(textarea),
+  .dynamicShell :global(select),
+  .dynamicShell :global(button),
+  .dynamicShell :global(a),
+  .dynamicShell :global(tbody tr) {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}
