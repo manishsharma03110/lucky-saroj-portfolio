@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/Button";
 import { WorkCard } from "@/components/home/WorkCard";
 import { getPublishedProjects } from "@/lib/db/queries";
+import type { HomePageContent } from "@/lib/db/home-content-service";
 
-export async function SelectedWork() {
+export async function SelectedWork({ content }: { content: HomePageContent }) {
   const featuredProjects = await getPublishedProjects({ featuredOnly: true, limit: 3 });
   const projects = featuredProjects.length > 0
     ? featuredProjects
@@ -17,13 +18,13 @@ export async function SelectedWork() {
       <div className="mx-auto w-full max-w-[1560px] px-5 sm:px-8 lg:px-12 2xl:px-16">
         <div className="mb-9 flex flex-col items-start gap-6 border-b border-white/10 pb-8 sm:mb-12 md:flex-row md:items-end md:justify-between 2xl:mb-14">
           <div>
-            <p className="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent-primary)] lg:text-[0.8rem]">Selected work</p>
+            <p className="mb-4 text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--accent-primary)] lg:text-[0.8rem]">{content.selectedWorkEyebrow}</p>
             <h2 className="max-w-3xl font-display text-[clamp(2.25rem,4.5vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-[var(--text-primary)]">
-              Work built to be watched.
+              {content.selectedWorkHeading}
             </h2>
           </div>
-          <Button href="/portfolio" variant="cine-outline" withArrow className="!rounded-md !border-white/20 !px-7 !py-3.5 !text-[var(--text-primary)] hover:!border-[var(--accent-primary)] hover:!text-[var(--accent-hover)]">
-            View All Work
+          <Button href={content.selectedWorkCtaUrl} variant="cine-outline" withArrow className="!rounded-md !border-white/20 !px-7 !py-3.5 !text-[var(--text-primary)] hover:!border-[var(--accent-primary)] hover:!text-[var(--accent-hover)]">
+            {content.selectedWorkCtaLabel}
           </Button>
         </div>
 

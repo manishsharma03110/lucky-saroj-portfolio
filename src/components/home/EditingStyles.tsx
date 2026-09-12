@@ -3,8 +3,9 @@ import * as Icons from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { getServices } from "@/lib/db/queries";
+import type { HomePageContent } from "@/lib/db/home-content-service";
 
-export async function EditingStyles() {
+export async function EditingStyles({ content }: { content: HomePageContent }) {
   const services = await getServices(false);
   if (services.length === 0) return null;
 
@@ -13,15 +14,15 @@ export async function EditingStyles() {
       <div className="mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">
         <div className="grid gap-8 md:gap-10 lg:grid-cols-[0.68fr_1.32fr] lg:gap-14 2xl:gap-20">
           <div className="lg:sticky lg:top-28 lg:self-start">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">What I do</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{content.servicesEyebrow}</p>
             <h2 className="mt-5 max-w-lg text-[2.25rem] font-semibold leading-[1] tracking-[-0.045em] text-[var(--text-primary)] sm:text-4xl lg:text-5xl">
-              Post-production built around the story.
+              {content.servicesHeading}
             </h2>
             <p className="mt-5 max-w-md text-base leading-7 text-[var(--text-secondary)]">
-              Explore the services currently available for projects and collaborations.
+              {content.servicesDescription}
             </p>
-            <Link href="/services" className="mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)]">
-              Explore services <ArrowUpRight size={17} aria-hidden />
+            <Link href={content.servicesCtaUrl} className="mt-8 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)]">
+              {content.servicesCtaLabel} <ArrowUpRight size={17} aria-hidden />
             </Link>
           </div>
 

@@ -7,12 +7,12 @@ function stored(value: string) {
   return Number.isFinite(numeric) ? compact(numeric) : value;
 }
 
-export function AboutStats({ years, projects, clients, views }: { years: number; projects: number; clients: number; views: string }) {
+export function AboutStats({ years, projects, clients, views, yearsLabel, projectsLabel, clientsLabel, viewsLabel }: { years: number; projects: number; clients: number; views: string; yearsLabel: string; projectsLabel: string; clientsLabel: string; viewsLabel: string }) {
   const stats = [
-    { value: years > 0 ? compact(years) : null, label: "Years experience" },
-    { value: projects > 0 ? compact(projects) : null, label: "Projects completed" },
-    { value: clients > 0 ? compact(clients) : null, label: "Clients" },
-    { value: views !== "0" ? stored(views) : null, label: "Views generated" },
+    { value: years > 0 ? compact(years) : null, label: yearsLabel },
+    { value: projects > 0 ? compact(projects) : null, label: projectsLabel },
+    { value: clients > 0 ? compact(clients) : null, label: clientsLabel },
+    { value: views !== "0" ? stored(views) : null, label: viewsLabel },
   ].filter((item): item is { value: string; label: string } => Boolean(item.value));
 
   if (stats.length === 0) return null;

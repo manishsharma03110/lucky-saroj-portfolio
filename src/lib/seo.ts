@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { PageSeoRecord } from "@/lib/db/page-seo-service";
 
 export const SITE_NAME = "Lucky Saroj";
 export const DEFAULT_SITE_TITLE = "Lucky Saroj — Video Editor & Visual Storyteller";
@@ -58,12 +59,19 @@ export function createPageMetadata(input: {
   description: string;
   path: string;
   image?: string | null;
+  keywords?: string[];
+  robotsIndex?: boolean;
 }): Metadata {
   const images = normalizeSocialImage(input.image);
+  const robotsIndex = input.robotsIndex ?? true;
   return {
     title: input.title,
     description: input.description,
+    ...(input.keywords && input.keywords.length > 0 ? { keywords: input.keywords } : {}),
     alternates: { canonical: input.path },
+    robots: robotsIndex
+      ? { index: true, follow: true }
+      : { index: false, follow: false, nocache: true },
     openGraph: {
       type: "website",
       siteName: SITE_NAME,
@@ -76,6 +84,39 @@ export function createPageMetadata(input: {
       card: images ? "summary_large_image" : "summary",
       title: input.title,
       description: input.description,
+      ...(images ? { images } : {}),
+    },
+  };
+}
+
+export function createCmsPageMetadata(seo: PageSeoRecord, globalImage?: string | null): Metadata {
+  const image = seo.ogImageUrl || globalImage || null;
+  const images = normalizeSocialImage(image);
+  const keywords = seo.keywords
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  return {
+    title: seo.metaTitle,
+    description: seo.metaDescription,
+    ...(keywords.length > 0 ? { keywords } : {}),
+    alternates: { canonical: seo.canonicalPath },
+    robots: seo.robotsIndex
+      ? { index: true, follow: true }
+      : { index: false, follow: false, nocache: true },
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      title: seo.ogTitle,
+      description: seo.ogDescription,
+      url: seo.canonicalPath,
+      ...(images ? { images } : {}),
+    },
+    twitter: {
+      card: images ? "summary_large_image" : "summary",
+      title: seo.ogTitle,
+      description: seo.ogDescription,
       ...(images ? { images } : {}),
     },
   };

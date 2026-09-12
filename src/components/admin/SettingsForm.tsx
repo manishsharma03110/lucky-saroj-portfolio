@@ -15,28 +15,60 @@ type Settings = typeof schema.siteSettings.$inferSelect;
 
 const initialState: ActionState = { status: "idle" };
 
-export function SettingsForm({ settings, heroImageAssetId }: { settings: Settings; heroImageAssetId?: string | null }) {
+export function SettingsForm({
+  settings,
+  logoImageUrl,
+  heroImageAssetId,
+  logoImageAssetId,
+  faviconAssetId,
+  ogImageAssetId,
+}: {
+  settings: Settings;
+  logoImageUrl?: string | null;
+  heroImageAssetId?: string | null;
+  logoImageAssetId?: string | null;
+  faviconAssetId?: string | null;
+  ogImageAssetId?: string | null;
+}) {
   const [state, formAction, pending] = useActionState(updateSettings, initialState);
 
   return (
     <MediaForm action={formAction} className={styles.sectionStack}>
       <input type="hidden" name="revision" value={settings.revision} />
 
-      <FormCard title="General">
+      <FormCard title="Brand Identity">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <Label htmlFor="logoText">Logo Text</Label>
+            <Label htmlFor="logoText">Logo Text Fallback</Label>
             <Input id="logoText" name="logoText" defaultValue={settings.logoText ?? "LS"} maxLength={10} required />
+            <p className={styles.helper}>Used automatically when no logo image is uploaded.</p>
           </div>
-        </div>
-      </FormCard>
-
-      <FormCard title="Contact & Professional Details">
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <Label htmlFor="siteName">Display Name</Label>
             <Input id="siteName" name="siteName" defaultValue={settings.siteName ?? "Lucky Saroj"} required />
           </div>
+        </div>
+        <FileUpload
+          name="logoImageUrl"
+          assetIdName="logoImageAssetId"
+          label="Website Logo Image"
+          kind="image"
+          defaultValue={logoImageUrl}
+          defaultAssetId={logoImageAssetId}
+        />
+        <p className={styles.helper}>Upload, replace, or remove the logo used in the website header.</p>
+        <FileUpload
+          name="favicon"
+          assetIdName="faviconAssetId"
+          label="Favicon / Browser Icon"
+          kind="image"
+          defaultValue={settings.favicon}
+          defaultAssetId={faviconAssetId}
+        />
+      </FormCard>
+
+      <FormCard title="Contact & Professional Details">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <Label htmlFor="contactEmail">Email</Label>
             <Input id="contactEmail" name="contactEmail" type="email" defaultValue={settings.contactEmail ?? ""} required />
@@ -155,6 +187,15 @@ export function SettingsForm({ settings, heroImageAssetId }: { settings: Setting
           <Label htmlFor="seoDescription">Default Meta Description</Label>
           <Textarea id="seoDescription" name="seoDescription" rows={3} defaultValue={settings.seoDescription ?? ""} />
         </div>
+        <FileUpload
+          name="ogImageUrl"
+          assetIdName="ogImageAssetId"
+          label="Default Social / Open Graph Image"
+          kind="image"
+          defaultValue={settings.ogImageUrl}
+          defaultAssetId={ogImageAssetId}
+        />
+        <p className={styles.helper}>Used as the default share image when a page does not have its own social image.</p>
       </FormCard>
 
       {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}

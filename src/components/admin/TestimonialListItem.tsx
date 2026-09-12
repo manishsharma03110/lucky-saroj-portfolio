@@ -9,7 +9,7 @@ import styles from "./AdminEditorial.module.css";
 
 type Testimonial = typeof schema.testimonials.$inferSelect;
 
-export function TestimonialListItem({ testimonial }: { testimonial: Testimonial }) {
+export function TestimonialListItem({ testimonial, profileImageAssetId }: { testimonial: Testimonial; profileImageAssetId?: string | null }) {
   return (
     <article className={styles.testimonialCard}>
       <div className={styles.cardHeader}>
@@ -39,7 +39,7 @@ export function TestimonialListItem({ testimonial }: { testimonial: Testimonial 
       <details className={styles.disclosure}>
         <summary>Edit testimonial</summary>
         <div className={styles.disclosureBody}>
-          <TestimonialForm testimonial={testimonial} />
+          <TestimonialForm testimonial={testimonial} profileImageAssetId={profileImageAssetId} />
         </div>
       </details>
     </article>

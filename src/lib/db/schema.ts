@@ -1,4 +1,4 @@
-import { pgTable, text, integer, boolean, timestamp, primaryKey, index, check, unique, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, boolean, timestamp, primaryKey, index, check, unique, uniqueIndex, jsonb } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
 export const roles = pgTable("roles", {
@@ -31,9 +31,6 @@ export const rolePermissions = pgTable("role_permissions", {
   index("role_permissions_permission_id_idx").on(table.permissionId),
 ]);
 
-// ---------------------------------------------------------------------------
-// AdminUser
-// ---------------------------------------------------------------------------
 export const adminUsers = pgTable("admin_users", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   email: text("email").notNull().unique(),
@@ -48,9 +45,6 @@ export const adminUsers = pgTable("admin_users", {
   check("admin_users_session_version_positive", sql`${table.sessionVersion} >= 1`),
 ]);
 
-// ---------------------------------------------------------------------------
-// PortfolioCategory
-// ---------------------------------------------------------------------------
 export const portfolioCategories = pgTable("portfolio_categories", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
@@ -61,9 +55,6 @@ export const portfolioCategories = pgTable("portfolio_categories", {
   check("portfolio_categories_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
 ]);
 
-// ---------------------------------------------------------------------------
-// PortfolioProject
-// ---------------------------------------------------------------------------
 export const portfolioProjects = pgTable("portfolio_projects", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   title: text("title").notNull(),
@@ -77,13 +68,9 @@ export const portfolioProjects = pgTable("portfolio_projects", {
   thumbnailUrl: text("thumbnail_url"),
   videoUrl: text("video_url"),
   posterUrl: text("poster_url"),
-  categoryId: text("category_id").references(() => portfolioCategories.id, {
-    onDelete: "set null",
-  }),
+  categoryId: text("category_id").references(() => portfolioCategories.id, { onDelete: "set null" }),
   isFeatured: boolean("is_featured").notNull().default(false),
-  status: text("status", { enum: ["draft", "published"] })
-    .notNull()
-    .default("draft"),
+  status: text("status", { enum: ["draft", "published"] }).notNull().default("draft"),
   displayOrder: integer("display_order").notNull().default(0),
   seoTitle: text("seo_title"),
   seoDescription: text("seo_description"),
@@ -96,14 +83,9 @@ export const portfolioProjects = pgTable("portfolio_projects", {
   check("portfolio_projects_status_valid", sql`${table.status} IN ('draft', 'published')`),
 ]);
 
-// ---------------------------------------------------------------------------
-// ProjectMedia (gallery / extra media beyond thumbnail+video)
-// ---------------------------------------------------------------------------
 export const projectMedia = pgTable("project_media", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  projectId: text("project_id")
-    .notNull()
-    .references(() => portfolioProjects.id, { onDelete: "cascade" }),
+  projectId: text("project_id").notNull().references(() => portfolioProjects.id, { onDelete: "cascade" }),
   url: text("url").notNull(),
   type: text("type", { enum: ["image", "video"] }).notNull(),
   displayOrder: integer("display_order").notNull().default(0),
@@ -113,22 +95,14 @@ export const projectMedia = pgTable("project_media", {
   check("project_media_type_valid", sql`${table.type} IN ('image', 'video')`),
 ]);
 
-// ---------------------------------------------------------------------------
-// ProjectTool (tools/software used, per project)
-// ---------------------------------------------------------------------------
 export const projectTools = pgTable("project_tools", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  projectId: text("project_id")
-    .notNull()
-    .references(() => portfolioProjects.id, { onDelete: "cascade" }),
+  projectId: text("project_id").notNull().references(() => portfolioProjects.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
 }, (table) => [
   unique("project_tools_project_id_name_unique").on(table.projectId, table.name),
 ]);
 
-// ---------------------------------------------------------------------------
-// Experience
-// ---------------------------------------------------------------------------
 export const experiences = pgTable("experiences", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   role: text("role").notNull(),
@@ -147,9 +121,6 @@ export const experiences = pgTable("experiences", {
   check("experiences_current_end_date", sql`NOT ${table.isCurrent} OR ${table.endDate} IS NULL`),
 ]);
 
-// ---------------------------------------------------------------------------
-// Service
-// ---------------------------------------------------------------------------
 export const services = pgTable("services", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
@@ -165,9 +136,6 @@ export const services = pgTable("services", {
   check("services_revision_positive", sql`${table.revision} >= 1`),
 ]);
 
-// ---------------------------------------------------------------------------
-// AboutProfile (singleton row)
-// ---------------------------------------------------------------------------
 export const aboutProfile = pgTable("about_profile", {
   id: text("id").primaryKey().default("singleton:about"),
   profileImageUrl: text("profile_image_url"),
@@ -187,9 +155,6 @@ export const aboutProfile = pgTable("about_profile", {
   check("about_profile_revision_positive", sql`${table.revision} >= 1`),
 ]);
 
-// ---------------------------------------------------------------------------
-// AboutSkill
-// ---------------------------------------------------------------------------
 export const aboutSkills = pgTable("about_skills", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   profileId: text("profile_id").notNull().default("singleton:about").references(() => aboutProfile.id, { onDelete: "cascade" }),
@@ -201,9 +166,6 @@ export const aboutSkills = pgTable("about_skills", {
   check("about_skills_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
 ]);
 
-// ---------------------------------------------------------------------------
-// AboutTool (software/tools shown on About page)
-// ---------------------------------------------------------------------------
 export const aboutTools = pgTable("about_tools", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   profileId: text("profile_id").notNull().default("singleton:about").references(() => aboutProfile.id, { onDelete: "cascade" }),
@@ -215,9 +177,6 @@ export const aboutTools = pgTable("about_tools", {
   check("about_tools_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
 ]);
 
-// ---------------------------------------------------------------------------
-// Testimonial
-// ---------------------------------------------------------------------------
 export const testimonials = pgTable("testimonials", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   clientName: text("client_name").notNull(),
@@ -227,9 +186,7 @@ export const testimonials = pgTable("testimonials", {
   testimonialText: text("testimonial_text").notNull(),
   rating: integer("rating").notNull().default(5),
   isFeatured: boolean("is_featured").notNull().default(false),
-  status: text("status", { enum: ["draft", "published"] })
-    .notNull()
-    .default("published"),
+  status: text("status", { enum: ["draft", "published"] }).notNull().default("published"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   revision: integer("revision").notNull().default(1),
 }, (table) => [
@@ -238,9 +195,6 @@ export const testimonials = pgTable("testimonials", {
   check("testimonials_status_valid", sql`${table.status} IN ('draft', 'published')`),
 ]);
 
-// ---------------------------------------------------------------------------
-// Showreel
-// ---------------------------------------------------------------------------
 export const showreels = pgTable("showreels", {
   id: text("id").primaryKey().default("singleton:showreel"),
   title: text("title").notNull(),
@@ -248,9 +202,7 @@ export const showreels = pgTable("showreels", {
   thumbnailUrl: text("thumbnail_url"),
   duration: text("duration"),
   isFeatured: boolean("is_featured").notNull().default(true),
-  status: text("status", { enum: ["draft", "published"] })
-    .notNull()
-    .default("published"),
+  status: text("status", { enum: ["draft", "published"] }).notNull().default("published"),
   revision: integer("revision").notNull().default(1),
 }, (table) => [
   check("showreels_singleton_id", sql`${table.id} = 'singleton:showreel'`),
@@ -258,9 +210,6 @@ export const showreels = pgTable("showreels", {
   check("showreels_status_valid", sql`${table.status} IN ('draft', 'published')`),
 ]);
 
-// ---------------------------------------------------------------------------
-// ContactMessage
-// ---------------------------------------------------------------------------
 export const contactMessages = pgTable("contact_messages", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
@@ -272,9 +221,7 @@ export const contactMessages = pgTable("contact_messages", {
   projectTimeline: text("project_timeline"),
   referenceUrl: text("reference_url"),
   message: text("message").notNull(),
-  status: text("status", { enum: ["new", "read", "replied", "archived"] })
-    .notNull()
-    .default("new"),
+  status: text("status", { enum: ["new", "read", "replied", "archived"] }).notNull().default("new"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   revision: integer("revision").notNull().default(1),
 }, (table) => [
@@ -282,14 +229,11 @@ export const contactMessages = pgTable("contact_messages", {
   check("contact_messages_status_valid", sql`${table.status} IN ('new', 'read', 'replied', 'archived')`),
 ]);
 
-// ---------------------------------------------------------------------------
-// SiteSettings (singleton row, JSON-ish flat fields per §16)
-// ---------------------------------------------------------------------------
 export const siteSettings = pgTable("site_settings", {
   id: text("id").primaryKey().default("singleton:settings"),
-  // General
   siteName: text("site_name").notNull().default("Lucky Saroj"),
   logoText: text("logo_text").notNull().default("LS"),
+  logoImageUrl: text("logo_image_url"),
   favicon: text("favicon"),
   contactEmail: text("contact_email").notNull().default("hello@luckysaroj.com"),
   contactPhone: text("contact_phone").notNull().default("+91 12345 67890"),
@@ -298,28 +242,21 @@ export const siteSettings = pgTable("site_settings", {
   availability: text("availability").notNull().default("Freelance / Full-time / Remote"),
   paymentTerms: text("payment_terms"),
   turnaroundTime: text("turnaround_time"),
-  // Homepage
   heroHeading: text("hero_heading").notNull().default("LUCKY SAROJ"),
   heroSubheading: text("hero_subheading").notNull().default("VIDEO EDITOR & VISUAL STORYTELLER"),
-  heroDescription: text("hero_description").notNull().default(
-    "I turn raw footage into powerful stories that engage, inspire, and leave a lasting impact."
-  ),
+  heroDescription: text("hero_description").notNull().default("I turn raw footage into powerful stories that engage, inspire, and leave a lasting impact."),
   heroImageUrl: text("hero_image_url"),
   statYears: text("stat_years").notNull().default("5+"),
   statProjects: text("stat_projects").notNull().default("100+"),
   statClients: text("stat_clients").notNull().default("50+"),
   statViews: text("stat_views").notNull().default("10M+"),
-  // Footer / social
-  footerDescription: text("footer_description").notNull().default(
-    "I transform ideas and raw footage into powerful visual stories that engage, inspire and leave a lasting impact."
-  ),
+  footerDescription: text("footer_description").notNull().default("I transform ideas and raw footage into powerful visual stories that engage, inspire and leave a lasting impact."),
   instagramUrl: text("instagram_url"),
   twitterUrl: text("twitter_url"),
   youtubeUrl: text("youtube_url"),
   linkedinUrl: text("linkedin_url"),
   behanceUrl: text("behance_url"),
   vimeoUrl: text("vimeo_url"),
-  // SEO
   seoTitle: text("seo_title").notNull().default("Lucky Saroj — Video Editor & Visual Storyteller"),
   seoDescription: text("seo_description"),
   ogImageUrl: text("og_image_url"),
@@ -329,9 +266,72 @@ export const siteSettings = pgTable("site_settings", {
   check("site_settings_revision_positive", sql`${table.revision} >= 1`),
 ]);
 
-// ---------------------------------------------------------------------------
-// MediaAsset (provider-owned object metadata; URLs are rendering metadata only)
-// ---------------------------------------------------------------------------
+export const homePageContent = pgTable("home_page_content", {
+  id: text("id").primaryKey().default("singleton:home"),
+  heroPrimaryLabel: text("hero_primary_label").notNull().default("View My Work"),
+  heroPrimaryUrl: text("hero_primary_url").notNull().default("/portfolio"),
+  heroShowreelLabel: text("hero_showreel_label").notNull().default("Watch Showreel"),
+  heroShowreelUrl: text("hero_showreel_url").notNull().default("#showreel"),
+  heroImageAlt: text("hero_image_alt").notNull().default(""),
+  showreelEyebrow: text("showreel_eyebrow").notNull().default("Featured showreel"),
+  showreelRuntimeLabel: text("showreel_runtime_label").notNull().default("Runtime"),
+  selectedWorkEyebrow: text("selected_work_eyebrow").notNull().default("Selected work"),
+  selectedWorkHeading: text("selected_work_heading").notNull().default("Work built to be watched."),
+  selectedWorkCtaLabel: text("selected_work_cta_label").notNull().default("View All Work"),
+  selectedWorkCtaUrl: text("selected_work_cta_url").notNull().default("/portfolio"),
+  servicesEyebrow: text("services_eyebrow").notNull().default("What I do"),
+  servicesHeading: text("services_heading").notNull().default("Post-production built around the story."),
+  servicesDescription: text("services_description").notNull().default("Explore the services currently available for projects and collaborations."),
+  servicesCtaLabel: text("services_cta_label").notNull().default("Explore services"),
+  servicesCtaUrl: text("services_cta_url").notNull().default("/services"),
+  aboutEyebrow: text("about_eyebrow").notNull().default("About the editor"),
+  aboutCtaLabel: text("about_cta_label").notNull().default("More about me"),
+  aboutCtaUrl: text("about_cta_url").notNull().default("/about"),
+  aboutStatYearsLabel: text("about_stat_years_label").notNull().default("Years"),
+  aboutStatProjectsLabel: text("about_stat_projects_label").notNull().default("Projects"),
+  aboutStatClientsLabel: text("about_stat_clients_label").notNull().default("Clients"),
+  aboutStatViewsLabel: text("about_stat_views_label").notNull().default("Views"),
+  aboutPortraitFallbackLabel: text("about_portrait_fallback_label").notNull().default("Portrait forthcoming"),
+  aboutProfileImageAlt: text("about_profile_image_alt").notNull().default(""),
+  testimonialsEyebrow: text("testimonials_eyebrow").notNull().default("Client perspective"),
+  testimonialsHeading: text("testimonials_heading").notNull().default("The work, in their words."),
+  testimonialsDescription: text("testimonials_description").notNull().default("Real feedback from published client testimonials."),
+  finalCtaEyebrow: text("final_cta_eyebrow").notNull().default("Start a project"),
+  finalCtaHeading: text("final_cta_heading").notNull().default("Let’s shape the next story."),
+  finalCtaDescription: text("final_cta_description").notNull().default("Tell me what you’re making, where it needs to land, and what success should feel like."),
+  finalCtaButtonLabel: text("final_cta_button_label").notNull().default("Start a conversation"),
+  finalCtaButtonUrl: text("final_cta_button_url").notNull().default("/contact"),
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("home_page_content_singleton_id", sql`${table.id} = 'singleton:home'`),
+  check("home_page_content_revision_positive", sql`${table.revision} >= 1`),
+]);
+
+export const pageContent = pgTable("page_content", {
+  pageKey: text("page_key").primaryKey(),
+  content: jsonb("content").notNull().default({}),
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("page_content_page_key_valid", sql`${table.pageKey} IN ('global','about','services','experience','portfolio','contact')`),
+  check("page_content_revision_positive", sql`${table.revision} >= 1`),
+]);
+
+export const pageSeo = pgTable("page_seo", {
+  pageKey: text("page_key").primaryKey(),
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  canonicalPath: text("canonical_path"),
+  ogTitle: text("og_title"),
+  ogDescription: text("og_description"),
+  ogImageUrl: text("og_image_url"),
+  robotsIndex: boolean("robots_index").notNull().default(true),
+  keywords: text("keywords"),
+  revision: integer("revision").notNull().default(1),
+}, (table) => [
+  check("page_seo_page_key_valid", sql`${table.pageKey} IN ('home','about','portfolio','services','experience','contact')`),
+  check("page_seo_revision_positive", sql`${table.revision} >= 1`),
+]);
+
 export const mediaAssets = pgTable("media_assets", {
   id: text("id").primaryKey(),
   provider: text("provider", { enum: ["vercel_blob"] }).notNull().default("vercel_blob"),
@@ -361,80 +361,45 @@ export const mediaAssets = pgTable("media_assets", {
   index("media_assets_delete_retry_idx").on(table.state, table.lastDeleteAttemptAt),
 ]);
 
-// Typed owner columns provide real FKs; ownerType selects exactly one column.
 export const mediaAssetReferences = pgTable("media_asset_references", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   assetId: text("asset_id").notNull().references(() => mediaAssets.id, { onDelete: "restrict" }),
-  ownerType: text("owner_type", { enum: ["portfolio_project", "showreel", "site_settings"] }).notNull(),
+  ownerType: text("owner_type", { enum: ["portfolio_project", "showreel", "site_settings", "testimonial"] }).notNull(),
   portfolioProjectId: text("portfolio_project_id").references(() => portfolioProjects.id, { onDelete: "cascade" }),
   showreelId: text("showreel_id").references(() => showreels.id, { onDelete: "cascade" }),
   siteSettingsId: text("site_settings_id").references(() => siteSettings.id, { onDelete: "cascade" }),
-  slot: text("slot", { enum: ["thumbnail", "video", "hero_image"] }).notNull(),
+  testimonialId: text("testimonial_id").references(() => testimonials.id, { onDelete: "cascade" }),
+  slot: text("slot").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => [
   check("media_asset_references_owner_valid", sql`(
-    (${table.ownerType} = 'portfolio_project' AND ${table.portfolioProjectId} IS NOT NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} IS NULL)
-    OR
-    (${table.ownerType} = 'showreel' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} = 'singleton:showreel' AND ${table.siteSettingsId} IS NULL)
-    OR
-    (${table.ownerType} = 'site_settings' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} = 'singleton:settings')
+    (${table.ownerType} = 'portfolio_project' AND ${table.portfolioProjectId} IS NOT NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} IS NULL AND ${table.testimonialId} IS NULL)
+    OR (${table.ownerType} = 'showreel' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} = 'singleton:showreel' AND ${table.siteSettingsId} IS NULL AND ${table.testimonialId} IS NULL)
+    OR (${table.ownerType} = 'site_settings' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} = 'singleton:settings' AND ${table.testimonialId} IS NULL)
+    OR (${table.ownerType} = 'testimonial' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} IS NULL AND ${table.testimonialId} IS NOT NULL)
   )`),
   check("media_asset_references_slot_valid", sql`(
     (${table.ownerType} IN ('portfolio_project','showreel') AND ${table.slot} IN ('thumbnail','video'))
-    OR (${table.ownerType} = 'site_settings' AND ${table.slot} = 'hero_image')
+    OR (${table.ownerType} = 'site_settings' AND ${table.slot} IN ('hero_image','about_profile_image','logo_image','favicon','og_image','services_hero_image','experience_hero_image','contact_hero_image'))
+    OR (${table.ownerType} = 'testimonial' AND ${table.slot} = 'profile_image')
   )`),
   unique("media_asset_references_asset_owner_slot_unique").on(table.assetId, table.ownerType, table.portfolioProjectId, table.showreelId, table.slot),
   uniqueIndex("media_asset_references_project_slot_unique").on(table.portfolioProjectId, table.slot).where(sql`${table.ownerType} = 'portfolio_project'`),
   uniqueIndex("media_asset_references_showreel_slot_unique").on(table.showreelId, table.slot).where(sql`${table.ownerType} = 'showreel'`),
   uniqueIndex("media_asset_references_settings_slot_unique").on(table.siteSettingsId, table.slot).where(sql`${table.ownerType} = 'site_settings'`),
+  uniqueIndex("media_asset_references_testimonial_slot_unique").on(table.testimonialId, table.slot).where(sql`${table.ownerType} = 'testimonial'`),
   index("media_asset_references_asset_id_idx").on(table.assetId),
 ]);
 
-// ---------------------------------------------------------------------------
-// Relations
-// ---------------------------------------------------------------------------
 export const portfolioProjectsRelations = relations(portfolioProjects, ({ one, many }) => ({
-  category: one(portfolioCategories, {
-    fields: [portfolioProjects.categoryId],
-    references: [portfolioCategories.id],
-  }),
+  category: one(portfolioCategories, { fields: [portfolioProjects.categoryId], references: [portfolioCategories.id] }),
   media: many(projectMedia),
   tools: many(projectTools),
 }));
 
-export const portfolioCategoriesRelations = relations(portfolioCategories, ({ many }) => ({
-  projects: many(portfolioProjects),
-}));
-
-export const projectMediaRelations = relations(projectMedia, ({ one }) => ({
-  project: one(portfolioProjects, {
-    fields: [projectMedia.projectId],
-    references: [portfolioProjects.id],
-  }),
-}));
-
-export const projectToolsRelations = relations(projectTools, ({ one }) => ({
-  project: one(portfolioProjects, {
-    fields: [projectTools.projectId],
-    references: [portfolioProjects.id],
-  }),
-}));
-
-export const aboutProfileRelations = relations(aboutProfile, ({ many }) => ({
-  skills: many(aboutSkills),
-  tools: many(aboutTools),
-}));
-
-export const aboutSkillsRelations = relations(aboutSkills, ({ one }) => ({
-  profile: one(aboutProfile, {
-    fields: [aboutSkills.profileId],
-    references: [aboutProfile.id],
-  }),
-}));
-
-export const aboutToolsRelations = relations(aboutTools, ({ one }) => ({
-  profile: one(aboutProfile, {
-    fields: [aboutTools.profileId],
-    references: [aboutProfile.id],
-  }),
-}));
+export const portfolioCategoriesRelations = relations(portfolioCategories, ({ many }) => ({ projects: many(portfolioProjects) }));
+export const projectMediaRelations = relations(projectMedia, ({ one }) => ({ project: one(portfolioProjects, { fields: [projectMedia.projectId], references: [portfolioProjects.id] }) }));
+export const projectToolsRelations = relations(projectTools, ({ one }) => ({ project: one(portfolioProjects, { fields: [projectTools.projectId], references: [portfolioProjects.id] }) }));
+export const aboutProfileRelations = relations(aboutProfile, ({ many }) => ({ skills: many(aboutSkills), tools: many(aboutTools) }));
+export const aboutSkillsRelations = relations(aboutSkills, ({ one }) => ({ profile: one(aboutProfile, { fields: [aboutSkills.profileId], references: [aboutProfile.id] }) }));
+export const aboutToolsRelations = relations(aboutTools, ({ one }) => ({ profile: one(aboutProfile, { fields: [aboutTools.profileId], references: [aboutProfile.id] }) }));

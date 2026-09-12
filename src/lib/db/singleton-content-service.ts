@@ -6,17 +6,26 @@ import { withCmsTransaction } from "./index";
 import { ContentNotFoundError, InvalidSingletonStateError, postgresErrorFields, StaleRevisionError } from "./mutation-errors";
 import { synchronizeMutationTest, type MutationTestSynchronization } from "./mutation-test-synchronization";
 import { prepareMediaSlot, synchronizeMediaSlot } from "./media-asset-service";
+import { prepareSiteImageSlot, synchronizeSiteImageSlot } from "./site-media-slot-service";
 
 export const SETTINGS_ID = "singleton:settings";
 export const SHOWREEL_ID = "singleton:showreel";
 
 export async function updateSingletonSettings(input: SettingsInput, expectedRevision: number, testSynchronization?: MutationTestSynchronization): Promise<number> {
   return withCmsTransaction(async (tx) => {
-    const heroImage = await prepareMediaSlot(tx, { assetId: input.heroImageAssetId || null, url: input.heroImageUrl || null, kind: "image" });
+    const [heroImage, logoImage, favicon, ogImage] = await Promise.all([
+      prepareSiteImageSlot(tx, { assetId: input.heroImageAssetId || null, url: input.heroImageUrl || null, kind: "image" }),
+      prepareSiteImageSlot(tx, { assetId: input.logoImageAssetId || null, url: input.logoImageUrl || null, kind: "image" }),
+      prepareSiteImageSlot(tx, { assetId: input.faviconAssetId || null, url: input.favicon || null, kind: "image" }),
+      prepareSiteImageSlot(tx, { assetId: input.ogImageAssetId || null, url: input.ogImageUrl || null, kind: "image" }),
+    ]);
     await synchronizeMutationTest(tx, testSynchronization);
-    const result = await tx.db.update<{ revision: number }>(sql`UPDATE site_settings SET site_name=${input.siteName},logo_text=${input.logoText},contact_email=${input.contactEmail},contact_phone=${input.contactPhone},whatsapp=${input.whatsapp || null},location=${input.location},availability=${input.availability},payment_terms=${input.paymentTerms || null},turnaround_time=${input.turnaroundTime || null},hero_heading=${input.heroHeading},hero_subheading=${input.heroSubheading},hero_description=${input.heroDescription},hero_image_url=${heroImage.url},stat_years=${input.statYears},stat_projects=${input.statProjects},stat_clients=${input.statClients},stat_views=${input.statViews},footer_description=${input.footerDescription},instagram_url=${input.instagramUrl || null},twitter_url=${input.twitterUrl || null},youtube_url=${input.youtubeUrl || null},linkedin_url=${input.linkedinUrl || null},behance_url=${input.behanceUrl || null},vimeo_url=${input.vimeoUrl || null},seo_title=${input.seoTitle},seo_description=${input.seoDescription || null},revision=revision+1 WHERE id=${SETTINGS_ID} AND revision=${expectedRevision} RETURNING revision`);
+    const result = await tx.db.update<{ revision: number }>(sql`UPDATE site_settings SET site_name=${input.siteName},logo_text=${input.logoText},logo_image_url=${logoImage.url},favicon=${favicon.url},contact_email=${input.contactEmail},contact_phone=${input.contactPhone},whatsapp=${input.whatsapp || null},location=${input.location},availability=${input.availability},payment_terms=${input.paymentTerms || null},turnaround_time=${input.turnaroundTime || null},hero_heading=${input.heroHeading},hero_subheading=${input.heroSubheading},hero_description=${input.heroDescription},hero_image_url=${heroImage.url},stat_years=${input.statYears},stat_projects=${input.statProjects},stat_clients=${input.statClients},stat_views=${input.statViews},footer_description=${input.footerDescription},instagram_url=${input.instagramUrl || null},twitter_url=${input.twitterUrl || null},youtube_url=${input.youtubeUrl || null},linkedin_url=${input.linkedinUrl || null},behance_url=${input.behanceUrl || null},vimeo_url=${input.vimeoUrl || null},seo_title=${input.seoTitle},seo_description=${input.seoDescription || null},og_image_url=${ogImage.url},revision=revision+1 WHERE id=${SETTINGS_ID} AND revision=${expectedRevision} RETURNING revision`);
     if (result.rows[0]) {
-      await synchronizeMediaSlot(tx, { entityType: "site_settings", entityId: SETTINGS_ID, slot: "hero_image" }, heroImage);
+      await synchronizeSiteImageSlot(tx, "hero_image", heroImage);
+      await synchronizeSiteImageSlot(tx, "logo_image", logoImage);
+      await synchronizeSiteImageSlot(tx, "favicon", favicon);
+      await synchronizeSiteImageSlot(tx, "og_image", ogImage);
       return result.rows[0].revision;
     }
     const exists = await tx.db.select(sql`SELECT 1 FROM site_settings WHERE id=${SETTINGS_ID}`);

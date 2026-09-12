@@ -1,9 +1,16 @@
 import { db, schema } from "./index";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 
 export async function getSiteSettings() {
   const rows = await db.select().from(schema.siteSettings);
   return rows[0];
+}
+
+export async function getSiteBranding() {
+  const rows = await db
+    .select({ logoImageUrl: sql<string | null>`logo_image_url` })
+    .from(schema.siteSettings);
+  return rows[0] ?? { logoImageUrl: null };
 }
 
 export async function getAboutProfile() {

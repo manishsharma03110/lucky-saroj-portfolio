@@ -24,7 +24,7 @@ export async function updateSettings(_prev: ActionState, formData: FormData): Pr
   try { await updateSingletonSettings(data, revision.data); }
   catch (error) {
     if (error instanceof MediaAssetBindingError || error instanceof MediaAssetNotAttachableError || error instanceof MediaAssetNotFoundError) {
-      return { status: "error", message: "Uploaded Hero image is invalid or no longer available." };
+      return { status: "error", message: "One of the uploaded site images is invalid or no longer available." };
     }
     if (error instanceof StaleRevisionError || error instanceof ContentNotFoundError) return { status: "error", message: error.message };
     throw error;

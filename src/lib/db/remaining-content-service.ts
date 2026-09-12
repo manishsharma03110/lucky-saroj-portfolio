@@ -9,6 +9,7 @@ import { withCmsTransaction } from "./index";
 import { ContentNotFoundError, DuplicateSlugError, postgresErrorFields, StaleRevisionError } from "./mutation-errors";
 import { synchronizeMutationTest, type MutationTestSynchronization } from "./mutation-test-synchronization";
 import { allocateNextDisplayOrder } from "./ordered-content-service";
+import { prepareTestimonialProfileImage, synchronizeTestimonialProfileImage } from "./testimonial-media-service";
 
 export type MessageStatus = "new" | "read" | "replied" | "archived";
 
@@ -72,19 +73,33 @@ export async function updateServiceRevision(id: string, expectedRevision: number
 }
 
 export async function createTestimonialRecord(input: TestimonialInput): Promise<string> {
-  const id = crypto.randomUUID();
-  await withCmsTransaction(async (tx) => { await tx.db.insert(sql`INSERT INTO testimonials(id,client_name,designation,company,testimonial_text,rating,is_featured,status,revision) VALUES (${id},${input.clientName},${input.designation || null},${input.company || null},${input.testimonialText},${input.rating},${!!input.isFeatured},${input.status},1)`); });
-  return id;
+  return withCmsTransaction(async (tx) => {
+    const id = crypto.randomUUID();
+    const profileImage = await prepareTestimonialProfileImage(tx, {
+      profileImageUrl: input.profileImageUrl || null,
+      profileImageAssetId: input.profileImageAssetId || null,
+    });
+    await tx.db.insert(sql`INSERT INTO testimonials(id,client_name,designation,company,profile_image_url,testimonial_text,rating,is_featured,status,revision) VALUES (${id},${input.clientName},${input.designation || null},${input.company || null},${input.profileImageUrl || null},${input.testimonialText},${input.rating},${!!input.isFeatured},${input.status},1)`);
+    await synchronizeTestimonialProfileImage(tx, id, profileImage);
+    return id;
+  });
 }
 
 export async function updateTestimonialRevision(id: string, expectedRevision: number, input: TestimonialInput, synchronization?: MutationTestSynchronization): Promise<number> {
   return withCmsTransaction(async (tx) => {
+    const profileImage = await prepareTestimonialProfileImage(tx, {
+      profileImageUrl: input.profileImageUrl || null,
+      profileImageAssetId: input.profileImageAssetId || null,
+    });
     await synchronizeMutationTest(tx, synchronization);
-    const result = await tx.db.update<{ revision: number }>(sql`UPDATE testimonials SET client_name=${input.clientName},designation=${input.designation || null},company=${input.company || null},testimonial_text=${input.testimonialText},rating=${input.rating},is_featured=${!!input.isFeatured},status=${input.status},revision=revision+1 WHERE id=${id} AND revision=${expectedRevision} RETURNING revision`);
-    if (result.rows[0]) return result.rows[0].revision;
-    const exists = await tx.db.select(sql`SELECT 1 FROM testimonials WHERE id=${id}`);
-    if (!exists.rows[0]) throw new ContentNotFoundError();
-    throw new StaleRevisionError();
+    const result = await tx.db.update<{ revision: number }>(sql`UPDATE testimonials SET client_name=${input.clientName},designation=${input.designation || null},company=${input.company || null},profile_image_url=${input.profileImageUrl || null},testimonial_text=${input.testimonialText},rating=${input.rating},is_featured=${!!input.isFeatured},status=${input.status},revision=revision+1 WHERE id=${id} AND revision=${expectedRevision} RETURNING revision`);
+    if (!result.rows[0]) {
+      const exists = await tx.db.select(sql`SELECT 1 FROM testimonials WHERE id=${id}`);
+      if (!exists.rows[0]) throw new ContentNotFoundError();
+      throw new StaleRevisionError();
+    }
+    await synchronizeTestimonialProfileImage(tx, id, profileImage);
+    return result.rows[0].revision;
   });
 }
 

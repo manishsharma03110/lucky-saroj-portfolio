@@ -59,8 +59,11 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Prepare CI database
-        run: npm run db:push
+      - name: Replay SQL migrations
+        run: npm run ci:migrate
+
+      - name: Verify Phase 9 schema
+        run: npm run ci:verify-phase9
 
       - name: Build
         env:

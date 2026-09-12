@@ -42,7 +42,7 @@ function monogram(name: string) {
   return (words.length > 1 ? words.map((word) => word[0]).join("") : name.slice(0, 2)).slice(0, 2).toUpperCase();
 }
 
-export function Skills({ biography, skills, tools }: { biography?: string | null; skills: Item[]; tools: Item[] }) {
+export function Skills({ biography, skills, tools, storyEyebrow = "My story", storyHeading = "Craft first. Technology in service of the story.", skillsLabel = "Skills", toolsLabel = "Tools I use" }: { biography?: string | null; skills: Item[]; tools: Item[]; storyEyebrow?: string; storyHeading?: string; skillsLabel?: string; toolsLabel?: string }) {
   if (!biography && skills.length === 0 && tools.length === 0) return null;
 
   return (
@@ -50,15 +50,15 @@ export function Skills({ biography, skills, tools }: { biography?: string | null
       <div className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 sm:px-8 md:grid-cols-2 lg:gap-16 lg:px-12 2xl:px-16">
         {biography && (
           <div className="md:col-span-2 lg:col-span-1 lg:pr-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">My story</p>
-            <h2 className="mt-4 max-w-[12ch] font-display text-[clamp(2.35rem,3.3vw,3.25rem)] font-semibold leading-none tracking-[-0.045em] text-[var(--text-primary)]">Craft first. Technology in service of the story.</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{storyEyebrow}</p>
+            <h2 className="mt-4 max-w-[12ch] font-display text-[clamp(2.35rem,3.3vw,3.25rem)] font-semibold leading-none tracking-[-0.045em] text-[var(--text-primary)]">{storyHeading}</h2>
             <p className="mt-6 max-w-[680px] whitespace-pre-line text-[0.97rem] leading-7 text-[var(--text-secondary)]">{biography}</p>
           </div>
         )}
 
         {skills.length > 0 && (
           <div className="border-t border-white/10 pt-6 md:border-t-0 md:pt-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Skills</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{skillsLabel}</p>
             <ul className="mt-5 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
               {skills.map((skill) => {
                 const Icon = iconForSkill(skill.name);
@@ -70,7 +70,7 @@ export function Skills({ biography, skills, tools }: { biography?: string | null
 
         {tools.length > 0 && (
           <div className="border-t border-white/10 pt-6 md:border-t-0 md:pt-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Tools I use</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{toolsLabel}</p>
             <ul className="mt-5 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
               {tools.map((tool) => {
                 const Icon = iconForTool(tool.name);

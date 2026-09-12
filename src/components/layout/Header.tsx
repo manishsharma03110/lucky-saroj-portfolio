@@ -9,19 +9,34 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils/cn";
 import { MobileMenu } from "./MobileMenu";
 
-const NAV_LINKS = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Portfolio", href: "/portfolio" },
-  { label: "Services", href: "/services" },
-  { label: "Experience", href: "/experience" },
-  { label: "Contact", href: "/contact" },
-];
-
-export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText?: string; siteName?: string }) {
+export function Header({
+  logoText = "LS",
+  logoImageUrl,
+  siteName = "Lucky Saroj",
+  roleLabel = "Video Editor",
+  ctaLabel = "Let’s Talk",
+  ctaUrl = "/contact",
+  navLabels = {},
+}: {
+  logoText?: string;
+  logoImageUrl?: string | null;
+  siteName?: string;
+  roleLabel?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  navLabels?: Partial<Record<"home" | "about" | "portfolio" | "services" | "experience" | "contact", string>>;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const navLinks = [
+    { label: navLabels.home || "Home", href: "/" },
+    { label: navLabels.about || "About", href: "/about" },
+    { label: navLabels.portfolio || "Portfolio", href: "/portfolio" },
+    { label: navLabels.services || "Services", href: "/services" },
+    { label: navLabels.experience || "Experience", href: "/experience" },
+    { label: navLabels.contact || "Contact", href: "/contact" },
+  ];
 
   useEffect(() => {
     if (!open) return;
@@ -46,19 +61,22 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
     <header className="sticky top-0 z-50 bg-[var(--color-ink)] text-white">
       <Container className="flex h-16 max-w-[1560px] items-center justify-between px-5 sm:h-[4.5rem] sm:px-8 lg:h-20 lg:px-12">
         <Link href="/" className="flex min-h-11 items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-md border border-white/20 font-display text-sm font-bold">
-            {logoText}
+          <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-white/20 font-display text-sm font-bold">
+            {logoImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoImageUrl} alt={`${siteName} logo`} className="h-full w-full object-contain" />
+            ) : (
+              logoText
+            )}
           </span>
           <span className="hidden flex-col leading-none sm:flex">
-            <span className="font-display text-sm font-semibold uppercase tracking-wide">
-              {siteName}
-            </span>
-            <span className="timecode !text-white/50">Video Editor</span>
+            <span className="font-display text-sm font-semibold uppercase tracking-wide">{siteName}</span>
+            <span className="timecode !text-white/50">{roleLabel}</span>
           </span>
         </Link>
 
         <nav className="hidden items-center gap-7 xl:gap-9 lg:flex" aria-label="Primary">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const active = isActive(link.href);
             return (
               <Link
@@ -77,9 +95,7 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
         </nav>
 
         <div className="hidden lg:block">
-          <Button href="/contact" className="!px-5 !py-2.5">
-            Let&rsquo;s Talk
-          </Button>
+          <Button href={ctaUrl} className="!px-5 !py-2.5">{ctaLabel}</Button>
         </div>
 
         <button
@@ -95,7 +111,7 @@ export function Header({ logoText = "LS", siteName = "Lucky Saroj" }: { logoText
         </button>
       </Container>
 
-      <MobileMenu open={open} onClose={() => setOpen(false)} links={NAV_LINKS} pathname={pathname} />
+      <MobileMenu open={open} onClose={() => setOpen(false)} links={navLinks} pathname={pathname} />
     </header>
   );
 }

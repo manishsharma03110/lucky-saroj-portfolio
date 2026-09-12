@@ -1,26 +1,37 @@
 import { Quote } from "lucide-react";
 import { getPublishedTestimonials } from "@/lib/db/queries";
+import type { HomePageContent } from "@/lib/db/home-content-service";
 
 function Attribution({
   name,
   designation,
   company,
+  profileImageUrl,
 }: {
   name: string;
   designation?: string | null;
   company?: string | null;
+  profileImageUrl?: string | null;
 }) {
   const detail = [designation, company].filter(Boolean).join(" · ");
 
   return (
-    <cite className="not-italic">
-      <span className="block font-medium text-[var(--text-primary)]">{name}</span>
-      {detail && <span className="mt-1 block text-sm text-[var(--text-muted)]">{detail}</span>}
-    </cite>
+    <div className="flex min-w-0 items-center gap-3">
+      {profileImageUrl && (
+        <span className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-[var(--surface-elevated)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={profileImageUrl} alt={`${name} profile`} className="h-full w-full object-cover" />
+        </span>
+      )}
+      <cite className="min-w-0 not-italic">
+        <span className="block font-medium text-[var(--text-primary)]">{name}</span>
+        {detail && <span className="mt-1 block text-sm text-[var(--text-muted)]">{detail}</span>}
+      </cite>
+    </div>
   );
 }
 
-export async function TestimonialsPreview() {
+export async function TestimonialsPreview({ content }: { content: HomePageContent }) {
   const testimonials = await getPublishedTestimonials(true);
   if (testimonials.length === 0) return null;
 
@@ -34,12 +45,12 @@ export async function TestimonialsPreview() {
         <div className={`grid items-stretch gap-5 ${secondary ? "lg:grid-cols-[minmax(0,1.62fr)_minmax(280px,0.78fr)] lg:gap-6" : ""}`}>
           <div className="min-w-0">
             <header className="mb-8 max-w-3xl sm:mb-10">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Client perspective</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{content.testimonialsEyebrow}</p>
               <h2 className="mt-4 text-[2.25rem] font-semibold leading-[1] tracking-[-0.045em] text-[var(--text-primary)] sm:text-4xl lg:text-5xl">
-                The work, in their words.
+                {content.testimonialsHeading}
               </h2>
               <p className="mt-4 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
-                Real feedback from published client testimonials.
+                {content.testimonialsDescription}
               </p>
             </header>
 
@@ -54,7 +65,7 @@ export async function TestimonialsPreview() {
 
               <footer className="mt-9 flex items-center gap-5 border-t border-white/10 pt-5 sm:mt-11">
                 <span className="h-px w-10 shrink-0 bg-[var(--accent-primary)]/75" aria-hidden />
-                <Attribution name={featured.clientName} designation={featured.designation} company={featured.company} />
+                <Attribution name={featured.clientName} designation={featured.designation} company={featured.company} profileImageUrl={featured.profileImageUrl} />
               </footer>
             </article>
           </div>
@@ -72,7 +83,7 @@ export async function TestimonialsPreview() {
               </div>
 
               <footer className="mt-9 border-t border-white/[0.08] pt-5">
-                <Attribution name={secondary.clientName} designation={secondary.designation} company={secondary.company} />
+                <Attribution name={secondary.clientName} designation={secondary.designation} company={secondary.company} profileImageUrl={secondary.profileImageUrl} />
               </footer>
             </article>
           )}

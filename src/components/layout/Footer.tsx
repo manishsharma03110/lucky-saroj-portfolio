@@ -4,23 +4,45 @@ import { BehanceIcon, InstagramIcon, LinkedinIcon, VimeoIcon, YoutubeIcon } from
 import { Container } from "@/components/ui/Container";
 import { getServices, getSiteSettings } from "@/lib/db/queries";
 
-const EXPLORE_LINKS = [
-  { label: "Home", href: "/" }, { label: "About Me", href: "/about" },
-  { label: "Portfolio", href: "/portfolio" }, { label: "Experience", href: "/experience" },
-  { label: "Services", href: "/services" }, { label: "Contact", href: "/contact" },
-];
-
-export async function Footer() {
+export async function Footer({ content = {} }: { content?: Record<string, string> }) {
   const [settings, services] = await Promise.all([getSiteSettings(), getServices()]);
   const year = new Date().getFullYear();
   const siteName = settings?.siteName ?? "Lucky Saroj";
   const logoText = settings?.logoText ?? "LS";
   const expertise = services.slice(0, 6).map((service) => ({ label: service.name, href: "/services" }));
+  const copy = {
+    eyebrow: content.footerEyebrow || "Have a project in mind?",
+    headingLine1: content.footerHeadingLine1 || "Let’s create",
+    headingLine2: content.footerHeadingLine2 || "something",
+    headingAccent: content.footerHeadingAccent || "worth watching.",
+    ctaDescription: content.footerCtaDescription || "Share the project and what you want the final edit to communicate.",
+    ctaLabel: content.footerCtaLabel || "Start a project",
+    ctaUrl: content.footerCtaUrl || "/contact",
+    roleLabel: content.footerRoleLabel || "Video Editor & Visual Storyteller",
+    exploreLabel: content.footerExploreLabel || "Explore",
+    expertiseLabel: content.footerExpertiseLabel || "Expertise",
+    emailLabel: content.footerEmailLabel || "Email",
+    phoneLabel: content.footerPhoneLabel || "Phone",
+    locationLabel: content.footerLocationLabel || "Location",
+    availabilityLabel: content.footerAvailabilityLabel || "Availability",
+    socialEyebrow: content.footerSocialEyebrow || "Social presence",
+    socialHeading: content.footerSocialHeading || "Follow my work",
+    copyrightRole: content.footerCopyrightRole || "Video Editor",
+    adminLabel: content.footerAdminLabel || "Admin",
+  };
+  const exploreLinks = [
+    { label: content.navHomeLabel || "Home", href: "/" },
+    { label: content.navAboutLabel || "About", href: "/about" },
+    { label: content.navPortfolioLabel || "Portfolio", href: "/portfolio" },
+    { label: content.navExperienceLabel || "Experience", href: "/experience" },
+    { label: content.navServicesLabel || "Services", href: "/services" },
+    { label: content.navContactLabel || "Contact", href: "/contact" },
+  ];
   const contactRows = [
-    settings?.contactEmail ? { icon: Mail, label: "Email", value: settings.contactEmail, href: `mailto:${settings.contactEmail}` } : null,
-    settings?.contactPhone ? { icon: Phone, label: "Phone", value: settings.contactPhone, href: `tel:${settings.contactPhone.replace(/[^\d+]/g, "")}` } : null,
-    settings?.location ? { icon: MapPin, label: "Location", value: settings.location } : null,
-    settings?.availability ? { icon: CircleDot, label: "Availability", value: settings.availability } : null,
+    settings?.contactEmail ? { icon: Mail, label: copy.emailLabel, value: settings.contactEmail, href: `mailto:${settings.contactEmail}` } : null,
+    settings?.contactPhone ? { icon: Phone, label: copy.phoneLabel, value: settings.contactPhone, href: `tel:${settings.contactPhone.replace(/[^\d+]/g, "")}` } : null,
+    settings?.location ? { icon: MapPin, label: copy.locationLabel, value: settings.location } : null,
+    settings?.availability ? { icon: CircleDot, label: copy.availabilityLabel, value: settings.availability } : null,
   ].filter((row): row is NonNullable<typeof row> => Boolean(row));
   const socials = [
     { icon: InstagramIcon, url: settings?.instagramUrl, label: "Instagram" },
@@ -37,68 +59,28 @@ export async function Footer() {
 
       <Container className="relative z-10 grid max-w-[1480px] gap-9 px-5 py-12 sm:px-8 sm:py-14 md:py-[3.75rem] lg:grid-cols-[minmax(0,1.85fr)_minmax(280px,1fr)] lg:items-center lg:gap-14 lg:px-12 lg:py-[4.25rem] 2xl:px-16">
         <div className="relative z-10 min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Have a project in mind?</p>
-          <h2 className="mt-5 max-w-[13ch] font-display text-[clamp(2.5rem,5vw,5rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-[var(--text-primary)] md:text-[clamp(2.5rem,4.6vw,4.55rem)]">
-            <span className="block">Let&apos;s create</span>
-            <span className="block">something</span>
-            <span className="block text-[var(--accent-primary)]">worth watching.</span>
-          </h2>
-          <p className="mt-5 max-w-xl text-base leading-7 text-[var(--text-secondary)]">Share the project and what you want the final edit to communicate.</p>
-          <Link href="/contact" className="group mt-7 inline-flex min-h-12 items-center justify-center gap-3 rounded-md bg-[var(--accent-primary)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[var(--background-primary)] transition-[background-color,box-shadow] duration-300 hover:bg-[var(--accent-hover)] hover:shadow-[0_0_24px_rgba(59,130,246,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]">
-            Start a project
-            <ArrowUpRight size={17} aria-hidden="true" className="transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-1 group-hover:-translate-y-1" />
-          </Link>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{copy.eyebrow}</p>
+          <h2 className="mt-5 max-w-[13ch] font-display text-[clamp(2.5rem,5vw,5rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-[var(--text-primary)] md:text-[clamp(2.5rem,4.6vw,4.55rem)]"><span className="block">{copy.headingLine1}</span><span className="block">{copy.headingLine2}</span><span className="block text-[var(--accent-primary)]">{copy.headingAccent}</span></h2>
+          <p className="mt-5 max-w-xl text-base leading-7 text-[var(--text-secondary)]">{copy.ctaDescription}</p>
+          <Link href={copy.ctaUrl} className="group mt-7 inline-flex min-h-12 items-center justify-center gap-3 rounded-md bg-[var(--accent-primary)] px-6 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-[var(--background-primary)] transition-[background-color,box-shadow] duration-300 hover:bg-[var(--accent-hover)] hover:shadow-[0_0_24px_rgba(59,130,246,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background-primary)]">{copy.ctaLabel}<ArrowUpRight size={17} aria-hidden="true" className="transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-1 group-hover:-translate-y-1" /></Link>
         </div>
-        <div className="relative z-0 hidden self-stretch items-center justify-center lg:flex" aria-hidden="true">
-          <span className="select-none font-display text-[clamp(10rem,18vw,18rem)] font-bold leading-none tracking-[-0.09em] text-white/[0.055]">{logoText}</span>
-          <span className="absolute right-0 top-0 h-12 w-12 border-r border-t border-[var(--accent-primary)]/30" />
-        </div>
+        <div className="relative z-0 hidden self-stretch items-center justify-center lg:flex" aria-hidden="true"><span className="select-none font-display text-[clamp(10rem,18vw,18rem)] font-bold leading-none tracking-[-0.09em] text-white/[0.055]">{logoText}</span><span className="absolute right-0 top-0 h-12 w-12 border-r border-t border-[var(--accent-primary)]/30" /></div>
       </Container>
 
       <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" /></Container>
 
       <Container className="relative grid max-w-[1480px] gap-9 px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[minmax(0,1.45fr)_minmax(180px,0.7fr)_minmax(180px,0.85fr)] lg:gap-12 lg:px-12 2xl:px-16">
         <section aria-labelledby="footer-identity-title">
-          <div className="flex items-center gap-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-[var(--accent-primary)]/40 bg-white/[0.025] font-display text-sm font-bold text-[var(--text-primary)]">{logoText}</span>
-            <div>
-              <h2 id="footer-identity-title" className="font-display text-base font-semibold uppercase tracking-[0.06em] text-[var(--text-primary)]">{siteName}</h2>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">Video Editor &amp; Visual Storyteller</p>
-            </div>
-          </div>
+          <div className="flex items-center gap-4"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-[var(--accent-primary)]/40 bg-white/[0.025] font-display text-sm font-bold text-[var(--text-primary)]">{logoText}</span><div><h2 id="footer-identity-title" className="font-display text-base font-semibold uppercase tracking-[0.06em] text-[var(--text-primary)]">{siteName}</h2><p className="mt-1 text-sm text-[var(--text-muted)]">{copy.roleLabel}</p></div></div>
           {contactRows.length > 0 && <div className="mt-6 grid gap-2.5 sm:grid-cols-2" aria-label="Contact details">{contactRows.map((row) => <ContactRow key={row.label} {...row} />)}</div>}
         </section>
-        <FooterNavigation title="Explore" label="Footer site navigation" links={EXPLORE_LINKS} />
-        {expertise.length > 0 && <FooterNavigation title="Expertise" label="Footer services navigation" links={expertise} />}
+        <FooterNavigation title={copy.exploreLabel} label="Footer site navigation" links={exploreLinks} />
+        {expertise.length > 0 && <FooterNavigation title={copy.expertiseLabel} label="Footer services navigation" links={expertise} />}
       </Container>
 
-      {socials.length > 0 && (
-        <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">
-          <section className="border-t border-white/15 py-8" aria-labelledby="footer-social-title">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">Social presence</p>
-                <h2 id="footer-social-title" className="mt-2 font-display text-xl font-semibold text-[var(--text-primary)]">Follow my work</h2>
-              </div>
-              <div className="grid grid-cols-2 gap-2 max-[360px]:grid-cols-1 sm:flex sm:flex-wrap lg:justify-end">
-                {socials.map(({ icon: Icon, url, label }) => (
-                  <a key={label} href={url ?? undefined} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-center justify-between gap-3 rounded-md border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-[var(--text-primary)] transition-[border-color,background-color,color,transform] duration-300 motion-reduce:transition-none hover:-translate-y-px hover:border-[var(--accent-primary)]/55 hover:bg-[var(--accent-primary)]/[0.06] hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">
-                    <span className="inline-flex min-w-0 items-center gap-2.5">{Icon && <Icon size={15} aria-hidden="true" />}<span className="break-words leading-5">{label}</span></span>
-                    <ArrowUpRight size={15} aria-hidden="true" className="shrink-0 transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          </section>
-        </Container>
-      )}
+      {socials.length > 0 && <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><section className="border-t border-white/15 py-8" aria-labelledby="footer-social-title"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{copy.socialEyebrow}</p><h2 id="footer-social-title" className="mt-2 font-display text-xl font-semibold text-[var(--text-primary)]">{copy.socialHeading}</h2></div><div className="grid grid-cols-2 gap-2 max-[360px]:grid-cols-1 sm:flex sm:flex-wrap lg:justify-end">{socials.map(({ icon: Icon, url, label }) => <a key={label} href={url ?? undefined} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-center justify-between gap-3 rounded-md border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-[var(--text-primary)] transition-[border-color,background-color,color,transform] duration-300 motion-reduce:transition-none hover:-translate-y-px hover:border-[var(--accent-primary)]/55 hover:bg-[var(--accent-primary)]/[0.06] hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"><span className="inline-flex min-w-0 items-center gap-2.5">{Icon && <Icon size={15} aria-hidden="true" />}<span className="break-words leading-5">{label}</span></span><ArrowUpRight size={15} aria-hidden="true" className="shrink-0 transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></a>)}</div></div></section></Container>}
 
-      <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">
-        <div className="flex flex-col gap-3 border-t border-white/10 py-4 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} {siteName}. All rights reserved. <span className="text-white/25">·</span> Video Editor</p>
-          <Link href="/admin/login" className="group inline-flex min-h-10 w-fit items-center gap-1.5 py-2 transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">Admin <ArrowUpRight size={13} aria-hidden="true" className="transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></Link>
-        </div>
-      </Container>
+      <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><div className="flex flex-col gap-3 border-t border-white/10 py-4 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between"><p>© {year} {siteName}. All rights reserved. <span className="text-white/25">·</span> {copy.copyrightRole}</p><Link href="/admin/login" className="group inline-flex min-h-10 w-fit items-center gap-1.5 py-2 transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">{copy.adminLabel} <ArrowUpRight size={13} aria-hidden="true" className="transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></Link></div></Container>
     </footer>
   );
 }
@@ -110,5 +92,5 @@ function ContactRow({ icon: Icon, label, value, href }: { icon: LucideIcon; labe
 }
 
 function FooterNavigation({ title, label, links }: { title: string; label: string; links: { label: string; href: string }[] }) {
-  return <nav aria-label={label}><h2 className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{title}</h2><ul className="mt-4 grid grid-cols-2 gap-x-6 sm:grid-cols-1">{links.map((link) => <li key={link.label}><Link href={link.href} className="group inline-flex min-h-9 items-center gap-2 py-1.5 text-sm text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"><span className="h-px w-0 bg-[var(--accent-primary)] transition-[width] duration-300 motion-reduce:transition-none group-hover:w-3" aria-hidden="true" />{link.label}</Link></li>)}</ul></nav>;
+  return <nav aria-label={label}><h2 className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{title}</h2><ul className="mt-4 grid grid-cols-2 gap-x-6 sm:grid-cols-1">{links.map((link) => <li key={link.href}><Link href={link.href} className="group inline-flex min-h-9 items-center gap-2 py-1.5 text-sm text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"><span className="h-px w-0 bg-[var(--accent-primary)] transition-[width] duration-300 motion-reduce:transition-none group-hover:w-3" aria-hidden="true" />{link.label}</Link></li>)}</ul></nav>;
 }
