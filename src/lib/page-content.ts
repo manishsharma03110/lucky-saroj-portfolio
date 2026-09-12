@@ -4,7 +4,7 @@ export type PageContentKey = (typeof PAGE_CONTENT_KEYS)[number];
 export type PageContentField = Readonly<{
   key: string;
   label: string;
-  kind?: "input" | "textarea" | "url" | "image";
+  kind?: "input" | "textarea" | "url" | "image" | "contact-options";
   maxLength?: number;
   defaultValue: string;
 }>;
@@ -159,13 +159,6 @@ export const PAGE_CONTENT_CONFIG: Record<PageContentKey, { label: string; fields
       { key: "detailMediaHeading", label: "Project Detail Additional Media Heading", defaultValue: "More from the project." },
       { key: "detailPreviewAltSuffix", label: "Project Preview Alt Text Suffix", defaultValue: "project preview" },
       { key: "detailMediaAltSuffix", label: "Project Media Alt Text Suffix", defaultValue: "project media" },
-      { key: "detailCtaEyebrow", label: "Project Detail CTA Eyebrow", defaultValue: "Next story" },
-      { key: "detailCtaHeading", label: "Project Detail CTA Heading", defaultValue: "Ready to shape the next project?" },
-      { key: "detailCtaDescription", label: "Project Detail CTA Description", kind: "textarea", defaultValue: "Share the project and what you want the final edit to communicate." },
-      { key: "detailCtaPrimaryLabel", label: "Project Detail Primary Button", defaultValue: "Start a conversation" },
-      { key: "detailCtaPrimaryUrl", label: "Project Detail Primary URL", kind: "url", defaultValue: "/contact" },
-      { key: "detailCtaSecondaryLabel", label: "Project Detail Secondary Button", defaultValue: "Back to portfolio" },
-      { key: "detailCtaSecondaryUrl", label: "Project Detail Secondary URL", kind: "url", defaultValue: "/portfolio" },
       { key: "ctaEyebrow", label: "Bottom CTA Eyebrow", defaultValue: "Next project" },
       { key: "ctaHeading", label: "Bottom CTA Heading", defaultValue: "Bring the next story into focus." },
       { key: "ctaDescription", label: "Bottom CTA Description", kind: "textarea", defaultValue: "Share the brief, the footage, or simply the idea. We can shape the next piece together." },

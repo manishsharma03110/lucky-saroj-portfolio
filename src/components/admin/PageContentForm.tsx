@@ -6,6 +6,7 @@ import { Input, Label, Textarea } from "@/components/ui/Input";
 import { FormCard } from "@/components/admin/FormParts";
 import { MediaForm } from "@/components/admin/MediaForm";
 import { FileUpload } from "@/components/admin/FileUpload";
+import { ContactOptionsEditor } from "@/components/admin/ContactOptionsEditor";
 import { updatePageContentAction } from "@/lib/actions/page-content";
 import { PAGE_CONTENT_CONFIG, type PageContentKey } from "@/lib/page-content";
 import { pageContentFields } from "@/lib/page-content-extra";
@@ -36,6 +37,13 @@ export function PageContentForm({
       <FormCard title={config.label}>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
           {fields.map((field) => {
+            if (field.kind === "contact-options") {
+              return (
+                <div key={field.key} className="lg:col-span-2">
+                  <ContactOptionsEditor name={field.key} defaultValue={content[field.key] ?? field.defaultValue} />
+                </div>
+              );
+            }
             if (field.kind === "image") {
               return (
                 <div key={field.key} className="lg:col-span-2">

@@ -1,6 +1,11 @@
 import { createProjectTypeSchema } from "@/lib/validations/contact-options";
 import { contactSchema } from "@/lib/validations/contact";
 import { fieldErrorsFromIssues, SAFE_VALIDATION_MESSAGE } from "@/lib/validations/action-errors";
+import {
+  activeContactOptionLabels,
+  DEFAULT_CONTACT_OPTIONS_CONFIG,
+  type ContactOptionsConfig,
+} from "@/lib/contact/contact-options-config";
 
 export type ContactField = "name" | "email" | "phone" | "projectType" | "budgetRange" | "videoType" | "projectTimeline" | "referenceUrl" | "message";
 
@@ -24,6 +29,7 @@ export type ContactMessageInput = {
 
 export type ContactSubmissionDependencies = {
   readActiveServiceNames: () => Promise<readonly string[]>;
+  readContactOptions?: () => Promise<ContactOptionsConfig>;
   createMessage: (input: ContactMessageInput) => Promise<void>;
 };
 
@@ -51,6 +57,10 @@ function publicFieldErrors(issues: Parameters<typeof fieldErrorsFromIssues>[0]):
   return Object.fromEntries(Object.entries(mapped).filter(([field]) => allowed.has(field as ContactField)));
 }
 
+function includesOption(options: readonly string[], value: string) {
+  return options.includes(value);
+}
+
 export function createContactSubmissionHandler(context: ContactFormContext, dependencies: ContactSubmissionDependencies) {
   return async function handleContactSubmission(raw: RawContactSubmission): Promise<ContactFormState> {
     const parsed = contactSchema.safeParse({ ...raw, formContext: context });
@@ -61,6 +71,39 @@ export function createContactSubmissionHandler(context: ContactFormContext, depe
 
     if (parsed.data.honeypot !== "") {
       return { status: "error", message: SAFE_SPAM_MESSAGE };
+    }
+
+    let optionConfig = DEFAULT_CONTACT_OPTIONS_CONFIG;
+    if (dependencies.readContactOptions) {
+      try {
+        optionConfig = await dependencies.readContactOptions();
+      } catch {
+        return { status: "error", message: SAFE_FAILURE_MESSAGE };
+      }
+    }
+
+    const budgetOptions = activeContactOptionLabels(optionConfig, "budgetRanges");
+    const videoTypeOptions = activeContactOptionLabels(optionConfig, "videoTypes");
+    const timelineOptions = activeContactOptionLabels(optionConfig, "projectTimelines");
+    const popupProjectTypeOptions = activeContactOptionLabels(optionConfig, "popupProjectTypes");
+
+    if (parsed.data.formContext === "popup") {
+      if (!includesOption(popupProjectTypeOptions, parsed.data.projectType)) {
+        return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { projectType: "Please select a supported project type." } };
+      }
+      if (parsed.data.budgetRange && !includesOption(budgetOptions, parsed.data.budgetRange)) {
+        return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { budgetRange: "Please select a supported budget range." } };
+      }
+    } else {
+      if (!includesOption(budgetOptions, parsed.data.budgetRange)) {
+        return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { budgetRange: "Please select a supported budget range." } };
+      }
+      if (!includesOption(videoTypeOptions, parsed.data.videoType)) {
+        return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { videoType: "Please select a supported video type." } };
+      }
+      if (parsed.data.projectTimeline && !includesOption(timelineOptions, parsed.data.projectTimeline)) {
+        return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { projectTimeline: "Please select a supported project timeline." } };
+      }
     }
 
     let projectType = parsed.data.projectType;
@@ -83,7 +126,7 @@ export function createContactSubmissionHandler(context: ContactFormContext, depe
       email: parsed.data.email,
       phone: parsed.data.phone || null,
       projectType,
-      budgetRange: parsed.data.budgetRange,
+      budgetRange: parsed.data.budgetRange || "Not specified",
       videoType: parsed.data.formContext === "popup" ? projectType : parsed.data.videoType,
       projectTimeline: parsed.data.projectTimeline || null,
       referenceUrl: parsed.data.referenceUrl || null,
