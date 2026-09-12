@@ -59,7 +59,9 @@ export function PageSeoForm({ seo }: { seo: PageSeoRecord }) {
       </FormCard>
       {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}
       {state.status === "success" && state.message && <p className={styles.feedbackSuccess}>{state.message}</p>}
-      <div className={styles.saveBar}><Button type="submit" disabled={pending}>{pending ? "Saving..." : `Save ${page.label} SEO`}</Button></div>
+      <div className={styles.saveBar} style={{ position: "static", zIndex: "auto", marginTop: 0 }}>
+        <Button type="submit" disabled={pending}>{pending ? "Saving..." : `Save ${page.label} SEO`}</Button>
+      </div>
     </form>
   );
 }
