@@ -35,15 +35,35 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const { project, category, tools, media } = data;
   const { prev, next } = await getAdjacentProjects(slug);
   const copy = portfolioPage.content;
+  const detailCopy = {
+    overviewEyebrow: copy.detailOverviewEyebrow,
+    clientLabel: copy.detailClientLabel,
+    categoryLabel: copy.detailCategoryLabel,
+    yearLabel: copy.detailYearLabel,
+    caseStudyEyebrow: copy.detailCaseStudyEyebrow,
+    challengeLabel: copy.detailChallengeLabel,
+    approachLabel: copy.detailApproachLabel,
+    resultLabel: copy.detailResultLabel,
+    toolsEyebrow: copy.detailToolsEyebrow,
+    toolsHeading: copy.detailToolsHeading,
+    toolsAriaLabel: copy.detailToolsAriaLabel,
+  };
+  const mediaCopy = {
+    selectedProjectLabel: copy.detailSelectedProjectLabel,
+    mediaEyebrow: copy.detailMediaEyebrow,
+    mediaHeading: copy.detailMediaHeading,
+    previewAltSuffix: copy.detailPreviewAltSuffix,
+    mediaAltSuffix: copy.detailMediaAltSuffix,
+  };
 
   return (
     <>
       <ProjectHero project={project} categoryName={category?.name} />
-      <ProjectMedia project={project} categoryName={category?.name} media={media} />
-      <ProjectOverview project={project} categoryName={category?.name} />
-      <CaseStudy project={project} />
-      <ProjectGallery project={project} media={media} />
-      <ProjectTools tools={tools} />
+      <ProjectMedia project={project} categoryName={category?.name} media={media} copy={mediaCopy} />
+      <ProjectOverview project={project} categoryName={category?.name} copy={detailCopy} />
+      <CaseStudy project={project} copy={detailCopy} />
+      <ProjectGallery project={project} media={media} copy={mediaCopy} />
+      <ProjectTools tools={tools} copy={detailCopy} />
       <ProjectNavigation previous={prev} next={next} />
       <ProjectCTA
         eyebrow={copy.detailCtaEyebrow}
