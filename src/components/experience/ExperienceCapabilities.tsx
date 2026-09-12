@@ -17,7 +17,7 @@ function iconForSkill(name: string) {
   return Clapperboard;
 }
 
-export function ExperienceCapabilities({ skills, heading = "What I work across" }: { skills: Skill[]; heading?: string }) {
+export function ExperienceCapabilities({ skills, heading }: { skills: Skill[]; heading: string }) {
   if (skills.length === 0) return null;
   const centerFinalTile = skills.length % 5 === 1;
   return (
