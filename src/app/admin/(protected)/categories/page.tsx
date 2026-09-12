@@ -26,9 +26,14 @@ export default async function AdminCategoriesPage() {
         description="Organize projects with a clear, reusable category structure."
       />
 
-      <div className={styles.twoColumn}>
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(320px,0.9fr)]">
         <div className={styles.tableCard}>
           <table className={styles.table}>
+            <colgroup>
+              <col className="w-[38%]" />
+              <col className="w-[42%]" />
+              <col className="w-[20%]" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Name</th>
@@ -56,7 +61,9 @@ export default async function AdminCategoriesPage() {
           )}
         </div>
 
-        <CategoryForm />
+        <div className="w-full xl:max-w-[420px] xl:justify-self-end">
+          <CategoryForm />
+        </div>
       </div>
     </div>
   );
