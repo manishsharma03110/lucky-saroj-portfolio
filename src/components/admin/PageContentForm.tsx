@@ -8,6 +8,7 @@ import { MediaForm } from "@/components/admin/MediaForm";
 import { FileUpload } from "@/components/admin/FileUpload";
 import { updatePageContentAction } from "@/lib/actions/page-content";
 import { PAGE_CONTENT_CONFIG, type PageContentKey } from "@/lib/page-content";
+import { pageContentFields } from "@/lib/page-content-extra";
 import type { ActionState } from "@/lib/actions/portfolio";
 import styles from "./AdminEditorial.module.css";
 
@@ -26,6 +27,7 @@ export function PageContentForm({
 }) {
   const [state, action, pending] = useActionState(updatePageContentAction, initialState);
   const config = PAGE_CONTENT_CONFIG[pageKey];
+  const fields = pageContentFields(pageKey, config.fields);
 
   return (
     <MediaForm action={action} className={styles.sectionStack}>
@@ -33,18 +35,11 @@ export function PageContentForm({
       <input type="hidden" name="revision" value={revision} />
       <FormCard title={config.label}>
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          {config.fields.map((field) => {
+          {fields.map((field) => {
             if (field.kind === "image") {
               return (
                 <div key={field.key} className="lg:col-span-2">
-                  <FileUpload
-                    name={field.key}
-                    assetIdName="heroImageAssetId"
-                    label={field.label}
-                    kind="image"
-                    defaultValue={content[field.key] ?? field.defaultValue}
-                    defaultAssetId={heroImageAssetId}
-                  />
+                  <FileUpload name={field.key} assetIdName="heroImageAssetId" label={field.label} kind="image" defaultValue={content[field.key] ?? field.defaultValue} defaultAssetId={heroImageAssetId} />
                 </div>
               );
             }
@@ -61,7 +56,6 @@ export function PageContentForm({
           })}
         </div>
       </FormCard>
-
       {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}
       {state.status === "success" && state.message && <p className={styles.feedbackSuccess}>{state.message}</p>}
       <div className={styles.saveBar}><Button type="submit" disabled={pending}>{pending ? "Saving..." : `Save ${config.label}`}</Button></div>
