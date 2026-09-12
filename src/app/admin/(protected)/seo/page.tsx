@@ -22,7 +22,7 @@ export default async function AdminSeoPage() {
         title="On-Page SEO"
         description="Control page titles, descriptions, canonicals, social metadata, keywords and indexability without changing the public design."
       />
-      <div className="space-y-12">
+      <div className="space-y-8">
         {pages.map((seo) => <PageSeoForm key={seo.pageKey} seo={seo} />)}
       </div>
     </div>
