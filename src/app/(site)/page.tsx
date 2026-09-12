@@ -30,10 +30,15 @@ export default async function HomePage() {
         subheading={settings?.heroSubheading ?? ""}
         description={settings?.heroDescription ?? ""}
         heroImageUrl={settings?.heroImageUrl}
+        heroImageAlt={content.heroImageAlt}
+        primaryLabel={content.heroPrimaryLabel}
+        primaryUrl={content.heroPrimaryUrl}
+        showreelLabel={content.heroShowreelLabel}
+        showreelUrl={content.heroShowreelUrl}
         hasShowreel={Boolean(showreel?.videoUrl)}
       />
       <SelectedWork content={content} />
-      <ShowreelSection showreel={showreel} />
+      <ShowreelSection showreel={showreel} content={content} />
       <EditingStyles content={content} />
       <AboutPreview content={content} />
       <TestimonialsPreview content={content} />
