@@ -268,6 +268,13 @@ export const siteSettings = pgTable("site_settings", {
 
 export const homePageContent = pgTable("home_page_content", {
   id: text("id").primaryKey().default("singleton:home"),
+  heroPrimaryLabel: text("hero_primary_label").notNull().default("View My Work"),
+  heroPrimaryUrl: text("hero_primary_url").notNull().default("/portfolio"),
+  heroShowreelLabel: text("hero_showreel_label").notNull().default("Watch Showreel"),
+  heroShowreelUrl: text("hero_showreel_url").notNull().default("#showreel"),
+  heroImageAlt: text("hero_image_alt").notNull().default(""),
+  showreelEyebrow: text("showreel_eyebrow").notNull().default("Featured showreel"),
+  showreelRuntimeLabel: text("showreel_runtime_label").notNull().default("Runtime"),
   selectedWorkEyebrow: text("selected_work_eyebrow").notNull().default("Selected work"),
   selectedWorkHeading: text("selected_work_heading").notNull().default("Work built to be watched."),
   selectedWorkCtaLabel: text("selected_work_cta_label").notNull().default("View All Work"),
@@ -280,6 +287,12 @@ export const homePageContent = pgTable("home_page_content", {
   aboutEyebrow: text("about_eyebrow").notNull().default("About the editor"),
   aboutCtaLabel: text("about_cta_label").notNull().default("More about me"),
   aboutCtaUrl: text("about_cta_url").notNull().default("/about"),
+  aboutStatYearsLabel: text("about_stat_years_label").notNull().default("Years"),
+  aboutStatProjectsLabel: text("about_stat_projects_label").notNull().default("Projects"),
+  aboutStatClientsLabel: text("about_stat_clients_label").notNull().default("Clients"),
+  aboutStatViewsLabel: text("about_stat_views_label").notNull().default("Views"),
+  aboutPortraitFallbackLabel: text("about_portrait_fallback_label").notNull().default("Portrait forthcoming"),
+  aboutProfileImageAlt: text("about_profile_image_alt").notNull().default(""),
   testimonialsEyebrow: text("testimonials_eyebrow").notNull().default("Client perspective"),
   testimonialsHeading: text("testimonials_heading").notNull().default("The work, in their words."),
   testimonialsDescription: text("testimonials_description").notNull().default("Real feedback from published client testimonials."),
@@ -351,26 +364,30 @@ export const mediaAssets = pgTable("media_assets", {
 export const mediaAssetReferences = pgTable("media_asset_references", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   assetId: text("asset_id").notNull().references(() => mediaAssets.id, { onDelete: "restrict" }),
-  ownerType: text("owner_type", { enum: ["portfolio_project", "showreel", "site_settings"] }).notNull(),
+  ownerType: text("owner_type", { enum: ["portfolio_project", "showreel", "site_settings", "testimonial"] }).notNull(),
   portfolioProjectId: text("portfolio_project_id").references(() => portfolioProjects.id, { onDelete: "cascade" }),
   showreelId: text("showreel_id").references(() => showreels.id, { onDelete: "cascade" }),
   siteSettingsId: text("site_settings_id").references(() => siteSettings.id, { onDelete: "cascade" }),
+  testimonialId: text("testimonial_id").references(() => testimonials.id, { onDelete: "cascade" }),
   slot: text("slot").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 }, (table) => [
   check("media_asset_references_owner_valid", sql`(
-    (${table.ownerType} = 'portfolio_project' AND ${table.portfolioProjectId} IS NOT NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} IS NULL)
-    OR (${table.ownerType} = 'showreel' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} = 'singleton:showreel' AND ${table.siteSettingsId} IS NULL)
-    OR (${table.ownerType} = 'site_settings' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} = 'singleton:settings')
+    (${table.ownerType} = 'portfolio_project' AND ${table.portfolioProjectId} IS NOT NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} IS NULL AND ${table.testimonialId} IS NULL)
+    OR (${table.ownerType} = 'showreel' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} = 'singleton:showreel' AND ${table.siteSettingsId} IS NULL AND ${table.testimonialId} IS NULL)
+    OR (${table.ownerType} = 'site_settings' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} = 'singleton:settings' AND ${table.testimonialId} IS NULL)
+    OR (${table.ownerType} = 'testimonial' AND ${table.portfolioProjectId} IS NULL AND ${table.showreelId} IS NULL AND ${table.siteSettingsId} IS NULL AND ${table.testimonialId} IS NOT NULL)
   )`),
   check("media_asset_references_slot_valid", sql`(
     (${table.ownerType} IN ('portfolio_project','showreel') AND ${table.slot} IN ('thumbnail','video'))
     OR (${table.ownerType} = 'site_settings' AND ${table.slot} IN ('hero_image','about_profile_image','logo_image','favicon','og_image','services_hero_image','experience_hero_image','contact_hero_image'))
+    OR (${table.ownerType} = 'testimonial' AND ${table.slot} = 'profile_image')
   )`),
   unique("media_asset_references_asset_owner_slot_unique").on(table.assetId, table.ownerType, table.portfolioProjectId, table.showreelId, table.slot),
   uniqueIndex("media_asset_references_project_slot_unique").on(table.portfolioProjectId, table.slot).where(sql`${table.ownerType} = 'portfolio_project'`),
   uniqueIndex("media_asset_references_showreel_slot_unique").on(table.showreelId, table.slot).where(sql`${table.ownerType} = 'showreel'`),
   uniqueIndex("media_asset_references_settings_slot_unique").on(table.siteSettingsId, table.slot).where(sql`${table.ownerType} = 'site_settings'`),
+  uniqueIndex("media_asset_references_testimonial_slot_unique").on(table.testimonialId, table.slot).where(sql`${table.ownerType} = 'testimonial'`),
   index("media_asset_references_asset_id_idx").on(table.assetId),
 ]);
 
