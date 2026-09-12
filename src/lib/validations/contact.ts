@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { boundedContactEmailSchema } from "./email";
-import { budgetRangeSchema, popupProjectTypeSchema, projectTimelineSchema, videoTypeSchema } from "./contact-options";
 import { externalWebUrlSchema } from "./urls";
 
 export const CONTACT_NAME_MAX_LENGTH = 120;
@@ -15,6 +14,9 @@ const singleLineText = (maximum: number) => z.string().trim().max(maximum).refin
   "Please remove unsupported control characters."
 );
 
+const requiredOption = (message: string) => singleLineText(CONTACT_PROJECT_TYPE_MAX_LENGTH).min(1, message);
+const optionalOption = z.union([z.literal(""), singleLineText(CONTACT_PROJECT_TYPE_MAX_LENGTH).min(1)]);
+
 const phoneSchema = singleLineText(CONTACT_PHONE_MAX_LENGTH).refine(
   (value) => !value || value.replace(/\D/g, "").length >= 10,
   "Please enter a valid phone number"
@@ -25,7 +27,6 @@ const messageSchema = z.string().trim()
   .max(CONTACT_MESSAGE_MAX_LENGTH)
   .refine((value) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(value), "Please remove unsupported control characters.");
 
-const optionalTimelineSchema = z.union([z.literal(""), projectTimelineSchema]);
 const boundedReferenceUrlSchema = externalWebUrlSchema.refine(
   (value) => value.length <= CONTACT_REFERENCE_URL_MAX_LENGTH,
   `Reference URL must be at most ${CONTACT_REFERENCE_URL_MAX_LENGTH} characters.`
@@ -44,9 +45,9 @@ export const popupContactSchema = z.object({
   ...commonContactFields,
   formContext: z.literal("popup"),
   phone: phoneSchema.min(1, "Please enter your phone number"),
-  projectType: popupProjectTypeSchema,
-  budgetRange: budgetRangeSchema,
-  videoType: z.string().max(CONTACT_PROJECT_TYPE_MAX_LENGTH),
+  projectType: requiredOption("Please select a project type"),
+  budgetRange: optionalOption,
+  videoType: singleLineText(CONTACT_PROJECT_TYPE_MAX_LENGTH),
   projectTimeline: z.literal(""),
   referenceUrl: z.literal(""),
 });
@@ -55,10 +56,10 @@ export const fullContactStructuralSchema = z.object({
   ...commonContactFields,
   formContext: z.literal("full"),
   phone: phoneSchema,
-  projectType: singleLineText(CONTACT_PROJECT_TYPE_MAX_LENGTH).min(1, "Please select a project category"),
-  budgetRange: budgetRangeSchema,
-  videoType: videoTypeSchema,
-  projectTimeline: optionalTimelineSchema,
+  projectType: requiredOption("Please select a project category"),
+  budgetRange: requiredOption("Please select a budget range"),
+  videoType: requiredOption("Please select a video type"),
+  projectTimeline: optionalOption,
   referenceUrl: optionalReferenceUrlSchema,
 });
 
