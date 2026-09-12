@@ -18,8 +18,10 @@ function RequiredMark() {
 
 export function ContactForm({ projectCategories = [], content = {} }: { projectCategories?: string[]; content?: Record<string, string> }) {
   const [state, formAction, pending] = useActionState(submitFullContactForm, initialState);
-  const categoryOptions = Array.from(new Set([...projectCategories, "Other"]));
+  const otherCategoryLabel = content.formOtherCategoryLabel || "Other";
+  const categoryOptions = Array.from(new Set([...projectCategories, otherCategoryLabel]));
   const copy = {
+    ariaLabel: content.formAriaLabel || "Project inquiry form",
     required: content.formRequiredLabel || "Required fields",
     nameLabel: content.formNameLabel || "Your Name",
     namePlaceholder: content.formNamePlaceholder || "Your name",
@@ -57,7 +59,7 @@ export function ContactForm({ projectCategories = [], content = {} }: { projectC
   }
 
   return (
-    <form action={formAction} className="space-y-5" aria-label="Project inquiry form" aria-busy={pending}>
+    <form action={formAction} className="space-y-5" aria-label={copy.ariaLabel} aria-busy={pending}>
       <div hidden aria-hidden="true"><label htmlFor="contact-website">Website</label><input id="contact-website" name="website" type="text" tabIndex={-1} autoComplete="off" /></div>
       <p className="text-xs leading-5 text-[var(--text-muted)]"><span className="text-[var(--accent-primary)]" aria-hidden>*</span> {copy.required}</p>
       <div className="grid gap-5 md:grid-cols-2">
