@@ -17,14 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const title = data.project.seoTitle ?? data.project.title;
   const description = data.project.seoDescription ?? data.project.description ?? `Watch ${data.project.title}, a video editing project by Lucky Saroj.`;
   const keywords = [data.project.title, data.category?.name, data.project.clientName, data.project.year ? String(data.project.year) : null, "video editing", "Lucky Saroj"].filter((value): value is string => Boolean(value));
-  return createPageMetadata({
-    title,
-    description,
-    path: `/portfolio/${data.project.slug}`,
-    image: data.project.thumbnailUrl ?? data.project.posterUrl ?? settings?.ogImageUrl,
-    keywords,
-    robotsIndex: true,
-  });
+  return createPageMetadata({ title, description, path: `/portfolio/${data.project.slug}`, image: data.project.thumbnailUrl ?? data.project.posterUrl ?? settings?.ogImageUrl, keywords, robotsIndex: true });
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -35,26 +28,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const { project, category, tools, media } = data;
   const { prev, next } = await getAdjacentProjects(slug);
   const copy = portfolioPage.content;
-  const detailCopy = {
-    overviewEyebrow: copy.detailOverviewEyebrow,
-    clientLabel: copy.detailClientLabel,
-    categoryLabel: copy.detailCategoryLabel,
-    yearLabel: copy.detailYearLabel,
-    caseStudyEyebrow: copy.detailCaseStudyEyebrow,
-    challengeLabel: copy.detailChallengeLabel,
-    approachLabel: copy.detailApproachLabel,
-    resultLabel: copy.detailResultLabel,
-    toolsEyebrow: copy.detailToolsEyebrow,
-    toolsHeading: copy.detailToolsHeading,
-    toolsAriaLabel: copy.detailToolsAriaLabel,
-  };
-  const mediaCopy = {
-    selectedProjectLabel: copy.detailSelectedProjectLabel,
-    mediaEyebrow: copy.detailMediaEyebrow,
-    mediaHeading: copy.detailMediaHeading,
-    previewAltSuffix: copy.detailPreviewAltSuffix,
-    mediaAltSuffix: copy.detailMediaAltSuffix,
-  };
+  const detailCopy = { overviewEyebrow: copy.detailOverviewEyebrow, clientLabel: copy.detailClientLabel, categoryLabel: copy.detailCategoryLabel, yearLabel: copy.detailYearLabel, caseStudyEyebrow: copy.detailCaseStudyEyebrow, challengeLabel: copy.detailChallengeLabel, approachLabel: copy.detailApproachLabel, resultLabel: copy.detailResultLabel, toolsEyebrow: copy.detailToolsEyebrow, toolsHeading: copy.detailToolsHeading, toolsAriaLabel: copy.detailToolsAriaLabel };
+  const mediaCopy = { selectedProjectLabel: copy.detailSelectedProjectLabel, mediaEyebrow: copy.detailMediaEyebrow, mediaHeading: copy.detailMediaHeading, previewAltSuffix: copy.detailPreviewAltSuffix, mediaAltSuffix: copy.detailMediaAltSuffix };
 
   return (
     <>
@@ -64,16 +39,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       <CaseStudy project={project} copy={detailCopy} />
       <ProjectGallery project={project} media={media} copy={mediaCopy} />
       <ProjectTools tools={tools} copy={detailCopy} />
-      <ProjectNavigation previous={prev} next={next} />
-      <ProjectCTA
-        eyebrow={copy.detailCtaEyebrow}
-        heading={copy.detailCtaHeading}
-        description={copy.detailCtaDescription}
-        primaryLabel={copy.detailCtaPrimaryLabel}
-        primaryUrl={copy.detailCtaPrimaryUrl}
-        secondaryLabel={copy.detailCtaSecondaryLabel}
-        secondaryUrl={copy.detailCtaSecondaryUrl}
-      />
+      <ProjectNavigation previous={prev} next={next} ariaLabel={copy.detailNavigationAriaLabel} previousLabel={copy.detailPreviousLabel} nextLabel={copy.detailNextLabel} />
+      <ProjectCTA eyebrow={copy.detailCtaEyebrow} heading={copy.detailCtaHeading} description={copy.detailCtaDescription} primaryLabel={copy.detailCtaPrimaryLabel} primaryUrl={copy.detailCtaPrimaryUrl} secondaryLabel={copy.detailCtaSecondaryLabel} secondaryUrl={copy.detailCtaSecondaryUrl} />
     </>
   );
 }
