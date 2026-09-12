@@ -2,12 +2,18 @@
 
 import { db, schema } from "@/lib/db";
 import { getServices } from "@/lib/db/queries";
+import { getPageContent } from "@/lib/db/page-content-service";
+import { parseContactOptionsConfig } from "@/lib/contact/contact-options-config";
 import { createContactSubmissionHandler, type ContactFormState, type ContactSubmissionDependencies, type RawContactSubmission } from "@/lib/contact/contact-submission";
 
 export type { ContactFormState } from "@/lib/contact/contact-submission";
 
 const dependencies: ContactSubmissionDependencies = {
   readActiveServiceNames: async () => (await getServices()).map((service) => service.name),
+  readContactOptions: async () => {
+    const contactPage = await getPageContent("contact");
+    return parseContactOptionsConfig(contactPage.content.contactOptionsConfig);
+  },
   createMessage: async (message) => {
     await db.insert(schema.contactMessages).values({ ...message, status: "new" });
   },
