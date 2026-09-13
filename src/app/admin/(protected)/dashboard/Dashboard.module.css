@@ -63,15 +63,18 @@
 .healthList p { margin: 0; }.healthList strong { display: block; color: #dfe4eb; font-size: 10px; }.healthList small { display: block; margin-top: 4px; color: #626975; font-size: 9px; }
 
 .projectGrid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; padding: 16px 20px 20px; }
-.projectCard { display: grid; min-height: 112px; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 14px; border: 1px solid rgba(255,255,255,.065); border-radius: 12px; padding: 14px; background: rgba(255,255,255,.018); transition: border-color .18s ease, background .18s ease, transform .18s ease; }
+.projectCard { display: grid; min-height: 132px; grid-template-columns: minmax(0,1fr); grid-template-rows: 1fr auto; align-items: start; gap: 18px; border: 1px solid rgba(255,255,255,.065); border-radius: 12px; padding: 16px; background: rgba(255,255,255,.018); transition: border-color .18s ease, background .18s ease, transform .18s ease; }
 .projectCard:hover { border-color: rgba(96,165,250,.27); background: rgba(59,130,246,.045); transform: translateY(-1px); }
-.projectCard strong { display: block; overflow: hidden; color: #dfe4eb; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }.projectCard > div > span { display: block; margin-top: 5px; color: #626975; font-size: 9px; }
-.projectFlags { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }.projectFlags > span { margin: 0 !important; }
+.projectCard > div:first-child { min-width: 0; }
+.projectCard strong { display: -webkit-box; overflow: hidden; color: #dfe4eb; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.projectCard > div:first-child > span { display: block; margin-top: 6px; color: #626975; font-size: 9px; }
+.projectFlags { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 6px; }
+.projectFlags > span { flex: 0 0 auto; margin: 0 !important; }
 .featuredBadge { border: 1px solid rgba(59,130,246,.18); background: rgba(59,130,246,.07); color: #60a5fa !important; }.publishedBadge { border: 1px solid rgba(52,211,153,.18); background: rgba(16,185,129,.07); color: #6ee7b7 !important; }.draftBadge { border: 1px solid rgba(148,163,184,.12); background: rgba(148,163,184,.05); color: #94a3b8 !important; }
 .emptyState { display: grid; min-height: 150px; place-items: center; align-content: center; gap: 8px; color: #626975; text-align: center; }.emptyState p { margin: 0; font-size: 10px; }
 
 @media (max-width: 1250px) { .overviewGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }.projectGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (max-width: 1080px) { .mainGrid { grid-template-columns: 1fr; }.sideStack { grid-template-columns: repeat(2,minmax(0,1fr)); }.projectGrid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 @media (max-width: 760px) { .attentionGrid,.sideStack { grid-template-columns: 1fr; }.attentionCard { grid-template-columns: auto 1fr; }.attentionCard .inlineAction { grid-column: 2; }.messageStatusGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }.projectGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }.enquiryTop { align-items: flex-start; flex-direction: column; gap: 6px; } }
-@media (max-width: 560px) { .overviewGrid { grid-template-columns: 1fr; }.overviewCard { min-height: 116px; }.projectGrid { grid-template-columns: 1fr; }.projectCard { grid-template-columns: minmax(0,1fr) auto; }.sectionHeading { padding: 15px 16px; }.enquiryList { padding-inline: 16px; }.enquiryNew::before { left: -16px; }.attentionCard { padding: 16px; }.messageStatusCard { padding: 16px; } }
+@media (max-width: 560px) { .overviewGrid { grid-template-columns: 1fr; }.overviewCard { min-height: 116px; }.projectGrid { grid-template-columns: 1fr; }.sectionHeading { padding: 15px 16px; }.enquiryList { padding-inline: 16px; }.enquiryNew::before { left: -16px; }.attentionCard { padding: 16px; }.messageStatusCard { padding: 16px; } }
 @media (prefers-reduced-motion: reduce) { .quickAction,.projectCard,.enquiryRow { transition: none; }.projectCard:hover,.enquiryRow:hover { transform: none; } }
