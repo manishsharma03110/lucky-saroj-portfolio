@@ -31,7 +31,7 @@ export default async function HomePage() {
         subheading={settings?.heroSubheading ?? ""}
         description={settings?.heroDescription ?? ""}
         heroImageUrl={settings?.heroImageUrl}
-        heroImageAlt={content.heroImageAlt}
+        heroImageAlt={content.heroImageAlt.trim() || "Lucky Saroj — Video Editor portrait and editing workspace"}
         primaryLabel={content.heroPrimaryLabel}
         primaryUrl={content.heroPrimaryUrl}
         showreelLabel={content.heroShowreelLabel}
