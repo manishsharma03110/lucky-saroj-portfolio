@@ -66,6 +66,7 @@ export const portfolioProjects = pgTable("portfolio_projects", {
   approach: text("approach"),
   result: text("result"),
   thumbnailUrl: text("thumbnail_url"),
+  thumbnailAlt: text("thumbnail_alt"),
   videoUrl: text("video_url"),
   posterUrl: text("poster_url"),
   categoryId: text("category_id").references(() => portfolioCategories.id, { onDelete: "set null" }),
@@ -81,6 +82,7 @@ export const portfolioProjects = pgTable("portfolio_projects", {
   check("portfolio_projects_display_order_nonnegative", sql`${table.displayOrder} >= 0`),
   check("portfolio_projects_revision_positive", sql`${table.revision} >= 1`),
   check("portfolio_projects_status_valid", sql`${table.status} IN ('draft', 'published')`),
+  check("portfolio_projects_thumbnail_alt_bounded", sql`${table.thumbnailAlt} IS NULL OR char_length(${table.thumbnailAlt}) <= 300`),
 ]);
 
 export const projectMedia = pgTable("project_media", {
@@ -260,10 +262,12 @@ export const siteSettings = pgTable("site_settings", {
   seoTitle: text("seo_title").notNull().default("Lucky Saroj — Video Editor & Visual Storyteller"),
   seoDescription: text("seo_description"),
   ogImageUrl: text("og_image_url"),
+  googleAnalyticsMeasurementId: text("google_analytics_measurement_id"),
   revision: integer("revision").notNull().default(1),
 }, (table) => [
   check("site_settings_singleton_id", sql`${table.id} = 'singleton:settings'`),
   check("site_settings_revision_positive", sql`${table.revision} >= 1`),
+  check("site_settings_ga_measurement_id_format", sql`${table.googleAnalyticsMeasurementId} IS NULL OR ${table.googleAnalyticsMeasurementId} = '' OR ${table.googleAnalyticsMeasurementId} ~ '^G-[A-Z0-9]+$'`),
 ]);
 
 export const homePageContent = pgTable("home_page_content", {

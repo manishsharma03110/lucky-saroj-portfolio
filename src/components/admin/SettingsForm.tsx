@@ -196,6 +196,11 @@ export function SettingsForm({
           defaultAssetId={ogImageAssetId}
         />
         <p className={styles.helper}>Used as the default share image when a page does not have its own social image.</p>
+        <div>
+          <Label htmlFor="googleAnalyticsMeasurementId">Google Analytics Measurement ID</Label>
+          <Input id="googleAnalyticsMeasurementId" name="googleAnalyticsMeasurementId" placeholder="G-XXXXXXXXXX" defaultValue={settings.googleAnalyticsMeasurementId ?? ""} autoCapitalize="characters" />
+          <p className={styles.helper}>Optional. GA4 loads on public pages only when a valid Measurement ID is saved.</p>
+        </div>
       </FormCard>
 
       {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}

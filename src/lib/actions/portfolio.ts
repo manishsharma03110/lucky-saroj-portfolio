@@ -33,6 +33,7 @@ function parseProjectForm(formData: FormData) {
     result: formData.get("result") ?? "",
     thumbnailUrl: formData.get("thumbnailUrl"),
     thumbnailAssetId: formData.get("thumbnailAssetId"),
+    thumbnailAlt: formData.get("thumbnailAlt") ?? "",
     videoUrl: formData.get("videoUrl"),
     videoAssetId: formData.get("videoAssetId"),
     isFeatured: formData.get("isFeatured"),
@@ -69,6 +70,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
   revalidatePath("/admin/portfolio");
   revalidatePath("/admin/activity");
   revalidatePath("/portfolio");
+  revalidatePath("/sitemap.xml");
   revalidatePath("/");
   redirect("/admin/portfolio");
 }
@@ -105,6 +107,7 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
   revalidatePath("/admin/activity");
   revalidatePath(`/portfolio/${data.slug}`);
   revalidatePath("/portfolio");
+  revalidatePath("/sitemap.xml");
   revalidatePath("/");
   redirect("/admin/portfolio");
 }
@@ -118,6 +121,7 @@ export async function deleteProject(id: string): Promise<void> {
   revalidatePath("/admin/portfolio");
   revalidatePath("/admin/activity");
   revalidatePath("/portfolio");
+  revalidatePath("/sitemap.xml");
   revalidatePath("/");
 }
 

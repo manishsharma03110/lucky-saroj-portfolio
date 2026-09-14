@@ -15,6 +15,10 @@ const optionalWhatsApp = z.union([
   boundedExternalUrl,
   z.string().trim().regex(/^\+?[\d\s().-]{7,40}$/, "Enter a valid WhatsApp number or URL."),
 ]);
+const optionalGaMeasurementId = z.union([
+  z.literal(""),
+  z.string().trim().toUpperCase().regex(/^G-[A-Z0-9]+$/, "Use a valid GA4 Measurement ID, for example G-XXXXXXXXXX."),
+]);
 
 export const settingsSchema = z.object({
   siteName: z.string().trim().min(1).max(120),
@@ -50,6 +54,7 @@ export const settingsSchema = z.object({
   seoDescription: z.string().trim().max(300).optional().or(z.literal("")),
   ogImageUrl: optionalImageUrl.optional(),
   ogImageAssetId: optionalImageAssetId.optional(),
+  googleAnalyticsMeasurementId: optionalGaMeasurementId.optional().default(""),
 });
 
-export type SettingsInput = z.infer<typeof settingsSchema>;
+export type SettingsInput = z.input<typeof settingsSchema>;

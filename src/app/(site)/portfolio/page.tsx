@@ -6,11 +6,13 @@ import { CategoryFilter } from "@/components/portfolio/CategoryFilter";
 import { PortfolioCTA } from "@/components/portfolio/PortfolioCTA";
 import { PortfolioHero } from "@/components/portfolio/PortfolioHero";
 import { hasUsableVisual, ProjectCard } from "@/components/portfolio/ProjectCard";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { PageMotionBoundary } from "@/components/ui/PageMotionBoundary";
 import { getCategories, getProjectBySlug, getPublishedProjects, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 import { getPageSeo } from "@/lib/db/page-seo-service";
 import { createCmsPageMetadata } from "@/lib/seo";
+import { portfolioItemListJsonLd } from "@/lib/structured-data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [seo, settings] = await Promise.all([getPageSeo("portfolio"), getSiteSettings()]);
@@ -37,6 +39,7 @@ export default async function PortfolioPage({ searchParams }: { searchParams: Pr
 
   return (
     <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
+      <JsonLd data={portfolioItemListJsonLd(projects.map(({ project }) => ({ title: project.title, slug: project.slug })))} />
       <PortfolioHero projectCount={projects.length} categoryName={activeCategory?.name} eyebrow={copy.heroEyebrow} heading={copy.heroHeading} description={copy.heroDescription} />
       <section className="border-b border-white/10 bg-[var(--background-primary)] py-5 sm:py-6"><div className="mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><Suspense fallback={null}><CategoryFilter categories={categories} allLabel={copy.filterAllLabel} ariaLabel={copy.filterAriaLabel} /></Suspense></div></section>
       <section className="py-14 sm:py-16 lg:py-24">

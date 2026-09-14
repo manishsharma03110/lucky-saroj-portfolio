@@ -5,10 +5,12 @@ import { ProjectCTA } from "@/components/portfolio/detail/ProjectCTA";
 import { ProjectHero } from "@/components/portfolio/detail/ProjectHero";
 import { ProjectGallery, ProjectMedia } from "@/components/portfolio/detail/ProjectMedia";
 import { ProjectNavigation } from "@/components/portfolio/detail/ProjectNavigation";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { PageMotionBoundary } from "@/components/ui/PageMotionBoundary";
 import { getAdjacentProjects, getProjectBySlug, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 import { createPageMetadata } from "@/lib/seo";
+import { projectCreativeWorkJsonLd } from "@/lib/structured-data";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -34,6 +36,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   return (
     <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
+      <JsonLd data={projectCreativeWorkJsonLd({ title: project.title, slug: project.slug, description: project.seoDescription ?? project.description, thumbnailUrl: project.thumbnailUrl ?? project.posterUrl, videoUrl: project.videoUrl, createdAt: project.createdAt, updatedAt: project.updatedAt, clientName: project.clientName })} />
       <ProjectHero project={project} categoryName={category?.name} />
       <ProjectMedia project={project} categoryName={category?.name} media={media} copy={mediaCopy} />
       <ProjectOverview project={project} categoryName={category?.name} copy={detailCopy} />

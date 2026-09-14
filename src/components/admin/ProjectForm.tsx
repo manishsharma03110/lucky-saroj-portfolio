@@ -80,6 +80,12 @@ export function ProjectForm({ project, tools, categories, mediaAssetIds }: {
         </div>
 
         <FileUpload name="thumbnailUrl" assetIdName="thumbnailAssetId" label="Thumbnail Image" kind="image" defaultValue={project?.thumbnailUrl} defaultAssetId={mediaAssetIds?.thumbnail} />
+        <div>
+          <Label htmlFor="thumbnailAlt">Thumbnail Alt Text</Label>
+          <Input id="thumbnailAlt" name="thumbnailAlt" maxLength={300} placeholder="Project title — video thumbnail by Lucky Saroj" defaultValue={project?.thumbnailAlt ?? ""} />
+          <p className={styles.helper}>Optional. If left blank, a descriptive alt text is generated from the project title.</p>
+          <FieldError message={state.fieldErrors?.thumbnailAlt} />
+        </div>
         <FileUpload name="videoUrl" assetIdName="videoAssetId" label="Project Video" kind="video" defaultValue={project?.videoUrl} defaultAssetId={mediaAssetIds?.video} />
         <p className={styles.helper}>Upload a video file or paste a YouTube/Vimeo link above.</p>
 

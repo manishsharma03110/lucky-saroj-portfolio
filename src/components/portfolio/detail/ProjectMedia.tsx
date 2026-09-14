@@ -39,7 +39,7 @@ function mediaState(project: Project, media: Media[]) {
 
 export function ProjectMedia({ project, categoryName, media, copy = {} }: { project: Project; categoryName?: string; media: Media[]; copy?: MediaCopy }) {
   const { primaryImage, video } = mediaState(project, media);
-  const previewAlt = `${project.title} ${copy.previewAltSuffix || "project preview"}`;
+  const previewAlt = project.thumbnailAlt?.trim() || `${project.title} ${copy.previewAltSuffix || "project preview"}`;
   return <section className="bg-[var(--background-primary)] py-8 sm:py-12 lg:py-16"><div className="mx-auto w-full max-w-[1600px] px-5 sm:px-8 lg:px-12 2xl:px-16"><div className="relative aspect-[16/10] overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] sm:aspect-video"><ProjectSlate project={project} categoryName={categoryName} hasVideo={Boolean(video)} selectedProjectLabel={copy.selectedProjectLabel} />{video ? <div className="absolute inset-0"><VideoPlayer videoUrl={video} posterUrl={primaryImage} title={project.title} className="h-full w-full" /></div> : primaryImage ? <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${primaryImage}')` }} role="img" aria-label={previewAlt} /> : null}</div></div></section>;
 }
 
