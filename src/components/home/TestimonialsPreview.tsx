@@ -1,4 +1,5 @@
 import { Quote } from "lucide-react";
+import { Marquee } from "@/components/ui/Marquee";
 import { getPublishedTestimonials } from "@/lib/db/queries";
 import type { HomePageContent } from "@/lib/db/home-content-service";
 
@@ -36,6 +37,7 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
   if (testimonials.length === 0) return null;
 
   const [featured, secondary] = testimonials.slice(0, 2);
+  const additional = testimonials.slice(2);
 
   return (
     <section className="relative overflow-hidden bg-[var(--background-primary)] py-16 md:py-20 lg:py-24 2xl:py-28">
@@ -88,6 +90,25 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
             </article>
           )}
         </div>
+
+        {additional.length > 0 && (
+          <div className="mt-8 border-y border-white/[0.08] py-5 sm:mt-10" aria-label="More client testimonials">
+            <Marquee durationSeconds={Math.max(30, additional.length * 10)}>
+              {additional.map((testimonial) => (
+                <article key={testimonial.id} className="flex w-[min(78vw,390px)] shrink-0 items-start gap-4 py-2 sm:w-[360px]">
+                  <Quote size={18} strokeWidth={1.35} className="mt-1 shrink-0 text-[var(--accent-primary)]/75" aria-hidden />
+                  <div className="min-w-0">
+                    <blockquote className="line-clamp-3 text-sm leading-6 text-[var(--text-secondary)]">&ldquo;{testimonial.testimonialText}&rdquo;</blockquote>
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-primary)]">{testimonial.clientName}</p>
+                    {[testimonial.designation, testimonial.company].filter(Boolean).length > 0 && (
+                      <p className="mt-1 text-xs text-[var(--text-muted)]">{[testimonial.designation, testimonial.company].filter(Boolean).join(" · ")}</p>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </Marquee>
+          </div>
+        )}
       </div>
     </section>
   );
