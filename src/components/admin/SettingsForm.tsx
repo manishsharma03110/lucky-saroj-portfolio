@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { Label, Input, Textarea } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { FormCard } from "@/components/admin/FormParts";
+import { FieldError, FormCard } from "@/components/admin/FormParts";
 import { updateSettings } from "@/lib/actions/settings";
 import type { ActionState } from "@/lib/actions/portfolio";
 import type { schema } from "@/lib/db";
@@ -196,6 +196,12 @@ export function SettingsForm({
           defaultAssetId={ogImageAssetId}
         />
         <p className={styles.helper}>Used as the default share image when a page does not have its own social image.</p>
+        <div>
+          <Label htmlFor="googleSiteVerification">Google Search Console Verification Code</Label>
+          <Input id="googleSiteVerification" name="googleSiteVerification" maxLength={1024} placeholder="XXXXX" defaultValue={settings.googleSiteVerification ?? ""} autoComplete="off" spellCheck={false} />
+          <p className={styles.helper}>Paste the content value from Google Search Console&apos;s HTML tag method (e.g. content value from &lt;meta name=&apos;google-site-verification&apos; content=&apos;XXXXX&apos; /&gt;) — do not paste the full tag, only the code. If you paste the full tag by mistake, the code is extracted automatically.</p>
+          <FieldError message={state.fieldErrors?.googleSiteVerification} />
+        </div>
         <div>
           <Label htmlFor="googleAnalyticsMeasurementId">Google Analytics Measurement ID</Label>
           <Input id="googleAnalyticsMeasurementId" name="googleAnalyticsMeasurementId" placeholder="G-XXXXXXXXXX" defaultValue={settings.googleAnalyticsMeasurementId ?? ""} autoCapitalize="characters" />
