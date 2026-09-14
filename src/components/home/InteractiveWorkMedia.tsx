@@ -58,7 +58,7 @@ export function InteractiveWorkMedia({
     const video = videoRef.current;
     if (!video || !previewVideoUrl) return;
 
-    if (!previewActive || reducedMotion) {
+    if (!previewActive || reducedMotion || !finePointer) {
       video.pause();
       video.currentTime = 0;
       return;
@@ -66,7 +66,7 @@ export function InteractiveWorkMedia({
 
     if (video.getAttribute("src") !== previewVideoUrl) video.src = previewVideoUrl;
     video.play().catch(() => undefined);
-  }, [previewActive, previewVideoUrl, reducedMotion]);
+  }, [finePointer, previewActive, previewVideoUrl, reducedMotion]);
 
   const resetTilt = () => {
     const frame = frameRef.current;
@@ -100,7 +100,9 @@ export function InteractiveWorkMedia({
   return (
     <div
       ref={frameRef}
-      onPointerEnter={() => setPreviewActive(true)}
+      onPointerEnter={() => {
+        if (finePointer && !reducedMotion) setPreviewActive(true);
+      }}
       onPointerLeave={() => {
         setPreviewActive(false);
         resetTilt();
@@ -155,7 +157,7 @@ export function InteractiveWorkMedia({
           playsInline
           preload="none"
           aria-label={`${title} preview`}
-          className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-500 motion-reduce:hidden ${previewActive && !reducedMotion ? "opacity-100" : "opacity-0"}`}
+          className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-500 motion-reduce:hidden ${previewActive && finePointer && !reducedMotion ? "opacity-100" : "opacity-0"}`}
         />
       )}
 
