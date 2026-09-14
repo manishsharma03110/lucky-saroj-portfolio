@@ -197,6 +197,11 @@ export function SettingsForm({
         />
         <p className={styles.helper}>Used as the default share image when a page does not have its own social image.</p>
         <div>
+          <Label htmlFor="googleSiteVerification">Google Search Console Verification Code</Label>
+          <Input id="googleSiteVerification" name="googleSiteVerification" placeholder="Google verification code" defaultValue={settings.googleSiteVerification ?? ""} autoComplete="off" spellCheck={false} />
+          <p className={styles.helper}>Paste the content value from Google Search Console&apos;s HTML tag method (for example, the content value from a google-site-verification meta tag). Do not paste the full tag, only the code. If you do paste the full Google meta tag, the code will be extracted automatically.</p>
+        </div>
+        <div>
           <Label htmlFor="googleAnalyticsMeasurementId">Google Analytics Measurement ID</Label>
           <Input id="googleAnalyticsMeasurementId" name="googleAnalyticsMeasurementId" placeholder="G-XXXXXXXXXX" defaultValue={settings.googleAnalyticsMeasurementId ?? ""} autoCapitalize="characters" />
           <p className={styles.helper}>Optional. GA4 loads on public pages only when a valid Measurement ID is saved.</p>

@@ -7,30 +7,38 @@ import "@fontsource/poppins/800.css";
 import "@fontsource/inter/400.css";
 import "@fontsource/inter/500.css";
 import "@fontsource/inter/600.css";
+import { getSiteSettings } from "@/lib/db/queries";
 import { DEFAULT_SITE_DESCRIPTION, DEFAULT_SITE_TITLE, resolveSiteUrl, SITE_NAME } from "@/lib/seo";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  metadataBase: resolveSiteUrl(),
-  title: {
-    default: DEFAULT_SITE_TITLE,
-    template: "%s — Lucky Saroj",
-  },
-  description: DEFAULT_SITE_DESCRIPTION,
-  alternates: { canonical: "/" },
-  openGraph: {
-    type: "website",
-    siteName: SITE_NAME,
-    title: DEFAULT_SITE_TITLE,
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  return {
+    metadataBase: resolveSiteUrl(),
+    title: {
+      default: DEFAULT_SITE_TITLE,
+      template: "%s — Lucky Saroj",
+    },
     description: DEFAULT_SITE_DESCRIPTION,
-    url: "/",
-  },
-  twitter: {
-    card: "summary",
-    title: DEFAULT_SITE_TITLE,
-    description: DEFAULT_SITE_DESCRIPTION,
-  },
-};
+    alternates: { canonical: "/" },
+    verification: settings?.googleSiteVerification
+      ? { google: settings.googleSiteVerification }
+      : undefined,
+    openGraph: {
+      type: "website",
+      siteName: SITE_NAME,
+      title: DEFAULT_SITE_TITLE,
+      description: DEFAULT_SITE_DESCRIPTION,
+      url: "/",
+    },
+    twitter: {
+      card: "summary",
+      title: DEFAULT_SITE_TITLE,
+      description: DEFAULT_SITE_DESCRIPTION,
+    },
+  };
+}
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
