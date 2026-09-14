@@ -54,7 +54,7 @@ export const settingsSchema = z.object({
   seoDescription: z.string().trim().max(300).optional().or(z.literal("")),
   ogImageUrl: optionalImageUrl.optional(),
   ogImageAssetId: optionalImageAssetId.optional(),
-  googleAnalyticsMeasurementId: optionalGaMeasurementId,
+  googleAnalyticsMeasurementId: optionalGaMeasurementId.optional().default(""),
 });
 
 export type SettingsInput = z.infer<typeof settingsSchema>;
