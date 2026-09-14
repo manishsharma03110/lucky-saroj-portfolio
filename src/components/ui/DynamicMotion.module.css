@@ -151,6 +151,14 @@
   100% { transform: translate3d(-2%, -1%, 0); }
 }
 
+@media (max-width: 767px), (pointer: coarse) {
+  .filmGrain {
+    inset: 0;
+    opacity: 0.018;
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .revealVisible,
