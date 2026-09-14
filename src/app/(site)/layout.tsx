@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ContactPopup } from "@/components/contact/ContactPopup";
 import quality from "@/components/ui/SiteQuality.module.css";
+import motionStyles from "@/components/ui/DynamicMotion.module.css";
 import { getSiteBranding, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 
@@ -31,6 +32,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   return (
     <div className={`public-site ${quality.boundary}`}>
       <a href="#site-main-content" className={quality.skipLink}>Skip to content</a>
+      <div className={motionStyles.filmGrain} aria-hidden="true" />
       <Header
         logoText={settings?.logoText}
         logoImageUrl={branding?.logoImageUrl}
