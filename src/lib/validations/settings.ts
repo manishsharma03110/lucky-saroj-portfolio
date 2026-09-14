@@ -57,4 +57,4 @@ export const settingsSchema = z.object({
   googleAnalyticsMeasurementId: optionalGaMeasurementId.optional().default(""),
 });
 
-export type SettingsInput = z.infer<typeof settingsSchema>;
+export type SettingsInput = z.input<typeof settingsSchema>;
