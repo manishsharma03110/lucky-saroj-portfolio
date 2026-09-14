@@ -20,6 +20,26 @@ const optionalGaMeasurementId = z.union([
   z.string().trim().toUpperCase().regex(/^G-[A-Z0-9]+$/, "Use a valid GA4 Measurement ID, for example G-XXXXXXXXXX."),
 ]);
 
+function normalizeGoogleSiteVerification(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  if (!trimmed || !/<meta\b/i.test(trimmed)) return trimmed;
+  if (!/name\s*=\s*["']google-site-verification["']/i.test(trimmed)) return trimmed;
+  const contentMatch = trimmed.match(/\bcontent\s*=\s*(["'])(.*?)\1/i);
+  return contentMatch?.[2]?.trim() ?? trimmed;
+}
+
+const optionalGoogleSiteVerification = z.preprocess(
+  normalizeGoogleSiteVerification,
+  z.union([
+    z.literal(""),
+    z.string().trim().max(512, "Google verification code must be at most 512 characters.").refine(
+      (value) => !/[<>]/.test(value),
+      "Paste only the Google verification content value, or a valid google-site-verification meta tag."
+    ),
+  ])
+);
+
 export const settingsSchema = z.object({
   siteName: z.string().trim().min(1).max(120),
   logoText: z.string().trim().min(1).max(10),
@@ -55,6 +75,7 @@ export const settingsSchema = z.object({
   ogImageUrl: optionalImageUrl.optional(),
   ogImageAssetId: optionalImageAssetId.optional(),
   googleAnalyticsMeasurementId: optionalGaMeasurementId.optional().default(""),
+  googleSiteVerification: optionalGoogleSiteVerification.optional().default(""),
 });
 
 export type SettingsInput = z.input<typeof settingsSchema>;
