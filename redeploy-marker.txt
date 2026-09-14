@@ -1,0 +1,1 @@
+Database migrations 0015 and 0016 applied to production Neon on 2026-09-14. This marker retriggers the protected GitHub→Vercel production pipeline without changing application behavior.
