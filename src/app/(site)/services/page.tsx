@@ -3,11 +3,13 @@ import Image from "next/image";
 import { ServicesShowcase } from "@/components/services/ServicesShowcase";
 import { ProcessTimeline } from "@/components/services/ProcessTimeline";
 import { ServicesTools } from "@/components/services/ServicesTools";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { PageMotionBoundary } from "@/components/ui/PageMotionBoundary";
 import { getAboutTools, getServices, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 import { getPageSeo } from "@/lib/db/page-seo-service";
 import { createCmsPageMetadata } from "@/lib/seo";
+import { servicesJsonLd } from "@/lib/structured-data";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [seo, settings] = await Promise.all([getPageSeo("services"), getSiteSettings()]);
@@ -25,6 +27,7 @@ export default async function ServicesPage() {
 
   return (
     <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
+      {services.length > 0 && <JsonLd data={servicesJsonLd(services)} />}
       <section className="relative flex items-center overflow-hidden border-b border-white/10 py-14 sm:py-16 lg:py-24">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_3%_50%,var(--accent-glow),transparent_31%)] opacity-60" aria-hidden />
         <div className="relative mx-auto grid w-full max-w-[1480px] gap-10 px-5 sm:px-8 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center md:gap-12 lg:gap-16 lg:px-12 2xl:gap-20 2xl:px-16">
