@@ -53,7 +53,8 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
   }
   const data = parsed.data;
   const tools = (data.tools ?? "").split(",").map((t) => t.trim()).filter(Boolean);
-  try { await createPortfolioProject({ ...data, tools }); }
+  const relatedProjectIds = data.relatedProjectIds ?? [];
+  try { await createPortfolioProject({ ...data, relatedProjectIds, tools }); }
   catch (error) {
     if (error instanceof DuplicateSlugError) return { status: "error", message: error.message, fieldErrors: { slug: "Slug already in use" } };
     if (error instanceof DuplicateContentError) return { status: "error", message: error.message, fieldErrors: { tools: error.message } };
@@ -66,7 +67,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
     resource: "portfolio_project",
     resourceId: data.slug,
     summary: `Created portfolio project “${data.title}”`,
-    metadata: { status: data.status, featured: data.isFeatured, relatedProjectCount: data.relatedProjectIds.length },
+    metadata: { status: data.status, featured: data.isFeatured, relatedProjectCount: relatedProjectIds.length },
   });
   revalidatePath("/admin/portfolio");
   revalidatePath("/admin/activity");
@@ -86,12 +87,13 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
     return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: fieldErrorsFromIssues(parsed.error.issues) };
   }
   const data = parsed.data;
+  const relatedProjectIds = data.relatedProjectIds ?? [];
   if (!revision.success) return { status: "error", message: "Invalid content revision. Reload before saving." };
-  if (data.relatedProjectIds.includes(parsedId.data)) {
+  if (relatedProjectIds.includes(parsedId.data)) {
     return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { relatedProjectIds: "A project cannot be related to itself." } };
   }
   const tools = (data.tools ?? "").split(",").map((t) => t.trim()).filter(Boolean);
-  try { await updatePortfolioProject(parsedId.data, revision.data, { ...data, tools }); }
+  try { await updatePortfolioProject(parsedId.data, revision.data, { ...data, relatedProjectIds, tools }); }
   catch (error) {
     if (error instanceof DuplicateSlugError) return { status: "error", message: error.message, fieldErrors: { slug: "Slug already in use" } };
     if (error instanceof DuplicateContentError) return { status: "error", message: error.message, fieldErrors: { tools: error.message } };
@@ -105,7 +107,7 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
     resource: "portfolio_project",
     resourceId: parsedId.data,
     summary: `Updated portfolio project “${data.title}”`,
-    metadata: { status: data.status, featured: data.isFeatured, previousRevision: revision.data, relatedProjectCount: data.relatedProjectIds.length },
+    metadata: { status: data.status, featured: data.isFeatured, previousRevision: revision.data, relatedProjectCount: relatedProjectIds.length },
   });
   revalidatePath("/admin/portfolio");
   revalidatePath("/admin/activity");
