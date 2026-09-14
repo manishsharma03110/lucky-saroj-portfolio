@@ -38,7 +38,9 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!enabled) return;
 
+    const previousCursor = document.body.style.cursor;
     document.body.classList.add("cine-cursor-active");
+    document.body.style.cursor = "none";
     bodyClassAdded.current = true;
 
     const handleMove = (e: PointerEvent) => {
@@ -49,6 +51,7 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
 
     return () => {
       window.removeEventListener("pointermove", handleMove);
+      document.body.style.cursor = previousCursor;
       if (bodyClassAdded.current) document.body.classList.remove("cine-cursor-active");
     };
   }, [enabled, x, y]);
