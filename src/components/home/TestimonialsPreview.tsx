@@ -1,4 +1,5 @@
-import { Quote } from "lucide-react";
+import { ArrowUpRight, Quote } from "lucide-react";
+import Link from "next/link";
 import { Marquee } from "@/components/ui/Marquee";
 import { getPublishedTestimonials } from "@/lib/db/queries";
 import type { HomePageContent } from "@/lib/db/home-content-service";
@@ -54,6 +55,9 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
               <p className="mt-4 max-w-md text-sm leading-6 text-[var(--text-secondary)]">
                 {content.testimonialsDescription}
               </p>
+              <Link href="/testimonials" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.14em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">
+                View all testimonials <ArrowUpRight size={16} aria-hidden />
+              </Link>
             </header>
 
             <article className="relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] px-6 pb-7 pt-9 shadow-[0_24px_80px_rgba(0,0,0,0.2)] sm:px-9 sm:pb-9 sm:pt-11 lg:min-h-[340px] lg:px-11">
