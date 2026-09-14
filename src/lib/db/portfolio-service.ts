@@ -6,7 +6,7 @@ import { ContentNotFoundError, DuplicateContentError, DuplicateSlugError, postgr
 import { synchronizeMutationTest, type MutationTestSynchronization } from "./mutation-test-synchronization";
 import { prepareMediaSlot, synchronizeMediaSlot } from "./media-asset-service";
 
-export type ProjectMutationInput = Omit<ProjectInput, "tools"> & { tools: readonly string[] };
+export type ProjectMutationInput = Omit<ProjectInput, "tools" | "relatedProjectIds"> & { tools: readonly string[]; relatedProjectIds: readonly string[] };
 function validateTools(tools: readonly string[]): void {
   const seen = new Set<string>();
   for (const tool of tools) {
@@ -28,13 +28,6 @@ function resolvedThumbnailAlt(input: ProjectMutationInput): string {
   return input.thumbnailAlt?.trim() || `${input.title} — video thumbnail by Lucky Saroj`;
 }
 
-async function replaceRelatedProjects(tx: Parameters<Parameters<typeof withCmsTransaction>[0]>[0], projectId: string, relatedProjectIds: readonly string[]) {
-  await tx.db.delete(sql`DELETE FROM project_related_projects WHERE project_id=${projectId}`);
-  for (const [index, relatedProjectId] of relatedProjectIds.entries()) {
-    await tx.db.insert(sql`INSERT INTO project_related_projects(project_id,related_project_id,display_order) VALUES (${projectId},${relatedProjectId},${index})`);
-  }
-}
-
 export async function createPortfolioProject(input: ProjectMutationInput): Promise<string> {
   validateTools(input.tools);
   validateRelatedProjects(input.relatedProjectIds);
@@ -46,7 +39,9 @@ export async function createPortfolioProject(input: ProjectMutationInput): Promi
       const thumbnailAlt = resolvedThumbnailAlt(input);
       await tx.db.insert(sql`INSERT INTO portfolio_projects(id,title,slug,client_name,year,category_id,description,challenge,approach,result,thumbnail_url,thumbnail_alt,video_url,is_featured,status,seo_title,seo_description,revision) VALUES (${id},${input.title},${input.slug},${input.clientName || null},${input.year ?? null},${input.categoryId || null},${input.description || null},${input.challenge || null},${input.approach || null},${input.result || null},${input.thumbnailUrl || null},${thumbnailAlt},${input.videoUrl || null},${input.isFeatured ?? false},${input.status},${input.seoTitle || null},${input.seoDescription || null},1)`);
       for (const tool of input.tools) await tx.db.insert(sql`INSERT INTO project_tools(id,project_id,name) VALUES (${crypto.randomUUID()},${id},${tool})`);
-      await replaceRelatedProjects(tx, id, input.relatedProjectIds);
+      for (const [index, relatedProjectId] of input.relatedProjectIds.entries()) {
+        await tx.db.insert(sql`INSERT INTO project_related_projects(project_id,related_project_id,display_order) VALUES (${id},${relatedProjectId},${index})`);
+      }
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "thumbnail" }, thumbnail);
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "video" }, video);
       return id;
@@ -71,7 +66,10 @@ export async function updatePortfolioProject(id: string, expectedRevision: numbe
       }
       await tx.db.delete(sql`DELETE FROM project_tools WHERE project_id=${id}`);
       for (const tool of input.tools) await tx.db.insert(sql`INSERT INTO project_tools(id,project_id,name) VALUES (${crypto.randomUUID()},${id},${tool})`);
-      await replaceRelatedProjects(tx, id, input.relatedProjectIds);
+      await tx.db.delete(sql`DELETE FROM project_related_projects WHERE project_id=${id}`);
+      for (const [index, relatedProjectId] of input.relatedProjectIds.entries()) {
+        await tx.db.insert(sql`INSERT INTO project_related_projects(project_id,related_project_id,display_order) VALUES (${id},${relatedProjectId},${index})`);
+      }
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "thumbnail" }, thumbnail);
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "video" }, video);
       return updated.rows[0].revision;
