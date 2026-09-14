@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import { Play } from "lucide-react";
+import { ChevronDown, Play } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/Button";
 import motionStyles from "@/components/ui/DynamicMotion.module.css";
 import { resolveHeroImageUrl } from "@/lib/media/hero-image";
@@ -30,10 +33,34 @@ export function Hero({
 }) {
   const visualUrl = resolveHeroImageUrl(heroImageUrl);
   const optimizedVisual = canUseOptimizedImage(visualUrl);
+  const parallaxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const node = parallaxRef.current;
+    if (!node) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) return;
+
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const offset = Math.min(window.scrollY * 0.075, 54);
+      node.style.transform = `translate3d(0, ${offset}px, 0) scale(1.035)`;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
 
   return (
     <section className="relative isolate overflow-hidden border-b border-white/10 bg-[var(--background-primary)]">
-      <div className="absolute inset-0 -z-20 overflow-hidden bg-[var(--surface-primary)]" aria-hidden={heroImageAlt ? undefined : "true"}>
+      <div ref={parallaxRef} className="absolute inset-0 -z-20 origin-center overflow-hidden bg-[var(--surface-primary)] will-change-transform motion-reduce:!transform-none" aria-hidden={heroImageAlt ? undefined : "true"}>
         {optimizedVisual ? (
           <Image src={visualUrl} alt={heroImageAlt} fill priority sizes="100vw" className={`${motionStyles.heroVisual} object-cover object-[70%_center] sm:object-center lg:object-[60%_center]`} />
         ) : (
@@ -45,12 +72,12 @@ export function Hero({
       <div className={`${motionStyles.heroAmbient} pointer-events-none absolute -left-32 top-1/3 -z-10 h-80 w-80 rounded-full bg-[var(--accent-glow)] blur-[120px]`} aria-hidden />
       <div className="pointer-events-none absolute right-[7%] top-[14%] -z-10 h-64 w-64 rounded-full bg-[rgba(59,130,246,0.08)] blur-[110px]" aria-hidden />
 
-      <div className="mx-auto flex min-h-[570px] w-full max-w-[1560px] items-end px-5 pb-12 pt-24 sm:min-h-[640px] sm:px-8 sm:pb-16 sm:pt-28 md:min-h-[680px] lg:min-h-[720px] lg:items-center lg:px-12 lg:py-24 xl:min-h-[760px] 2xl:px-16">
-        <div className={`${motionStyles.heroContent} max-w-[760px] 2xl:max-w-[860px]`}>
+      <div className="mx-auto flex min-h-[610px] w-full max-w-[1560px] items-end px-5 pb-16 pt-24 sm:min-h-[680px] sm:px-8 sm:pb-20 sm:pt-28 md:min-h-[720px] lg:min-h-[790px] lg:items-center lg:px-12 lg:py-28 xl:min-h-[840px] 2xl:min-h-[880px] 2xl:px-16">
+        <div className={`${motionStyles.heroContent} max-w-[860px] 2xl:max-w-[980px]`}>
           {subheading && <p className="mb-5 flex items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--accent-text)] sm:mb-6 sm:text-xs lg:text-[0.8rem]"><span className="h-px w-9 bg-[var(--accent-primary)] sm:w-10" aria-hidden />{subheading}</p>}
-          {heading && <h1 className="max-w-[12ch] text-balance font-display text-[clamp(2.65rem,6.2vw,6rem)] font-semibold leading-[0.94] tracking-[-0.052em] text-[var(--text-primary)] 2xl:text-[6.5rem]">{heading}</h1>}
-          {description && <p className="mt-5 max-w-[34rem] text-pretty text-[0.98rem] leading-7 text-white/68 sm:mt-6 sm:text-lg sm:leading-8 2xl:max-w-[38rem]">{description}</p>}
-          <div className="mt-7 flex flex-col items-start gap-3 sm:mt-9 sm:flex-row">
+          {heading && <h1 className="max-w-[11ch] text-balance font-display text-[clamp(3.15rem,7.4vw,7.5rem)] font-semibold leading-[0.89] tracking-[-0.062em] text-[var(--text-primary)] 2xl:text-[8rem]">{heading}</h1>}
+          {description && <p className="mt-6 max-w-[36rem] text-pretty text-[0.98rem] leading-7 text-white/68 sm:mt-7 sm:text-lg sm:leading-8 2xl:max-w-[40rem]">{description}</p>}
+          <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10 sm:flex-row">
             <Button href={primaryUrl} variant="cine-solid" withArrow className="min-h-12 !rounded-md !bg-[var(--accent-primary)] !px-6 !py-3 !font-semibold !text-[var(--background-primary)] motion-safe:transition-all motion-safe:duration-300 hover:-translate-y-0.5 hover:!bg-[var(--accent-hover)] hover:shadow-[0_12px_36px_rgba(59,130,246,0.2)] sm:px-7">{primaryLabel}</Button>
             {hasShowreel && (
               <Button href={showreelUrl} variant="cine-outline" className="min-h-12 gap-2 !rounded-md !border-white/25 !px-6 !py-3 !text-[var(--text-primary)] motion-safe:transition-all motion-safe:duration-300 hover:-translate-y-0.5 hover:!border-[var(--accent-primary)] hover:!text-[var(--accent-hover)] sm:px-7">
@@ -58,9 +85,14 @@ export function Hero({
               </Button>
             )}
           </div>
-          <span className="mt-9 block h-px w-20 bg-[var(--public-accent-gradient)] sm:mt-11 sm:w-24" aria-hidden />
+          <span className="mt-10 block h-px w-20 bg-[var(--public-accent-gradient)] sm:mt-12 sm:w-24" aria-hidden />
         </div>
       </div>
+
+      <a href="#home-selected-work" aria-label="Scroll to selected work" className={`${motionStyles.scrollCue} absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-white/45 transition-colors hover:text-[var(--accent-hover)] md:flex`}>
+        <span>Scroll</span>
+        <ChevronDown size={17} aria-hidden="true" />
+      </a>
     </section>
   );
 }
