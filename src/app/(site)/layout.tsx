@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ContactPopup } from "@/components/contact/ContactPopup";
+import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import quality from "@/components/ui/SiteQuality.module.css";
 import { getSiteBranding, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
+import { personJsonLd } from "@/lib/structured-data";
 
 // CMS-driven content should reflect immediately after an admin edit, not
 // require a rebuild — render these pages per-request instead of at build time.
@@ -29,8 +32,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     getPageContent("contact"),
   ]);
   const global = globalPage.content;
+  const sameAs = [settings?.instagramUrl, settings?.twitterUrl, settings?.youtubeUrl, settings?.linkedinUrl, settings?.behanceUrl, settings?.vimeoUrl];
+
   return (
     <div className={`public-site ${quality.boundary}`}>
+      <JsonLd data={personJsonLd({ name: settings?.siteName ?? "Lucky Saroj", jobTitle: "Video Editor", sameAs })} />
       <a href="#site-main-content" className={quality.skipLink}>Skip to content</a>
       <ScrollProgress />
       <Header
@@ -45,6 +51,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <main id="site-main-content" tabIndex={-1} className={`flex-1 ${quality.main}`}>{children}</main>
       <Footer content={global} />
       <ContactPopup copy={global} optionsConfig={contactPage.content.contactOptionsConfig} />
+      {settings?.googleAnalyticsMeasurementId ? <GoogleAnalytics measurementId={settings.googleAnalyticsMeasurementId} /> : null}
     </div>
   );
 }
