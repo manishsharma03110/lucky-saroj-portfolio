@@ -32,7 +32,7 @@ export const projectSchema = z.object({
   seoTitle: z.string().trim().max(200).optional().or(z.literal("")),
   seoDescription: z.string().trim().max(300).optional().or(z.literal("")),
   tools: z.string().trim().max(500).optional().or(z.literal("")), // comma separated
-  relatedProjectIds: z.array(entityIdSchema).max(3, "Choose up to 3 related projects.").default([]),
+  relatedProjectIds: z.array(entityIdSchema).max(3, "Choose up to 3 related projects.").optional(),
 });
 
 export type ProjectInput = z.infer<typeof projectSchema>;
