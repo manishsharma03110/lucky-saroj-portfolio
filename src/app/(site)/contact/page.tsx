@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { ContactInfo } from "@/components/contact/ContactInfo";
 import { ContactFormShell } from "@/components/contact/page/ContactFormShell";
 import { ContactHero } from "@/components/contact/page/ContactHero";
@@ -28,6 +29,7 @@ export default async function ContactPage() {
 
   return (
     <PageMotionBoundary className="bg-[var(--background-primary)]">
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Contact" }]} />
       <ContactHero eyebrow={copy.heroEyebrow} titleBefore={copy.heroTitleBefore} titleAccent={copy.heroTitleAccent} titleAfter={copy.heroTitleAfter} description={copy.heroDescription} heroImageUrl={copy.heroImageUrl} heroImageAlt={copy.heroImageAlt} />
       <section className="bg-[var(--background-primary)] py-14 sm:py-16 lg:py-24" aria-labelledby="contact-details-heading">
         <div className="mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">

@@ -15,6 +15,10 @@ function validateTools(tools: readonly string[]): void {
     seen.add(tool);
   }
 }
+function validateRelatedProjects(ids: readonly string[], currentId?: string): void {
+  if (new Set(ids).size !== ids.length) throw new DuplicateContentError("Related projects must be unique.");
+  if (currentId && ids.includes(currentId)) throw new DuplicateContentError("A project cannot be related to itself.");
+}
 function isSlugConflict(error: unknown): boolean {
   const fields = postgresErrorFields(error);
   return fields.code === "23505" && fields.constraint === "portfolio_projects_slug_unique";
@@ -26,6 +30,8 @@ function resolvedThumbnailAlt(input: ProjectMutationInput): string {
 
 export async function createPortfolioProject(input: ProjectMutationInput): Promise<string> {
   validateTools(input.tools);
+  const relatedProjectIds = input.relatedProjectIds ?? [];
+  validateRelatedProjects(relatedProjectIds);
   try {
     return await withCmsTransaction(async (tx) => {
       const id = crypto.randomUUID();
@@ -34,6 +40,9 @@ export async function createPortfolioProject(input: ProjectMutationInput): Promi
       const thumbnailAlt = resolvedThumbnailAlt(input);
       await tx.db.insert(sql`INSERT INTO portfolio_projects(id,title,slug,client_name,year,category_id,description,challenge,approach,result,thumbnail_url,thumbnail_alt,video_url,is_featured,status,seo_title,seo_description,revision) VALUES (${id},${input.title},${input.slug},${input.clientName || null},${input.year ?? null},${input.categoryId || null},${input.description || null},${input.challenge || null},${input.approach || null},${input.result || null},${input.thumbnailUrl || null},${thumbnailAlt},${input.videoUrl || null},${input.isFeatured ?? false},${input.status},${input.seoTitle || null},${input.seoDescription || null},1)`);
       for (const tool of input.tools) await tx.db.insert(sql`INSERT INTO project_tools(id,project_id,name) VALUES (${crypto.randomUUID()},${id},${tool})`);
+      for (const [index, relatedProjectId] of relatedProjectIds.entries()) {
+        await tx.db.insert(sql`INSERT INTO project_related_projects(project_id,related_project_id,display_order) VALUES (${id},${relatedProjectId},${index})`);
+      }
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "thumbnail" }, thumbnail);
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "video" }, video);
       return id;
@@ -43,6 +52,8 @@ export async function createPortfolioProject(input: ProjectMutationInput): Promi
 
 export async function updatePortfolioProject(id: string, expectedRevision: number, input: ProjectMutationInput, testSynchronization?: MutationTestSynchronization): Promise<number> {
   validateTools(input.tools);
+  const relatedProjectIds = input.relatedProjectIds ?? [];
+  validateRelatedProjects(relatedProjectIds, id);
   try {
     return await withCmsTransaction(async (tx) => {
       const thumbnail = await prepareMediaSlot(tx, { assetId: input.thumbnailAssetId || null, url: input.thumbnailUrl || null, kind: "image" });
@@ -57,6 +68,10 @@ export async function updatePortfolioProject(id: string, expectedRevision: numbe
       }
       await tx.db.delete(sql`DELETE FROM project_tools WHERE project_id=${id}`);
       for (const tool of input.tools) await tx.db.insert(sql`INSERT INTO project_tools(id,project_id,name) VALUES (${crypto.randomUUID()},${id},${tool})`);
+      await tx.db.delete(sql`DELETE FROM project_related_projects WHERE project_id=${id}`);
+      for (const [index, relatedProjectId] of relatedProjectIds.entries()) {
+        await tx.db.insert(sql`INSERT INTO project_related_projects(project_id,related_project_id,display_order) VALUES (${id},${relatedProjectId},${index})`);
+      }
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "thumbnail" }, thumbnail);
       await synchronizeMediaSlot(tx, { entityType: "portfolio_project", entityId: id, slot: "video" }, video);
       return updated.rows[0].revision;

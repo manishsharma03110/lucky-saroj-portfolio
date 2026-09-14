@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { ExperienceCapabilities } from "@/components/experience/ExperienceCapabilities";
 import { ExperienceHero } from "@/components/experience/ExperienceHero";
 import { ExperienceList } from "@/components/experience/ExperienceList";
@@ -20,6 +21,7 @@ export default async function ExperiencePage() {
 
   return (
     <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Experience" }]} />
       <ExperienceHero experiences={experiences} eyebrow={copy.heroEyebrow} heading={copy.heroHeading} description={copy.heroDescription} heroImageUrl={copy.heroImageUrl} heroImageAlt={copy.heroImageAlt} currentRoleLabel={copy.currentRoleLabel} locationLabel={copy.locationLabel} entriesLabel={copy.entriesLabel} primaryLabel={copy.heroPrimaryLabel} primaryUrl={copy.heroPrimaryUrl} secondaryLabel={copy.heroSecondaryLabel} secondaryUrl={copy.heroSecondaryUrl} />
       <ExperienceList experiences={experiences} eyebrow={copy.listEyebrow} heading={copy.listHeading} description={copy.listDescription} emptyText={copy.listEmptyText} presentLabel={copy.presentLabel} currentBadgeLabel={copy.currentBadgeLabel} />
       <ExperienceCapabilities skills={skills} heading={copy.capabilitiesHeading} />

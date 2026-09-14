@@ -31,7 +31,7 @@ export async function EditingStyles({ content }: { content: HomePageContent }) {
               const Icon = (Icons[service.icon as keyof typeof Icons] as LucideIcon) ?? Clapperboard;
               const isLastOdd = index === services.length - 1 && services.length % 2 === 1;
               return (
-                <article key={service.id} className={`group relative overflow-hidden bg-[var(--background-secondary)] p-5 transition-colors duration-300 hover:bg-[var(--surface-elevated)] motion-reduce:transition-none sm:min-h-44 sm:p-6 lg:min-h-48 lg:p-7 ${isLastOdd ? "sm:col-span-2" : ""}`}>
+                <Link key={service.id} href={`/services#service-${service.id}`} className={`group relative overflow-hidden bg-[var(--background-secondary)] p-5 transition-colors duration-300 hover:bg-[var(--surface-elevated)] motion-reduce:transition-none sm:min-h-44 sm:p-6 lg:min-h-48 lg:p-7 ${isLastOdd ? "sm:col-span-2" : ""} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)]`}>
                   <span className="absolute inset-y-0 left-0 w-px origin-bottom scale-y-0 bg-[var(--accent-primary)] transition-transform duration-300 group-hover:scale-y-100 motion-reduce:transition-none" aria-hidden />
                   <div className="flex items-start justify-between gap-5">
                     <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/35 text-[var(--accent-primary)]">
@@ -41,7 +41,8 @@ export async function EditingStyles({ content }: { content: HomePageContent }) {
                   </div>
                   <h3 className="mt-5 text-xl font-medium tracking-[-0.03em] text-[var(--text-primary)] transition-colors group-hover:text-[var(--accent-hover)] sm:mt-6">{service.name}</h3>
                   {service.description && <p className="mt-3 max-w-sm text-sm leading-6 text-[var(--text-secondary)]">{service.description}</p>}
-                </article>
+                  <span className="mt-5 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent-primary)]">View service <ArrowUpRight size={14} aria-hidden /></span>
+                </Link>
               );
             })}
           </div>

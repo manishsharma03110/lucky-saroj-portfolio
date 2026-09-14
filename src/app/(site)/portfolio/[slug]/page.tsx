@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { CaseStudy, ProjectOverview, ProjectTools } from "@/components/portfolio/detail/CaseStudy";
 import { ProjectCTA } from "@/components/portfolio/detail/ProjectCTA";
 import { ProjectHero } from "@/components/portfolio/detail/ProjectHero";
 import { ProjectGallery, ProjectMedia } from "@/components/portfolio/detail/ProjectMedia";
 import { ProjectNavigation } from "@/components/portfolio/detail/ProjectNavigation";
+import { RelatedProjects } from "@/components/portfolio/detail/RelatedProjects";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { PageMotionBoundary } from "@/components/ui/PageMotionBoundary";
-import { getAdjacentProjects, getProjectBySlug, getSiteSettings } from "@/lib/db/queries";
+import { getAdjacentProjects, getProjectBySlug, getRelatedProjects, getSiteSettings } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 import { createPageMetadata } from "@/lib/seo";
 import { projectCreativeWorkJsonLd } from "@/lib/structured-data";
@@ -29,7 +31,10 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   if (!data || data.project.status !== "published") notFound();
 
   const { project, category, tools, media } = data;
-  const { prev, next } = await getAdjacentProjects(slug);
+  const [{ prev, next }, relatedProjects] = await Promise.all([
+    getAdjacentProjects(slug),
+    getRelatedProjects(project.id, project.categoryId, 3),
+  ]);
   const copy = portfolioPage.content;
   const detailCopy = { overviewEyebrow: copy.detailOverviewEyebrow, clientLabel: copy.detailClientLabel, categoryLabel: copy.detailCategoryLabel, yearLabel: copy.detailYearLabel, caseStudyEyebrow: copy.detailCaseStudyEyebrow, challengeLabel: copy.detailChallengeLabel, approachLabel: copy.detailApproachLabel, resultLabel: copy.detailResultLabel, toolsEyebrow: copy.detailToolsEyebrow, toolsHeading: copy.detailToolsHeading, toolsAriaLabel: copy.detailToolsAriaLabel };
   const mediaCopy = { selectedProjectLabel: copy.detailSelectedProjectLabel, mediaEyebrow: copy.detailMediaEyebrow, mediaHeading: copy.detailMediaHeading, previewAltSuffix: copy.detailPreviewAltSuffix, mediaAltSuffix: copy.detailMediaAltSuffix };
@@ -37,12 +42,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   return (
     <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
       <JsonLd data={projectCreativeWorkJsonLd({ title: project.title, slug: project.slug, description: project.seoDescription ?? project.description, thumbnailUrl: project.thumbnailUrl ?? project.posterUrl, videoUrl: project.videoUrl, createdAt: project.createdAt, updatedAt: project.updatedAt, clientName: project.clientName })} />
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Portfolio", href: "/portfolio" }, { label: project.title }]} />
       <ProjectHero project={project} categoryName={category?.name} />
       <ProjectMedia project={project} categoryName={category?.name} media={media} copy={mediaCopy} />
       <ProjectOverview project={project} categoryName={category?.name} copy={detailCopy} />
       <CaseStudy project={project} copy={detailCopy} />
       <ProjectGallery project={project} media={media} copy={mediaCopy} />
       <ProjectTools tools={tools} copy={detailCopy} />
+      <RelatedProjects projects={relatedProjects} />
       <ProjectNavigation previous={prev} next={next} ariaLabel={copy.detailNavigationAriaLabel} previousLabel={copy.detailPreviousLabel} nextLabel={copy.detailNextLabel} />
       <ProjectCTA eyebrow={copy.detailCtaEyebrow} heading={copy.detailCtaHeading} description={copy.detailCtaDescription} primaryLabel={copy.detailCtaPrimaryLabel} primaryUrl={copy.detailCtaPrimaryUrl} secondaryLabel={copy.detailCtaSecondaryLabel} secondaryUrl={copy.detailCtaSecondaryUrl} />
     </PageMotionBoundary>

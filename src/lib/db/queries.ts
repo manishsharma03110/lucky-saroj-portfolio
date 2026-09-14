@@ -78,6 +78,29 @@ export async function getPublishedProjects(opts?: { featuredOnly?: boolean; cate
   return filtered;
 }
 
+export async function getRelatedProjects(projectId: string, categoryId: string | null, limit = 3) {
+  const published = await getPublishedProjects();
+  const byId = new Map(published.map((entry) => [entry.project.id, entry]));
+  const manualRows = await db.execute<{ relatedProjectId: string }>(sql`
+    SELECT related_project_id AS "relatedProjectId"
+    FROM project_related_projects
+    WHERE project_id=${projectId}
+    ORDER BY display_order
+  `);
+
+  const manual = manualRows.rows
+    .map((row) => byId.get(row.relatedProjectId))
+    .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
+    .slice(0, limit);
+  if (manual.length > 0) return manual;
+
+  const sameCategory = categoryId
+    ? published.filter((entry) => entry.project.id !== projectId && entry.project.categoryId === categoryId)
+    : [];
+  const fallback = published.filter((entry) => entry.project.id !== projectId && !sameCategory.some((candidate) => candidate.project.id === entry.project.id));
+  return [...sameCategory, ...fallback].slice(0, limit);
+}
+
 export async function getProjectBySlug(slug: string) {
   const projectRows = await db
     .select()

@@ -6,7 +6,7 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 type CursorLabel = null | "watch" | "play";
 
 const CursorContext = createContext<{ setLabel: (label: CursorLabel) => void } | null>(null);
-const CURSOR_MEDIA_QUERY = "(min-width: 1024px) and (hover: hover) and (pointer: fine)";
+const CURSOR_MEDIA_QUERY = "(min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 
 function subscribeToCursorMediaQuery(onStoreChange: () => void) {
   const mediaQuery = window.matchMedia(CURSOR_MEDIA_QUERY);
@@ -22,13 +22,6 @@ function getServerCursorMediaQuerySnapshot() {
   return false;
 }
 
-/**
- * Wrap a page (or section) in this to enable the custom cursor. Automatically
- * disables itself on touch/mobile viewports (matchMedia check below), so it
- * never has to be conditionally rendered by the caller. Not mounted anywhere
- * in the app yet — this is foundation only, ready for the Home/Portfolio
- * redesign to opt into.
- */
 export function CustomCursorProvider({ children }: { children: ReactNode }) {
   const [label, setLabel] = useState<CursorLabel>(null);
   const enabled = useSyncExternalStore(
@@ -45,7 +38,9 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!enabled) return;
 
+    const previousCursor = document.body.style.cursor;
     document.body.classList.add("cine-cursor-active");
+    document.body.style.cursor = "none";
     bodyClassAdded.current = true;
 
     const handleMove = (e: PointerEvent) => {
@@ -56,9 +51,8 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
 
     return () => {
       window.removeEventListener("pointermove", handleMove);
-      if (bodyClassAdded.current) {
-        document.body.classList.remove("cine-cursor-active");
-      }
+      document.body.style.cursor = previousCursor;
+      if (bodyClassAdded.current) document.body.classList.remove("cine-cursor-active");
     };
   }, [enabled, x, y]);
 
@@ -80,11 +74,7 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center justify-center rounded-full"
           >
-            {label && (
-              <span className="cine-eyebrow !text-[0.6rem] !text-[var(--background-primary)]">
-                {label.toUpperCase()}
-              </span>
-            )}
+            {label && <span className="cine-eyebrow !text-[0.6rem] !text-[var(--background-primary)]">{label.toUpperCase()}</span>}
           </motion.div>
         </motion.div>
       )}
@@ -92,19 +82,9 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Attach to any hoverable element (a portfolio card, a video thumbnail) to
- * switch the cursor label while hovering over it.
- *
- * Usage: `<div {...useCursorLabel("watch")}>...</div>`
- */
 export function useCursorLabel(label: Exclude<CursorLabel, null>) {
   const ctx = useContext(CursorContext);
-  if (!ctx) {
-    // Provider not mounted (e.g. page not yet opted into the cinematic
-    // cursor) — return no-op handlers so this hook is always safe to call.
-    return { onPointerEnter: undefined, onPointerLeave: undefined };
-  }
+  if (!ctx) return { onPointerEnter: undefined, onPointerLeave: undefined };
   return {
     onPointerEnter: () => ctx.setLabel(label),
     onPointerLeave: () => ctx.setLabel(null),

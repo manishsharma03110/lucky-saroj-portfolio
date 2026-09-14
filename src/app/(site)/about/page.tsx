@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { AboutHero } from "@/components/about/AboutHero";
 import { AboutStats } from "@/components/about/AboutStats";
 import { Skills } from "@/components/about/Skills";
@@ -23,6 +24,7 @@ export default async function AboutPage() {
 
   return (
     <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
+      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "About" }]} />
       <AboutHero name={profile?.name ?? ""} headline={profile?.headline} biography={profile?.biography} profileImageUrl={profile?.profileImageUrl} location={settings?.location} availability={settings?.availability} eyebrow={copy.heroEyebrow} primaryLabel={copy.heroPrimaryLabel} primaryUrl={copy.heroPrimaryUrl} secondaryLabel={copy.heroSecondaryLabel} secondaryUrl={copy.heroSecondaryUrl} />
       <AboutStats years={profile?.yearsExperience ?? 0} projects={profile?.projectsCompleted ?? 0} clients={profile?.clientCount ?? 0} views={profile?.viewsGenerated ?? "0"} yearsLabel={copy.statsYearsLabel} projectsLabel={copy.statsProjectsLabel} clientsLabel={copy.statsClientsLabel} viewsLabel={copy.statsViewsLabel} />
       <Skills biography={profile?.biography} skills={skills} tools={tools} storyEyebrow={copy.storyEyebrow} storyHeading={copy.storyHeading} skillsLabel={copy.skillsLabel} toolsLabel={copy.toolsLabel} />

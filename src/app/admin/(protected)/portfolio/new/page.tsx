@@ -15,17 +15,20 @@ export default async function NewProjectPage() {
     throw error;
   });
 
-  const categories = await db.select().from(schema.portfolioCategories).orderBy(schema.portfolioCategories.displayOrder);
+  const [categories, availableProjects] = await Promise.all([
+    db.select().from(schema.portfolioCategories).orderBy(schema.portfolioCategories.displayOrder),
+    db.select({ id: schema.portfolioProjects.id, title: schema.portfolioProjects.title, status: schema.portfolioProjects.status }).from(schema.portfolioProjects).orderBy(schema.portfolioProjects.title),
+  ]);
 
   return (
     <div>
       <AdminPageHeader
         eyebrow="Portfolio"
         title="Add New Project"
-        description="Create a new portfolio project with media, project details, and SEO metadata."
+        description="Create a new portfolio project with media, project details, internal links, and SEO metadata."
       />
       <div className={styles.singleColumn}>
-        <ProjectForm categories={categories} />
+        <ProjectForm categories={categories} availableProjects={availableProjects} />
       </div>
     </div>
   );

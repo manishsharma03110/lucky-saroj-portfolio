@@ -15,6 +15,7 @@ import styles from "@/components/admin/AdminEditorial.module.css";
 type Project = typeof schema.portfolioProjects.$inferSelect;
 type ProjectTool = typeof schema.projectTools.$inferSelect;
 type Category = typeof schema.portfolioCategories.$inferSelect;
+type ProjectOption = Pick<Project, "id" | "title" | "status">;
 
 const initialState: ActionState = { status: "idle" };
 
@@ -27,11 +28,13 @@ function slugify(input: string) {
     .replace(/-+/g, "-");
 }
 
-export function ProjectForm({ project, tools, categories, mediaAssetIds }: {
+export function ProjectForm({ project, tools, categories, mediaAssetIds, availableProjects = [], relatedProjectIds = [] }: {
   project?: Project;
   tools?: ProjectTool[];
   categories: Category[];
   mediaAssetIds?: Partial<Record<"thumbnail" | "video", string>>;
+  availableProjects?: ProjectOption[];
+  relatedProjectIds?: string[];
 }) {
   const router = useRouter();
   const action = project ? updateProject.bind(null, project.id) : createProject;
@@ -114,6 +117,25 @@ export function ProjectForm({ project, tools, categories, mediaAssetIds }: {
         <div>
           <Label htmlFor="result">The Result</Label>
           <Textarea id="result" name="result" rows={2} defaultValue={project?.result ?? ""} />
+        </div>
+      </FormCard>
+
+      <FormCard title="Internal Linking">
+        <div>
+          <Label htmlFor="relatedProjectIds">Related Project IDs (manual override)</Label>
+          <select
+            id="relatedProjectIds"
+            name="relatedProjectIds"
+            multiple
+            defaultValue={relatedProjectIds}
+            className="min-h-36 w-full rounded-lg border border-[var(--color-line)] bg-white px-4 py-3 text-sm focus:border-[var(--color-accent)] focus:outline-none"
+          >
+            {availableProjects.map((item) => (
+              <option key={item.id} value={item.id}>{item.title}{item.status === "draft" ? " (Draft)" : ""}</option>
+            ))}
+          </select>
+          <p className={styles.helper}>Optional. Choose up to 3 projects. If none are selected, the public site automatically chooses projects from the same category, then falls back to other published work.</p>
+          <FieldError message={state.fieldErrors?.relatedProjectIds} />
         </div>
       </FormCard>
 
