@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { Quote } from "lucide-react";
 import { Breadcrumb } from "@/components/navigation/Breadcrumb";
 import { PageMotionBoundary } from "@/components/ui/PageMotionBoundary";
@@ -38,7 +37,7 @@ export default async function TestimonialsPage() {
                 <Quote size={28} strokeWidth={1.25} className="text-[var(--accent-primary)]" aria-hidden />
                 <blockquote className="mt-6 max-w-[42ch] text-xl font-medium leading-[1.55] tracking-[-0.025em] text-[var(--text-primary)] sm:text-2xl">&ldquo;{testimonial.testimonialText}&rdquo;</blockquote>
                 <div className="mt-8 flex items-center gap-4 border-t border-white/10 pt-5">
-                  {testimonial.profileImageUrl && <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-white/10"><Image src={testimonial.profileImageUrl} alt={`${testimonial.clientName} profile`} fill sizes="44px" className="object-cover" /></span>}
+                  {testimonial.profileImageUrl && <span className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-white/10 bg-[var(--surface-elevated)]">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={testimonial.profileImageUrl} alt={`${testimonial.clientName} profile`} className="h-full w-full object-cover" /></span>}
                   <div><p className="font-semibold text-[var(--text-primary)]">{testimonial.clientName}</p><p className="mt-1 text-sm text-[var(--text-muted)]">{[testimonial.designation, testimonial.company].filter(Boolean).join(" · ")}</p></div>
                 </div>
               </article>
