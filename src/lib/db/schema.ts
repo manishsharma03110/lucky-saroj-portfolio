@@ -263,11 +263,13 @@ export const siteSettings = pgTable("site_settings", {
   seoDescription: text("seo_description"),
   ogImageUrl: text("og_image_url"),
   googleAnalyticsMeasurementId: text("google_analytics_measurement_id"),
+  googleSiteVerification: text("google_site_verification"),
   revision: integer("revision").notNull().default(1),
 }, (table) => [
   check("site_settings_singleton_id", sql`${table.id} = 'singleton:settings'`),
   check("site_settings_revision_positive", sql`${table.revision} >= 1`),
   check("site_settings_ga_measurement_id_format", sql`${table.googleAnalyticsMeasurementId} IS NULL OR ${table.googleAnalyticsMeasurementId} = '' OR ${table.googleAnalyticsMeasurementId} ~ '^G-[A-Z0-9]+$'`),
+  check("site_settings_google_site_verification_bounded", sql`${table.googleSiteVerification} IS NULL OR char_length(${table.googleSiteVerification}) <= 512`),
 ]);
 
 export const homePageContent = pgTable("home_page_content", {
