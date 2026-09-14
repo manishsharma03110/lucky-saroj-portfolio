@@ -68,9 +68,16 @@ export function Header({
 
   return (
     <header className={cn("sticky top-0 z-50 text-white", motionStyles.glassHeader, scrolled && motionStyles.glassHeaderScrolled)}>
-      <Container className="flex h-16 max-w-[1560px] items-center justify-between px-5 sm:h-[4.5rem] sm:px-8 lg:h-20 lg:px-12">
+      <Container className={cn(
+        "flex max-w-[1560px] items-center justify-between px-5 transition-[height,padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:px-8 lg:px-12",
+        scrolled ? "h-14 sm:h-16 lg:h-[4.25rem]" : "h-16 sm:h-[4.5rem] lg:h-20"
+      )}>
         <Link href="/" className={cn("flex min-h-11 items-center gap-3", motionStyles.logoLink)}>
-          <span className={cn("flex h-9 w-9 items-center justify-center overflow-hidden rounded-md border border-white/20 font-display text-sm font-bold", motionStyles.logoMark)}>
+          <span className={cn(
+            "flex items-center justify-center overflow-hidden rounded-md border border-white/20 font-display text-sm font-bold transition-[width,height] duration-300",
+            scrolled ? "h-8 w-8" : "h-9 w-9",
+            motionStyles.logoMark
+          )}>
             {logoImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoImageUrl} alt={`${siteName} logo`} className="h-full w-full object-contain" />
@@ -80,7 +87,7 @@ export function Header({
           </span>
           <span className="hidden flex-col leading-none sm:flex">
             <span className="font-display text-sm font-semibold uppercase tracking-wide">{siteName}</span>
-            <span className="timecode !text-white/50">{roleLabel}</span>
+            <span className={cn("timecode !text-white/50 transition-opacity duration-300", scrolled && "lg:opacity-0")}>{roleLabel}</span>
           </span>
         </Link>
 
@@ -105,7 +112,7 @@ export function Header({
         </nav>
 
         <div className="hidden lg:block">
-          <Button href={ctaUrl} className="!px-5 !py-2.5 motion-safe:transition-transform motion-safe:duration-300 hover:-translate-y-0.5">{ctaLabel}</Button>
+          <Button href={ctaUrl} withArrow className="!px-5 !py-2.5 motion-safe:transition-transform motion-safe:duration-300 hover:-translate-y-0.5">{ctaLabel}</Button>
         </div>
 
         <button
