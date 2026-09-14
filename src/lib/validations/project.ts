@@ -24,6 +24,7 @@ export const projectSchema = z.object({
   result: z.string().trim().max(2000).optional().or(z.literal("")),
   thumbnailUrl: optionalMediaReference,
   thumbnailAssetId: optionalAssetId,
+  thumbnailAlt: z.string().trim().max(300).optional().or(z.literal("")),
   videoUrl: optionalMediaReference,
   videoAssetId: optionalAssetId,
   isFeatured: formDataCheckboxSchema,
