@@ -41,6 +41,7 @@ function parseProjectForm(formData: FormData) {
     seoTitle: formData.get("seoTitle") ?? "",
     seoDescription: formData.get("seoDescription") ?? "",
     tools: formData.get("tools") ?? "",
+    relatedProjectIds: formData.getAll("relatedProjectIds").map(String),
   });
 }
 
@@ -65,7 +66,7 @@ export async function createProject(_prev: ActionState, formData: FormData): Pro
     resource: "portfolio_project",
     resourceId: data.slug,
     summary: `Created portfolio project “${data.title}”`,
-    metadata: { status: data.status, featured: data.isFeatured },
+    metadata: { status: data.status, featured: data.isFeatured, relatedProjectCount: data.relatedProjectIds.length },
   });
   revalidatePath("/admin/portfolio");
   revalidatePath("/admin/activity");
@@ -86,6 +87,9 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
   }
   const data = parsed.data;
   if (!revision.success) return { status: "error", message: "Invalid content revision. Reload before saving." };
+  if (data.relatedProjectIds.includes(parsedId.data)) {
+    return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { relatedProjectIds: "A project cannot be related to itself." } };
+  }
   const tools = (data.tools ?? "").split(",").map((t) => t.trim()).filter(Boolean);
   try { await updatePortfolioProject(parsedId.data, revision.data, { ...data, tools }); }
   catch (error) {
@@ -101,7 +105,7 @@ export async function updateProject(id: string, _prev: ActionState, formData: Fo
     resource: "portfolio_project",
     resourceId: parsedId.data,
     summary: `Updated portfolio project “${data.title}”`,
-    metadata: { status: data.status, featured: data.isFeatured, previousRevision: revision.data },
+    metadata: { status: data.status, featured: data.isFeatured, previousRevision: revision.data, relatedProjectCount: data.relatedProjectIds.length },
   });
   revalidatePath("/admin/portfolio");
   revalidatePath("/admin/activity");
