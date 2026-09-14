@@ -25,6 +25,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       };
     });
 
+  const supplementalEntries: MetadataRoute.Sitemap = [{
+    url: absoluteSiteUrl("/testimonials"),
+    changeFrequency: "monthly",
+    priority: 0.6,
+  }];
+
   const projectEntries: MetadataRoute.Sitemap = projects.map(({ project }) => ({
     url: absoluteSiteUrl(`/portfolio/${project.slug}`),
     lastModified: project.updatedAt,
@@ -32,5 +38,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticEntries, ...projectEntries];
+  return [...staticEntries, ...supplementalEntries, ...projectEntries];
 }
