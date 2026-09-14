@@ -60,7 +60,7 @@ export async function AboutPreview({ content }: { content: HomePageContent }) {
               ))}
             </dl>
           )}
-          <Link href={content.aboutCtaUrl} className={`${motionStyles.textLink} mt-10 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)]`}>{content.aboutCtaLabel}<ArrowUpRight size={17} className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden /></Link>
+          <Link href={content.aboutCtaUrl} className={`${motionStyles.textLink} group mt-10 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)]`}>{content.aboutCtaLabel}<ArrowUpRight size={17} className="transition-transform duration-300 group-hover:translate-x-1" aria-hidden /></Link>
         </div>
       </div>
     </section>
