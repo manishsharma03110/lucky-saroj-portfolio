@@ -37,6 +37,10 @@
 .heroContent > :nth-child(4) { animation-delay: 350ms; }
 .heroContent > :nth-child(5) { animation-delay: 440ms; }
 
+.scrollCue {
+  animation: scrollCue 1.8s ease-in-out infinite;
+}
+
 .glassHeader {
   background: rgba(8, 9, 11, 0.72);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -102,12 +106,18 @@
   to { opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
 }
 
+@keyframes scrollCue {
+  0%, 100% { transform: translate3d(-50%, 0, 0); opacity: 0.46; }
+  50% { transform: translate3d(-50%, 7px, 0); opacity: 0.82; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .revealVisible,
   .heroVisual,
   .heroAmbient,
-  .heroContent > * {
+  .heroContent > *,
+  .scrollCue {
     opacity: 1;
     transform: none;
     filter: none;
