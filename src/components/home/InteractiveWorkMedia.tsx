@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Play } from "lucide-react";
+import { ArrowUpRight, Play } from "lucide-react";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 
 type InteractiveWorkMediaProps = {
@@ -64,9 +64,8 @@ export function InteractiveWorkMedia({
       return;
     }
 
-    if (video.src !== previewVideoUrl) video.src = previewVideoUrl;
-    const play = video.play();
-    play?.catch(() => undefined);
+    if (video.getAttribute("src") !== previewVideoUrl) video.src = previewVideoUrl;
+    video.play().catch(() => undefined);
   }, [previewActive, previewVideoUrl, reducedMotion]);
 
   const resetTilt = () => {
@@ -179,6 +178,10 @@ export function InteractiveWorkMedia({
             <Play size={16} fill="currentColor" />
           </span>
         )}
+      </div>
+      <div className="absolute inset-x-5 bottom-5 flex items-end justify-between gap-4 sm:inset-x-7 sm:bottom-7">
+        <span className="text-sm font-medium text-white">View project</span>
+        <ArrowUpRight size={20} className="text-[var(--accent-hover)] transition-transform duration-300 motion-reduce:transition-none group-hover/media:-translate-y-0.5 group-hover/media:translate-x-0.5" aria-hidden="true" />
       </div>
     </div>
   );
