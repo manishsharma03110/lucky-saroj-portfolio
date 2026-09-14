@@ -4,6 +4,9 @@ import { Footer } from "@/components/layout/Footer";
 import { ContactPopup } from "@/components/contact/ContactPopup";
 import { GoogleAnalytics } from "@/components/seo/GoogleAnalytics";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { CustomCursorProvider } from "@/components/ui/CustomCursor";
+import { MotionReveal } from "@/components/ui/MotionReveal";
+import { RouteTransition } from "@/components/ui/RouteTransition";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import quality from "@/components/ui/SiteQuality.module.css";
 import { getSiteBranding, getSiteSettings } from "@/lib/db/queries";
@@ -35,23 +38,27 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const sameAs = [settings?.instagramUrl, settings?.twitterUrl, settings?.youtubeUrl, settings?.linkedinUrl, settings?.behanceUrl, settings?.vimeoUrl];
 
   return (
-    <div className={`public-site ${quality.boundary}`}>
-      <JsonLd data={personJsonLd({ name: settings?.siteName ?? "Lucky Saroj", jobTitle: "Video Editor", sameAs })} />
-      <a href="#site-main-content" className={quality.skipLink}>Skip to content</a>
-      <ScrollProgress />
-      <Header
-        logoText={settings?.logoText}
-        logoImageUrl={branding?.logoImageUrl}
-        siteName={settings?.siteName}
-        roleLabel={global.headerRoleLabel}
-        ctaLabel={global.headerCtaLabel}
-        ctaUrl={global.headerCtaUrl}
-        navLabels={{ home: global.navHomeLabel, about: global.navAboutLabel, portfolio: global.navPortfolioLabel, services: global.navServicesLabel, experience: global.navExperienceLabel, contact: global.navContactLabel }}
-      />
-      <main id="site-main-content" tabIndex={-1} className={`flex-1 ${quality.main}`}>{children}</main>
-      <Footer content={global} />
-      <ContactPopup copy={global} optionsConfig={contactPage.content.contactOptionsConfig} />
-      {settings?.googleAnalyticsMeasurementId ? <GoogleAnalytics measurementId={settings.googleAnalyticsMeasurementId} /> : null}
-    </div>
+    <CustomCursorProvider>
+      <div className={`public-site ${quality.boundary}`}>
+        <JsonLd data={personJsonLd({ name: settings?.siteName ?? "Lucky Saroj", jobTitle: "Video Editor", sameAs })} />
+        <a href="#site-main-content" className={quality.skipLink}>Skip to content</a>
+        <ScrollProgress />
+        <Header
+          logoText={settings?.logoText}
+          logoImageUrl={branding?.logoImageUrl}
+          siteName={settings?.siteName}
+          roleLabel={global.headerRoleLabel}
+          ctaLabel={global.headerCtaLabel}
+          ctaUrl={global.headerCtaUrl}
+          navLabels={{ home: global.navHomeLabel, about: global.navAboutLabel, portfolio: global.navPortfolioLabel, services: global.navServicesLabel, experience: global.navExperienceLabel, contact: global.navContactLabel }}
+        />
+        <main id="site-main-content" tabIndex={-1} className={`flex-1 ${quality.main}`}>
+          <RouteTransition>{children}</RouteTransition>
+        </main>
+        <MotionReveal><Footer content={global} /></MotionReveal>
+        <ContactPopup copy={global} optionsConfig={contactPage.content.contactOptionsConfig} />
+        {settings?.googleAnalyticsMeasurementId ? <GoogleAnalytics measurementId={settings.googleAnalyticsMeasurementId} /> : null}
+      </div>
+    </CustomCursorProvider>
   );
 }
