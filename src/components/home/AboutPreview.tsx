@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { CountUpStat } from "@/components/home/CountUpStat";
 import { getAboutProfile } from "@/lib/db/queries";
 import type { HomePageContent } from "@/lib/db/home-content-service";
 
@@ -7,26 +8,29 @@ function formatNumber(value: number) {
   return new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(value);
 }
 
-function formatStoredMetric(value: string) {
-  const numeric = Number(value.replace(/,/g, ""));
-  return Number.isFinite(numeric) ? formatNumber(numeric) : value;
+function parseStoredMetric(value: string) {
+  const normalized = value.replace(/,/g, "").trim();
+  if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+  const numeric = Number(normalized);
+  return Number.isFinite(numeric) ? numeric : null;
 }
 
 export async function AboutPreview({ content }: { content: HomePageContent }) {
   const profile = await getAboutProfile();
   if (!profile) return null;
 
+  const storedViews = profile.viewsGenerated !== "0" ? parseStoredMetric(profile.viewsGenerated) : null;
   const stats = [
-    { value: profile.yearsExperience > 0 ? formatNumber(profile.yearsExperience) : null, label: content.aboutStatYearsLabel },
-    { value: profile.projectsCompleted > 0 ? formatNumber(profile.projectsCompleted) : null, label: content.aboutStatProjectsLabel },
-    { value: profile.clientCount > 0 ? formatNumber(profile.clientCount) : null, label: content.aboutStatClientsLabel },
-    { value: profile.viewsGenerated !== "0" ? formatStoredMetric(profile.viewsGenerated) : null, label: content.aboutStatViewsLabel },
-  ].filter((stat): stat is { value: string; label: string } => Boolean(stat.value));
+    profile.yearsExperience > 0 ? { target: profile.yearsExperience, fallback: formatNumber(profile.yearsExperience), label: content.aboutStatYearsLabel } : null,
+    profile.projectsCompleted > 0 ? { target: profile.projectsCompleted, fallback: formatNumber(profile.projectsCompleted), label: content.aboutStatProjectsLabel } : null,
+    profile.clientCount > 0 ? { target: profile.clientCount, fallback: formatNumber(profile.clientCount), label: content.aboutStatClientsLabel } : null,
+    profile.viewsGenerated !== "0" ? { target: storedViews, fallback: storedViews != null ? formatNumber(storedViews) : profile.viewsGenerated, label: content.aboutStatViewsLabel } : null,
+  ].filter((stat): stat is { target: number | null; fallback: string; label: string } => stat !== null);
 
   return (
     <section className="overflow-hidden border-y border-white/10 bg-[var(--surface-primary)] py-16 md:py-20 lg:py-24 2xl:py-28">
       <div className="mx-auto grid w-full max-w-[1480px] items-center gap-9 px-5 sm:px-8 md:gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-16 lg:px-12 2xl:gap-24 2xl:px-16">
-        <div className="relative mx-auto aspect-[4/5] w-full max-w-[470px] overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-elevated)] lg:mx-0">
+        <div className="relative mx-auto aspect-[4/5] w-full max-w-[470px] overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-elevated)] transition-transform duration-300 motion-safe:hover:-translate-y-1 lg:mx-0">
           {profile.profileImageUrl ? (
             <div className="h-full w-full bg-cover bg-center grayscale-[15%]" style={{ backgroundImage: `url('${profile.profileImageUrl}')` }} role="img" aria-label={content.aboutProfileImageAlt || profile.name} />
           ) : (
@@ -48,8 +52,8 @@ export async function AboutPreview({ content }: { content: HomePageContent }) {
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{content.aboutEyebrow}</p>
           <h2 className="mt-5 max-w-2xl text-[2.25rem] font-semibold leading-[1] tracking-[-0.045em] text-[var(--text-primary)] sm:text-4xl lg:text-5xl">{profile.headline ?? profile.name}</h2>
           {profile.biography && <p className="mt-6 max-w-[620px] text-base leading-7 text-white/58 sm:text-[1.0625rem]">{profile.biography}</p>}
-          {stats.length > 0 && <dl className="mt-8 grid grid-cols-2 border-y border-white/12 sm:grid-cols-4">{stats.map((stat) => <div key={stat.label} className="border-white/10 py-4 odd:border-r sm:border-r sm:px-5 sm:py-5 sm:first:pl-0 sm:last:border-r-0"><dd className="text-[1.75rem] font-semibold tracking-[-0.04em] text-[var(--accent-primary)] lg:text-3xl">{stat.value}</dd><dt className="mt-1 text-[0.7rem] uppercase tracking-[0.16em] text-[var(--text-secondary)]">{stat.label}</dt></div>)}</dl>}
-          <Link href={content.aboutCtaUrl} className="mt-9 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)]">{content.aboutCtaLabel}<ArrowUpRight size={17} aria-hidden /></Link>
+          {stats.length > 0 && <dl className="mt-8 grid grid-cols-2 border-y border-white/12 sm:grid-cols-4">{stats.map((stat) => <CountUpStat key={stat.label} target={stat.target} fallback={stat.fallback} label={stat.label} />)}</dl>}
+          <Link href={content.aboutCtaUrl} className="group relative mt-9 inline-flex items-center gap-2 pb-1 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)] after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent-primary)] after:transition-transform after:duration-300 hover:after:scale-x-100"><span>{content.aboutCtaLabel}</span><ArrowUpRight size={17} className="transition-transform duration-300 motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden /></Link>
         </div>
       </div>
     </section>

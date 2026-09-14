@@ -11,8 +11,6 @@ const variantClasses: Record<Variant, string> = {
   secondary:
     "bg-transparent text-[var(--color-ink)] border border-[var(--color-ink)]/20 hover:border-[var(--color-ink)]/50",
   ghost: "bg-transparent text-[var(--color-ink)] hover:text-[var(--color-accent)]",
-  // Cinematic-system variants — additive, not used by any existing page yet.
-  // Intended for dark (--cine-void) surfaces in the upcoming redesign.
   "cine-outline":
     "bg-transparent text-[var(--cine-text-primary)] border border-[var(--cine-border-strong)] hover:border-[var(--cine-accent)] hover:text-[var(--cine-accent)]",
   "cine-solid":
@@ -20,7 +18,7 @@ const variantClasses: Record<Variant, string> = {
 };
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-colors duration-200 disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-[color,background-color,border-color,box-shadow,transform] duration-200 motion-safe:hover:-translate-y-0.5 motion-reduce:transform-none disabled:pointer-events-none disabled:opacity-50";
 
 export function Button({
   children,
@@ -34,8 +32,6 @@ export function Button({
   variant?: Variant;
   className?: string;
   href?: string;
-  /** Adds a trailing arrow that nudges right on hover — opt-in, off by
-   * default so no existing button call site is affected. */
   withArrow?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   const classes = cn(base, variantClasses[variant], withArrow && "group", className);
@@ -44,7 +40,8 @@ export function Button({
       {children}
       <ArrowRight
         size={16}
-        className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-x-1"
+        className="transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-safe:group-hover:translate-x-1"
+        aria-hidden="true"
       />
     </>
   ) : (
