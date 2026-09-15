@@ -11,22 +11,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**.blob.vercel-storage.com",
-        pathname: "/**",
-      },
-    ],
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [{ protocol: "https", hostname: "**.blob.vercel-storage.com", pathname: "/**" }],
   },
-  async headers() {
-    return [
-      {
-        source: "/:path*",
-        headers: securityHeaders,
-      },
-    ];
-  },
+  async headers() { return [{ source: "/:path*", headers: securityHeaders }]; },
 };
 
 export default nextConfig;
