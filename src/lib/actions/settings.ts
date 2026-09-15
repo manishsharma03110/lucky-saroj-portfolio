@@ -28,6 +28,6 @@ export async function updateSettings(_prev: ActionState, formData: FormData): Pr
     throw error;
   }
   await recordActivitySafely({ actor: auth.admin, action: "update", resource: "settings", resourceId: "singleton:settings", summary: "Updated site settings.", metadata: { previousRevision: revision.data, fieldCount: Object.keys(data).length } });
-  revalidatePath("/", "layout"); revalidatePath("/contact"); revalidatePath("/admin/settings");
+  revalidatePath("/", "layout"); revalidatePath("/contact"); revalidatePath("/admin/settings"); revalidatePath("/admin/seo");
   return { status: "success", message: "Settings updated." };
 }
