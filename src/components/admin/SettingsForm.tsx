@@ -11,18 +11,16 @@ import { MediaForm } from "@/components/admin/MediaForm";
 import { FileUpload } from "@/components/admin/FileUpload";
 import styles from "./AdminEditorial.module.css";
 
-type Settings = typeof schema.siteSettings.$inferSelect;
+type BaseSettings = typeof schema.siteSettings.$inferSelect;
+type Settings = BaseSettings & {
+  twitterCardType: "summary" | "summary_large_image";
+  twitterSiteUsername: string | null;
+  robotsTxt: string;
+};
 
 const initialState: ActionState = { status: "idle" };
 
-export function SettingsForm({
-  settings,
-  logoImageUrl,
-  heroImageAssetId,
-  logoImageAssetId,
-  faviconAssetId,
-  ogImageAssetId,
-}: {
+export function SettingsForm({ settings, logoImageUrl, heroImageAssetId, logoImageAssetId, faviconAssetId, ogImageAssetId }: {
   settings: Settings;
   logoImageUrl?: string | null;
   heroImageAssetId?: string | null;
@@ -32,191 +30,60 @@ export function SettingsForm({
 }) {
   const [state, formAction, pending] = useActionState(updateSettings, initialState);
 
+  // These values are owned by the Homepage or Navigation & Social editors. They are
+  // submitted unchanged because updateSettings validates the complete singleton record.
+  const preserved: Record<string, string> = {
+    heroHeading: settings.heroHeading ?? "", heroSubheading: settings.heroSubheading ?? "", heroDescription: settings.heroDescription ?? "",
+    heroImageUrl: settings.heroImageUrl ?? "", heroImageAssetId: heroImageAssetId ?? "", statYears: settings.statYears ?? "", statProjects: settings.statProjects ?? "",
+    statClients: settings.statClients ?? "", statViews: settings.statViews ?? "", footerDescription: settings.footerDescription ?? "",
+    instagramUrl: settings.instagramUrl ?? "", twitterUrl: settings.twitterUrl ?? "", youtubeUrl: settings.youtubeUrl ?? "", linkedinUrl: settings.linkedinUrl ?? "",
+    behanceUrl: settings.behanceUrl ?? "", vimeoUrl: settings.vimeoUrl ?? "",
+  };
+
   return (
     <MediaForm action={formAction} className={styles.sectionStack}>
       <input type="hidden" name="revision" value={settings.revision} />
+      {Object.entries(preserved).map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
 
-      <FormCard title="Brand Identity">
+      <FormCard title="Site Identity">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="logoText">Logo Text Fallback</Label>
-            <Input id="logoText" name="logoText" defaultValue={settings.logoText ?? "LS"} maxLength={10} required />
-            <p className={styles.helper}>Used automatically when no logo image is uploaded.</p>
-          </div>
-          <div>
-            <Label htmlFor="siteName">Display Name</Label>
-            <Input id="siteName" name="siteName" defaultValue={settings.siteName ?? "Lucky Saroj"} required />
-          </div>
+          <div><Label htmlFor="logoText">Logo Text Fallback</Label><Input id="logoText" name="logoText" defaultValue={settings.logoText ?? "LS"} maxLength={10} required /></div>
+          <div><Label htmlFor="siteName">Site Name</Label><Input id="siteName" name="siteName" defaultValue={settings.siteName ?? "Lucky Saroj"} required /></div>
         </div>
-        <FileUpload
-          name="logoImageUrl"
-          assetIdName="logoImageAssetId"
-          label="Website Logo Image"
-          kind="image"
-          defaultValue={logoImageUrl}
-          defaultAssetId={logoImageAssetId}
-        />
-        <p className={styles.helper}>Upload, replace, or remove the logo used in the website header.</p>
-        <FileUpload
-          name="favicon"
-          assetIdName="faviconAssetId"
-          label="Favicon / Browser Icon"
-          kind="image"
-          defaultValue={settings.favicon}
-          defaultAssetId={faviconAssetId}
-        />
+        <FileUpload name="logoImageUrl" assetIdName="logoImageAssetId" label="Website Logo Image" kind="image" defaultValue={logoImageUrl} defaultAssetId={logoImageAssetId} />
+        <FileUpload name="favicon" assetIdName="faviconAssetId" label="Favicon / Browser Icon" kind="image" defaultValue={settings.favicon} defaultAssetId={faviconAssetId} />
       </FormCard>
 
       <FormCard title="Contact & Professional Details">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="contactEmail">Email</Label>
-            <Input id="contactEmail" name="contactEmail" type="email" defaultValue={settings.contactEmail ?? ""} required />
-          </div>
-          <div>
-            <Label htmlFor="contactPhone">Phone</Label>
-            <Input id="contactPhone" name="contactPhone" type="tel" defaultValue={settings.contactPhone ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="whatsapp">WhatsApp</Label>
-            <Input id="whatsapp" name="whatsapp" inputMode="tel" defaultValue={settings.whatsapp ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="location">Location</Label>
-            <Input id="location" name="location" defaultValue={settings.location ?? ""} />
-          </div>
-          <div className="sm:col-span-2">
-            <Label htmlFor="availability">Availability</Label>
-            <Input id="availability" name="availability" placeholder="Available for freelance projects" defaultValue={settings.availability ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="paymentTerms">Payment Terms</Label>
-            <Textarea id="paymentTerms" name="paymentTerms" rows={3} placeholder="50% advance, remaining on final delivery" defaultValue={settings.paymentTerms ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="turnaroundTime">Turnaround Time</Label>
-            <Textarea id="turnaroundTime" name="turnaroundTime" rows={3} placeholder="Typically 3–7 working days depending on scope" defaultValue={settings.turnaroundTime ?? ""} />
-          </div>
+          <div><Label htmlFor="contactEmail">Email</Label><Input id="contactEmail" name="contactEmail" type="email" defaultValue={settings.contactEmail ?? ""} required /></div>
+          <div><Label htmlFor="contactPhone">Phone</Label><Input id="contactPhone" name="contactPhone" type="tel" defaultValue={settings.contactPhone ?? ""} /></div>
+          <div><Label htmlFor="whatsapp">WhatsApp</Label><Input id="whatsapp" name="whatsapp" inputMode="tel" defaultValue={settings.whatsapp ?? ""} /></div>
+          <div><Label htmlFor="location">Location</Label><Input id="location" name="location" defaultValue={settings.location ?? ""} /></div>
+          <div className="sm:col-span-2"><Label htmlFor="availability">Availability</Label><Input id="availability" name="availability" defaultValue={settings.availability ?? ""} /></div>
+          <div><Label htmlFor="paymentTerms">Payment Terms</Label><Textarea id="paymentTerms" name="paymentTerms" rows={3} defaultValue={settings.paymentTerms ?? ""} /></div>
+          <div><Label htmlFor="turnaroundTime">Turnaround Time</Label><Textarea id="turnaroundTime" name="turnaroundTime" rows={3} defaultValue={settings.turnaroundTime ?? ""} /></div>
         </div>
       </FormCard>
 
-      <FormCard title="Homepage">
-        <div>
-          <Label htmlFor="heroHeading">Hero Heading</Label>
-          <Input id="heroHeading" name="heroHeading" defaultValue={settings.heroHeading ?? ""} required />
+      <FormCard title="Site-wide SEO & Technical Settings">
+        <p className={styles.helper}>These are fallback/site-wide values only. Home, About, Services and other pages keep their own Meta/OG/Twitter overrides in that page&apos;s SEO tab.</p>
+        <div><Label htmlFor="seoTitle">Default Meta Title</Label><Input id="seoTitle" name="seoTitle" defaultValue={settings.seoTitle ?? ""} required /></div>
+        <div><Label htmlFor="seoDescription">Default Meta Description</Label><Textarea id="seoDescription" name="seoDescription" rows={3} defaultValue={settings.seoDescription ?? ""} /></div>
+        <FileUpload name="ogImageUrl" assetIdName="ogImageAssetId" label="Default Open Graph / Twitter Image" kind="image" defaultValue={settings.ogImageUrl} defaultAssetId={ogImageAssetId} />
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div><Label htmlFor="twitterCardType">Default Twitter Card</Label><select id="twitterCardType" name="twitterCardType" defaultValue={settings.twitterCardType}><option value="summary_large_image">Large image</option><option value="summary">Summary</option></select></div>
+          <div><Label htmlFor="twitterSiteUsername">Twitter / X Site Username</Label><Input id="twitterSiteUsername" name="twitterSiteUsername" placeholder="@username" defaultValue={settings.twitterSiteUsername ?? ""} /><FieldError message={state.fieldErrors?.twitterSiteUsername} /></div>
         </div>
-        <div>
-          <Label htmlFor="heroSubheading">Hero Subheading</Label>
-          <Input id="heroSubheading" name="heroSubheading" defaultValue={settings.heroSubheading ?? ""} required />
-        </div>
-        <div>
-          <Label htmlFor="heroDescription">Hero Description</Label>
-          <Textarea id="heroDescription" name="heroDescription" rows={3} defaultValue={settings.heroDescription ?? ""} />
-        </div>
-        <FileUpload
-          name="heroImageUrl"
-          assetIdName="heroImageAssetId"
-          label="Home Hero Image"
-          kind="image"
-          defaultValue={settings.heroImageUrl}
-          defaultAssetId={heroImageAssetId}
-        />
-        <p className={styles.helper}>Upload, replace, or remove the Home Hero image. Removing it restores the built-in fallback image.</p>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          <div>
-            <Label htmlFor="statYears">Years</Label>
-            <Input id="statYears" name="statYears" defaultValue={settings.statYears ?? "5+"} />
-          </div>
-          <div>
-            <Label htmlFor="statProjects">Projects</Label>
-            <Input id="statProjects" name="statProjects" defaultValue={settings.statProjects ?? "100+"} />
-          </div>
-          <div>
-            <Label htmlFor="statClients">Clients</Label>
-            <Input id="statClients" name="statClients" defaultValue={settings.statClients ?? "50+"} />
-          </div>
-          <div>
-            <Label htmlFor="statViews">Views</Label>
-            <Input id="statViews" name="statViews" defaultValue={settings.statViews ?? "10M+"} />
-          </div>
-        </div>
-      </FormCard>
-
-      <FormCard title="Footer">
-        <div>
-          <Label htmlFor="footerDescription">Footer Description</Label>
-          <Textarea id="footerDescription" name="footerDescription" rows={2} defaultValue={settings.footerDescription ?? ""} />
-        </div>
-      </FormCard>
-
-      <FormCard title="Social Links">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="instagramUrl">Instagram URL</Label>
-            <Input id="instagramUrl" name="instagramUrl" type="url" defaultValue={settings.instagramUrl ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="twitterUrl">X / Twitter URL</Label>
-            <Input id="twitterUrl" name="twitterUrl" type="url" defaultValue={settings.twitterUrl ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="youtubeUrl">YouTube URL</Label>
-            <Input id="youtubeUrl" name="youtubeUrl" type="url" defaultValue={settings.youtubeUrl ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
-            <Input id="linkedinUrl" name="linkedinUrl" type="url" defaultValue={settings.linkedinUrl ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="behanceUrl">Behance URL</Label>
-            <Input id="behanceUrl" name="behanceUrl" type="url" defaultValue={settings.behanceUrl ?? ""} />
-          </div>
-          <div>
-            <Label htmlFor="vimeoUrl">Vimeo URL</Label>
-            <Input id="vimeoUrl" name="vimeoUrl" type="url" defaultValue={settings.vimeoUrl ?? ""} />
-          </div>
-        </div>
-      </FormCard>
-
-      <FormCard title="SEO Settings">
-        <div>
-          <Label htmlFor="seoTitle">Default Meta Title</Label>
-          <Input id="seoTitle" name="seoTitle" defaultValue={settings.seoTitle ?? ""} required />
-        </div>
-        <div>
-          <Label htmlFor="seoDescription">Default Meta Description</Label>
-          <Textarea id="seoDescription" name="seoDescription" rows={3} defaultValue={settings.seoDescription ?? ""} />
-        </div>
-        <FileUpload
-          name="ogImageUrl"
-          assetIdName="ogImageAssetId"
-          label="Default Social / Open Graph Image"
-          kind="image"
-          defaultValue={settings.ogImageUrl}
-          defaultAssetId={ogImageAssetId}
-        />
-        <p className={styles.helper}>Used as the default share image when a page does not have its own social image.</p>
-        <div>
-          <Label htmlFor="googleSiteVerification">Google Search Console Verification Code</Label>
-          <Input id="googleSiteVerification" name="googleSiteVerification" maxLength={1024} placeholder="XXXXX" defaultValue={settings.googleSiteVerification ?? ""} autoComplete="off" spellCheck={false} />
-          <p className={styles.helper}>Paste the content value from Google Search Console&apos;s HTML tag method (e.g. content value from &lt;meta name=&apos;google-site-verification&apos; content=&apos;XXXXX&apos; /&gt;) — do not paste the full tag, only the code. If you paste the full tag by mistake, the code is extracted automatically.</p>
-          <FieldError message={state.fieldErrors?.googleSiteVerification} />
-        </div>
-        <div>
-          <Label htmlFor="googleAnalyticsMeasurementId">Google Analytics Measurement ID</Label>
-          <Input id="googleAnalyticsMeasurementId" name="googleAnalyticsMeasurementId" placeholder="G-XXXXXXXXXX" defaultValue={settings.googleAnalyticsMeasurementId ?? ""} autoCapitalize="characters" />
-          <p className={styles.helper}>Optional. GA4 loads on public pages only when a valid Measurement ID is saved.</p>
-        </div>
+        <div><Label htmlFor="googleSiteVerification">Google Search Console Verification Code</Label><Input id="googleSiteVerification" name="googleSiteVerification" maxLength={512} defaultValue={settings.googleSiteVerification ?? ""} autoComplete="off" spellCheck={false} /><p className={styles.helper}>Enter only the verification content value. A full verification meta tag is normalized automatically.</p><FieldError message={state.fieldErrors?.googleSiteVerification} /></div>
+        <div><Label htmlFor="googleAnalyticsMeasurementId">Google Analytics Measurement ID</Label><Input id="googleAnalyticsMeasurementId" name="googleAnalyticsMeasurementId" placeholder="G-XXXXXXXXXX" defaultValue={settings.googleAnalyticsMeasurementId ?? ""} /></div>
+        <div><Label htmlFor="robotsTxt">robots.txt</Label><Textarea id="robotsTxt" name="robotsTxt" rows={10} defaultValue={settings.robotsTxt} /><p className={styles.helper}>Admin and API routes remain blocked by the public robots route. Sitemap/Host directives must use HTTPS.</p><FieldError message={state.fieldErrors?.robotsTxt} /></div>
+        <p className={styles.helper}>Google&apos;s legacy sitemap ping endpoint is retired, so no misleading “Notify Google” button is shown. Keep the sitemap referenced in robots.txt and submit/manage it through Google Search Console.</p>
       </FormCard>
 
       {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}
       {state.status === "success" && state.message && <p className={styles.feedbackSuccess}>{state.message}</p>}
-
-      <div className={styles.saveBar}>
-        <Button type="submit" disabled={pending}>
-          {pending ? "Saving..." : "Save Settings"}
-        </Button>
-      </div>
+      <div className={styles.saveBar}><Button type="submit" disabled={pending}>{pending ? "Saving..." : "Save Global Settings"}</Button></div>
     </MediaForm>
   );
 }
