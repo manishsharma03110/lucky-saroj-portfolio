@@ -10,6 +10,7 @@ const STATIC_ROUTES = {
   services: "/services",
   experience: "/experience",
   contact: "/contact",
+  testimonials: "/testimonials",
 } as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -21,22 +22,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       return {
         url: absoluteSiteUrl(path),
         changeFrequency: path === "/" || path === "/portfolio" ? "weekly" : "monthly",
-        priority: path === "/" ? 1 : path === "/portfolio" ? 0.9 : 0.7,
+        priority: path === "/" ? 1 : path === "/portfolio" ? 0.9 : path === "/testimonials" ? 0.6 : 0.7,
       };
     });
-
-  const supplementalEntries: MetadataRoute.Sitemap = [{
-    url: absoluteSiteUrl("/testimonials"),
-    changeFrequency: "monthly",
-    priority: 0.6,
-  }];
 
   const projectEntries: MetadataRoute.Sitemap = projects.map(({ project }) => ({
     url: absoluteSiteUrl(`/portfolio/${project.slug}`),
     lastModified: project.updatedAt,
     changeFrequency: "monthly",
     priority: 0.8,
+    ...(project.thumbnailUrl ? { images: [project.thumbnailUrl] } : {}),
   }));
 
-  return [...staticEntries, ...supplementalEntries, ...projectEntries];
+  return [...staticEntries, ...projectEntries];
 }

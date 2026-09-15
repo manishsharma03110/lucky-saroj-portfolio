@@ -1,14 +1,6 @@
 import type { MetadataRoute } from "next";
+import { sql } from "drizzle-orm";
+import { db } from "@/lib/db";
 import { absoluteSiteUrl, resolveSiteUrl } from "@/lib/seo";
-
-export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: ["/admin", "/admin/", "/api/"],
-    },
-    sitemap: absoluteSiteUrl("/sitemap.xml"),
-    host: resolveSiteUrl().origin,
-  };
-}
+type RobotsRow={robotsTxt:string};
+export default async function robots():Promise<MetadataRoute.Robots>{let text="";try{const result=await db.execute<RobotsRow>(sql`SELECT robots_txt AS "robotsTxt" FROM site_settings WHERE id='singleton:settings'`);text=result.rows[0]?.robotsTxt??""}catch{}const allows:string[]=[],disallows:string[]=["/admin","/admin/","/api/"];let userAgent="*",sitemap=absoluteSiteUrl("/sitemap.xml"),host=resolveSiteUrl().origin;for(const raw of text.split(/\r?\n/)){const line=raw.replace(/#.*$/,"").trim();if(!line)continue;const i=line.indexOf(":");if(i<0)continue;const key=line.slice(0,i).trim().toLowerCase(),value=line.slice(i+1).trim();if(!value)continue;if(key==="user-agent")userAgent=value.slice(0,100);else if(key==="allow"&&value.startsWith("/"))allows.push(value);else if(key==="disallow"&&value.startsWith("/")&&!disallows.includes(value))disallows.push(value);else if(key==="sitemap"&&/^https:\/\//i.test(value))sitemap=value;else if(key==="host"&&/^https:\/\//i.test(value))host=value}return{rules:{userAgent,allow:allows.length?allows:"/",disallow:disallows},sitemap,host}}
