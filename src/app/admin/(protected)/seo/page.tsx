@@ -17,43 +17,27 @@ export default async function AdminSeoPage() {
     if (error instanceof AuthorizationError) notFound();
     throw error;
   });
-
   const [pages, settingsRows, references] = await Promise.all([
     getAllPageSeo(),
     db.select().from(schema.siteSettings).where(eq(schema.siteSettings.id, SETTINGS_ID)),
-    db
-      .select({ assetId: schema.mediaAssetReferences.assetId, slot: schema.mediaAssetReferences.slot })
-      .from(schema.mediaAssetReferences)
-      .where(and(
-        eq(schema.mediaAssetReferences.ownerType, "site_settings"),
-        eq(schema.mediaAssetReferences.siteSettingsId, SETTINGS_ID)
-      )),
+    db.select({ assetId: schema.mediaAssetReferences.assetId, slot: schema.mediaAssetReferences.slot }).from(schema.mediaAssetReferences).where(and(eq(schema.mediaAssetReferences.ownerType, "site_settings"), eq(schema.mediaAssetReferences.siteSettingsId, SETTINGS_ID))),
   ]);
   const settings = settingsRows[0];
   if (!settings) notFound();
-  const ogImageAssetId = references.find((reference) => reference.slot === "og_image")?.assetId ?? null;
+  const assetFor = (slot: string) => references.find((reference) => reference.slot === slot)?.assetId ?? null;
+  const assets = { logoImageAssetId: assetFor("logo_image"), heroImageAssetId: assetFor("hero_image"), faviconAssetId: assetFor("favicon"), ogImageAssetId: assetFor("og_image") };
 
   return (
     <div>
-      <AdminPageHeader
-        eyebrow="Search & Sharing"
-        title="SEO"
-        description="Manage global search settings and page-specific metadata from one place. Existing website content and SEO data are preserved."
-      />
+      <AdminPageHeader eyebrow="Search & Sharing" title="SEO" description="Manage global search settings and page-specific metadata from one place. Existing website content and SEO data are preserved." />
       <div className="space-y-12">
         <section aria-labelledby="global-seo-heading">
           <h2 id="global-seo-heading" className="mb-5 font-display text-xl font-semibold text-[var(--text-primary)]">Global & Technical SEO</h2>
-          <SeoGlobalSettingsForm settings={settings} ogImageAssetId={ogImageAssetId} />
+          <SeoGlobalSettingsForm settings={settings} assets={assets} />
         </section>
-
         <section aria-labelledby="page-seo-heading">
-          <div className="mb-5">
-            <h2 id="page-seo-heading" className="font-display text-xl font-semibold text-[var(--text-primary)]">Page SEO</h2>
-            <p className="mt-2 text-sm text-[var(--text-secondary)]">Titles, descriptions, canonicals, social metadata, keywords and indexability for each public page.</p>
-          </div>
-          <div className="space-y-8">
-            {pages.map((seo) => <PageSeoForm key={seo.pageKey} seo={seo} />)}
-          </div>
+          <div className="mb-5"><h2 id="page-seo-heading" className="font-display text-xl font-semibold text-[var(--text-primary)]">Page SEO</h2><p className="mt-2 text-sm text-[var(--text-secondary)]">Titles, descriptions, canonicals, social metadata, keywords and indexability for each public page.</p></div>
+          <div className="space-y-8">{pages.map((seo) => <PageSeoForm key={seo.pageKey} seo={seo} />)}</div>
         </section>
       </div>
     </div>
