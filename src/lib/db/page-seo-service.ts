@@ -4,112 +4,11 @@ import { withCmsTransaction } from "./index";
 import { ContentNotFoundError, StaleRevisionError } from "./mutation-errors";
 import { SEO_PAGE_DEFAULTS, SEO_PAGE_KEYS, type SeoPageKey } from "@/lib/page-seo";
 
-export type PageSeoRecord = Readonly<{
-  pageKey: SeoPageKey;
-  metaTitle: string;
-  metaDescription: string;
-  canonicalPath: string;
-  ogTitle: string;
-  ogDescription: string;
-  ogImageUrl: string;
-  robotsIndex: boolean;
-  keywords: string;
-  revision: number;
-}>;
+export type PageSeoRecord = Readonly<{ pageKey: SeoPageKey; metaTitle: string; metaDescription: string; canonicalPath: string; pageH1: string; pageH2: string; ogTitle: string; ogDescription: string; ogImageUrl: string; twitterTitle: string; twitterDescription: string; twitterImageUrl: string; robotsIndex: boolean; keywords: string; revision: number }>;
 
-function defaults(pageKey: SeoPageKey): PageSeoRecord {
-  const item = SEO_PAGE_DEFAULTS[pageKey];
-  return Object.freeze({
-    pageKey,
-    metaTitle: item.title,
-    metaDescription: item.description,
-    canonicalPath: item.path,
-    ogTitle: item.title,
-    ogDescription: item.description,
-    ogImageUrl: "",
-    robotsIndex: true,
-    keywords: "",
-    revision: 1,
-  });
-}
-
-function normalize(pageKey: SeoPageKey, row?: Partial<PageSeoRecord> | null): PageSeoRecord {
-  const fallback = defaults(pageKey);
-  if (!row) return fallback;
-  return Object.freeze({
-    pageKey,
-    metaTitle: row.metaTitle?.trim() || fallback.metaTitle,
-    metaDescription: row.metaDescription?.trim() || fallback.metaDescription,
-    canonicalPath: row.canonicalPath?.trim() || fallback.canonicalPath,
-    ogTitle: row.ogTitle?.trim() || row.metaTitle?.trim() || fallback.ogTitle,
-    ogDescription: row.ogDescription?.trim() || row.metaDescription?.trim() || fallback.ogDescription,
-    ogImageUrl: row.ogImageUrl?.trim() || "",
-    robotsIndex: row.robotsIndex ?? true,
-    keywords: row.keywords?.trim() || "",
-    revision: row.revision ?? 1,
-  });
-}
-
-export async function getPageSeo(pageKey: SeoPageKey): Promise<PageSeoRecord> {
-  return withCmsTransaction(async (tx) => {
-    const result = await tx.db.select<Partial<PageSeoRecord>>(sql`
-      SELECT
-        page_key AS "pageKey",
-        meta_title AS "metaTitle",
-        meta_description AS "metaDescription",
-        canonical_path AS "canonicalPath",
-        og_title AS "ogTitle",
-        og_description AS "ogDescription",
-        og_image_url AS "ogImageUrl",
-        robots_index AS "robotsIndex",
-        keywords,
-        revision
-      FROM page_seo WHERE page_key=${pageKey}
-    `);
-    return normalize(pageKey, result.rows[0]);
-  });
-}
-
-export async function getAllPageSeo(): Promise<PageSeoRecord[]> {
-  return withCmsTransaction(async (tx) => {
-    const result = await tx.db.select<Partial<PageSeoRecord>>(sql`
-      SELECT
-        page_key AS "pageKey",
-        meta_title AS "metaTitle",
-        meta_description AS "metaDescription",
-        canonical_path AS "canonicalPath",
-        og_title AS "ogTitle",
-        og_description AS "ogDescription",
-        og_image_url AS "ogImageUrl",
-        robots_index AS "robotsIndex",
-        keywords,
-        revision
-      FROM page_seo ORDER BY page_key
-    `);
-    const byKey = new Map(result.rows.map((row) => [row.pageKey, row]));
-    return SEO_PAGE_KEYS.map((key) => normalize(key, byKey.get(key)));
-  });
-}
-
-export async function updatePageSeo(input: PageSeoRecord, expectedRevision: number): Promise<number> {
-  return withCmsTransaction(async (tx) => {
-    const updated = await tx.db.update<{ revision: number }>(sql`
-      UPDATE page_seo SET
-        meta_title=${input.metaTitle || null},
-        meta_description=${input.metaDescription || null},
-        canonical_path=${input.canonicalPath || null},
-        og_title=${input.ogTitle || null},
-        og_description=${input.ogDescription || null},
-        og_image_url=${input.ogImageUrl || null},
-        robots_index=${input.robotsIndex},
-        keywords=${input.keywords || null},
-        revision=revision+1
-      WHERE page_key=${input.pageKey} AND revision=${expectedRevision}
-      RETURNING revision
-    `);
-    if (updated.rows[0]) return updated.rows[0].revision;
-    const exists = await tx.db.select(sql`SELECT 1 FROM page_seo WHERE page_key=${input.pageKey}`);
-    if (!exists.rows[0]) throw new ContentNotFoundError();
-    throw new StaleRevisionError();
-  });
-}
+function defaults(pageKey: SeoPageKey): PageSeoRecord { const item = SEO_PAGE_DEFAULTS[pageKey]; return Object.freeze({ pageKey, metaTitle:item.title, metaDescription:item.description, canonicalPath:item.path, pageH1:"", pageH2:"", ogTitle:"", ogDescription:"", ogImageUrl:"", twitterTitle:"", twitterDescription:"", twitterImageUrl:"", robotsIndex:true, keywords:"", revision:1 }); }
+function normalize(pageKey: SeoPageKey, row?: Partial<PageSeoRecord> | null): PageSeoRecord { const f=defaults(pageKey); if(!row) return f; return Object.freeze({ pageKey, metaTitle:row.metaTitle?.trim()||f.metaTitle, metaDescription:row.metaDescription?.trim()||f.metaDescription, canonicalPath:row.canonicalPath?.trim()||f.canonicalPath, pageH1:row.pageH1?.trim()||"", pageH2:row.pageH2?.trim()||"", ogTitle:row.ogTitle?.trim()||"", ogDescription:row.ogDescription?.trim()||"", ogImageUrl:row.ogImageUrl?.trim()||"", twitterTitle:row.twitterTitle?.trim()||"", twitterDescription:row.twitterDescription?.trim()||"", twitterImageUrl:row.twitterImageUrl?.trim()||"", robotsIndex:row.robotsIndex??true, keywords:row.keywords?.trim()||"", revision:row.revision??1 }); }
+const SELECT=sql`page_key AS "pageKey", meta_title AS "metaTitle", meta_description AS "metaDescription", canonical_path AS "canonicalPath", page_h1 AS "pageH1", page_h2 AS "pageH2", og_title AS "ogTitle", og_description AS "ogDescription", og_image_url AS "ogImageUrl", twitter_title AS "twitterTitle", twitter_description AS "twitterDescription", twitter_image_url AS "twitterImageUrl", robots_index AS "robotsIndex", keywords, revision`;
+export async function getPageSeo(pageKey: SeoPageKey): Promise<PageSeoRecord> { return withCmsTransaction(async tx=>{ const r=await tx.db.select<Partial<PageSeoRecord>>(sql`SELECT ${SELECT} FROM page_seo WHERE page_key=${pageKey}`); return normalize(pageKey,r.rows[0]); }); }
+export async function getAllPageSeo(): Promise<PageSeoRecord[]> { return withCmsTransaction(async tx=>{ const r=await tx.db.select<Partial<PageSeoRecord>>(sql`SELECT ${SELECT} FROM page_seo ORDER BY page_key`); const m=new Map(r.rows.map(x=>[x.pageKey,x])); return SEO_PAGE_KEYS.map(k=>normalize(k,m.get(k))); }); }
+export async function updatePageSeo(input: PageSeoRecord, expectedRevision:number): Promise<number> { return withCmsTransaction(async tx=>{ const u=await tx.db.update<{revision:number}>(sql`UPDATE page_seo SET meta_title=${input.metaTitle||null}, meta_description=${input.metaDescription||null}, canonical_path=${input.canonicalPath||null}, page_h1=${input.pageH1||null}, page_h2=${input.pageH2||null}, og_title=${input.ogTitle||null}, og_description=${input.ogDescription||null}, og_image_url=${input.ogImageUrl||null}, twitter_title=${input.twitterTitle||null}, twitter_description=${input.twitterDescription||null}, twitter_image_url=${input.twitterImageUrl||null}, robots_index=${input.robotsIndex}, keywords=${input.keywords||null}, revision=revision+1 WHERE page_key=${input.pageKey} AND revision=${expectedRevision} RETURNING revision`); if(u.rows[0]) return u.rows[0].revision; const e=await tx.db.select(sql`SELECT 1 FROM page_seo WHERE page_key=${input.pageKey}`); if(!e.rows[0]) throw new ContentNotFoundError(); throw new StaleRevisionError(); }); }
