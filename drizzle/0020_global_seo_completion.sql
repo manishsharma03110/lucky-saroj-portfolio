@@ -1,7 +1,7 @@
 ALTER TABLE site_settings
   ADD COLUMN IF NOT EXISTS twitter_card_type text NOT NULL DEFAULT 'summary_large_image',
   ADD COLUMN IF NOT EXISTS twitter_site_username text,
-  ADD COLUMN IF NOT EXISTS robots_txt text NOT NULL DEFAULT E'User-agent: *\nAllow: /\n\nSitemap: https://luckysaroj.com/sitemap.xml';
+  ADD COLUMN IF NOT EXISTS robots_txt text NOT NULL DEFAULT E'User-agent: *\nAllow: /';
 
 ALTER TABLE site_settings DROP CONSTRAINT IF EXISTS site_settings_twitter_card_type_valid;
 ALTER TABLE site_settings ADD CONSTRAINT site_settings_twitter_card_type_valid
