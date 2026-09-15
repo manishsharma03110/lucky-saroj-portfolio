@@ -1,5 +1,4 @@
 "use server";
-
 import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth/authorization";
 import { recordActivitySafely } from "@/lib/audit/activity-log";
@@ -8,30 +7,7 @@ import { updatePageSeo } from "@/lib/db/page-seo-service";
 import { revisionSchema } from "@/lib/validations/revision";
 import { StaleRevisionError } from "@/lib/db/mutation-errors";
 import type { ActionState } from "./portfolio";
-
-function pageKey(value: FormDataEntryValue | null): SeoPageKey | null {
-  return typeof value === "string" && (SEO_PAGE_KEYS as readonly string[]).includes(value) ? value as SeoPageKey : null;
-}
-function text(formData: FormData, key: string, max: number): string | null { const raw = formData.get(key); const value = typeof raw === "string" ? raw.trim() : ""; return value.length <= max ? value : null; }
-function validCanonical(value: string): boolean { return value.startsWith("/") || /^https:\/\//i.test(value); }
-function validImage(value: string): boolean { return !value || value.startsWith("/") || /^https:\/\//i.test(value); }
-
-export async function updatePageSeoAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
-  const auth = await requirePermission("settings.update");
-  const key = pageKey(formData.get("pageKey")); const revision = revisionSchema.safeParse(formData.get("revision"));
-  if (!key || !revision.success) return { status: "error", message: "Invalid SEO request. Reload before saving." };
-  const metaTitle = text(formData, "metaTitle", 200); const metaDescription = text(formData, "metaDescription", 320); const canonicalPath = text(formData, "canonicalPath", 500);
-  const ogTitle = text(formData, "ogTitle", 200); const ogDescription = text(formData, "ogDescription", 320); const ogImageUrl = text(formData, "ogImageUrl", 2048); const keywords = text(formData, "keywords", 500);
-  if ([metaTitle, metaDescription, canonicalPath, ogTitle, ogDescription, ogImageUrl, keywords].some((value) => value === null)) return { status: "error", message: "One or more SEO fields are too long." };
-  if (canonicalPath && !validCanonical(canonicalPath)) return { status: "error", message: "Canonical must be an internal path or HTTPS URL." };
-  if (ogImageUrl && !validImage(ogImageUrl)) return { status: "error", message: "OG image must be an internal path or HTTPS URL." };
-  const fallback = SEO_PAGE_DEFAULTS[key]; const robotsIndex = formData.get("robotsIndex") === "on";
-  try {
-    await updatePageSeo({ pageKey: key, metaTitle: metaTitle || fallback.title, metaDescription: metaDescription || fallback.description,
-      canonicalPath: canonicalPath || fallback.path, ogTitle: ogTitle || metaTitle || fallback.title,
-      ogDescription: ogDescription || metaDescription || fallback.description, ogImageUrl: ogImageUrl || "", robotsIndex, keywords: keywords || "", revision: revision.data }, revision.data);
-  } catch (error) { if (error instanceof StaleRevisionError) return { status: "error", message: error.message }; throw error; }
-  await recordActivitySafely({ actor: auth.admin, action: "update", resource: "seo", resourceId: key, summary: `Updated ${fallback.label} SEO.`, metadata: { pageKey: key, previousRevision: revision.data, robotsIndex, hasOgImage: Boolean(ogImageUrl), hasKeywords: Boolean(keywords) } });
-  revalidatePath("/admin/seo"); revalidatePath(key === "home" ? "/" : `/${key}`);
-  return { status: "success", message: `${fallback.label} SEO updated.` };
-}
+function pageKey(v:FormDataEntryValue|null):SeoPageKey|null{return typeof v==="string"&&(SEO_PAGE_KEYS as readonly string[]).includes(v)?v as SeoPageKey:null;}
+function text(fd:FormData,k:string,max:number):string|null{const r=fd.get(k);const v=typeof r==="string"?r.trim():"";return v.length<=max?v:null;}
+function validCanonical(v:string){return v.startsWith("/")||/^https:\/\//i.test(v);} function validImage(v:string){return !v||v.startsWith("/")||/^https:\/\//i.test(v);}
+export async function updatePageSeoAction(_prev:ActionState,fd:FormData):Promise<ActionState>{const auth=await requirePermission("settings.update");const key=pageKey(fd.get("pageKey"));const rev=revisionSchema.safeParse(fd.get("revision"));if(!key||!rev.success)return{status:"error",message:"Invalid SEO request. Reload before saving."};const metaTitle=text(fd,"metaTitle",200),metaDescription=text(fd,"metaDescription",320),canonicalPath=text(fd,"canonicalPath",500),pageH1=text(fd,"pageH1",200),pageH2=text(fd,"pageH2",200),ogTitle=text(fd,"ogTitle",200),ogDescription=text(fd,"ogDescription",320),ogImageUrl=text(fd,"ogImageUrl",2048),twitterTitle=text(fd,"twitterTitle",200),twitterDescription=text(fd,"twitterDescription",320),twitterImageUrl=text(fd,"twitterImageUrl",2048),keywords=text(fd,"keywords",500);const values=[metaTitle,metaDescription,canonicalPath,pageH1,pageH2,ogTitle,ogDescription,ogImageUrl,twitterTitle,twitterDescription,twitterImageUrl,keywords];if(values.some(v=>v===null))return{status:"error",message:"One or more SEO fields are too long."};if(canonicalPath&&!validCanonical(canonicalPath))return{status:"error",message:"Canonical must be an internal path or HTTPS URL."};if([ogImageUrl,twitterImageUrl].some(v=>v&&!validImage(v)))return{status:"error",message:"Social images must be internal paths or HTTPS URLs."};const f=SEO_PAGE_DEFAULTS[key],robotsIndex=fd.get("robotsIndex")==="on";try{await updatePageSeo({pageKey:key,metaTitle:metaTitle||f.title,metaDescription:metaDescription||f.description,canonicalPath:canonicalPath||f.path,pageH1:pageH1||"",pageH2:pageH2||"",ogTitle:ogTitle||"",ogDescription:ogDescription||"",ogImageUrl:ogImageUrl||"",twitterTitle:twitterTitle||"",twitterDescription:twitterDescription||"",twitterImageUrl:twitterImageUrl||"",robotsIndex,keywords:keywords||"",revision:rev.data},rev.data);}catch(e){if(e instanceof StaleRevisionError)return{status:"error",message:e.message};throw e;}await recordActivitySafely({actor:auth.admin,action:"update",resource:"seo",resourceId:key,summary:`Updated ${f.label} SEO.`,metadata:{pageKey:key,previousRevision:rev.data,robotsIndex}});revalidatePath("/admin/seo");revalidatePath(key==="home"?"/":`/${key}`);return{status:"success",message:`${f.label} SEO updated.`};}
