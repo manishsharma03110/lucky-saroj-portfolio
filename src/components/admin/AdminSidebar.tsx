@@ -7,14 +7,11 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Home,
-  FileText,
   Search,
   FolderKanban,
-  Tags,
   Briefcase,
   Wrench,
   UserCircle,
-  Film,
   MessageSquareText,
   Mail,
   History,
@@ -30,30 +27,27 @@ import styles from "./AdminShell.module.css";
 
 const NAV_SECTIONS = [
   {
-    label: "Content",
+    label: "Website",
     items: [
       { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard, permission: "dashboard.view" },
       { label: "Homepage", href: "/admin/home", icon: Home, permission: "settings.read" },
-      { label: "Page Content", href: "/admin/pages", icon: FileText, permission: "settings.read" },
-      { label: "SEO", href: "/admin/seo", icon: Search, permission: "settings.read" },
+      { label: "About", href: "/admin/about", icon: UserCircle, permission: "about.read" },
       { label: "Portfolio", href: "/admin/portfolio", icon: FolderKanban, permission: "portfolio.read" },
-      { label: "Categories", href: "/admin/categories", icon: Tags, permission: "categories.read" },
-      { label: "Experience", href: "/admin/experience", icon: Briefcase, permission: "experience.read" },
       { label: "Services", href: "/admin/services", icon: Wrench, permission: "services.read" },
-      { label: "About Me", href: "/admin/about", icon: UserCircle, permission: "about.read" },
-      { label: "Showreel", href: "/admin/showreel", icon: Film, permission: "showreel.read" },
+      { label: "Experience", href: "/admin/experience", icon: Briefcase, permission: "experience.read" },
       { label: "Testimonials", href: "/admin/testimonials", icon: MessageSquareText, permission: "testimonials.read" },
+      { label: "SEO", href: "/admin/seo", icon: Search, permission: "settings.read" },
     ],
   },
   {
-    label: "Communication",
-    items: [{ label: "Messages", href: "/admin/messages", icon: Mail, permission: "messages.read" }],
+    label: "Inbox",
+    items: [{ label: "Contact Messages", href: "/admin/messages", icon: Mail, permission: "messages.read" }],
   },
   {
     label: "System",
     items: [
+      { label: "Global Settings", href: "/admin/settings", icon: Settings, permission: "settings.read" },
       { label: "Activity", href: "/admin/activity", icon: History, permission: "activity.read" },
-      { label: "Settings", href: "/admin/settings", icon: Settings, permission: "settings.read" },
     ],
   },
 ];
