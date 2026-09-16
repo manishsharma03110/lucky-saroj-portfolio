@@ -10,31 +10,8 @@ import { getPageContent } from "@/lib/db/page-content-service";
 import { getPageSeo } from "@/lib/db/page-seo-service";
 import { createCmsPageMetadata } from "@/lib/seo";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const [seo, settings] = await Promise.all([getPageSeo("experience"), getSiteSettings()]);
-  return createCmsPageMetadata(seo, settings?.ogImageUrl);
-}
-
+export async function generateMetadata(): Promise<Metadata> { const [seo,settings]=await Promise.all([getPageSeo("experience"),getSiteSettings()]); return createCmsPageMetadata(seo,settings?.ogImageUrl); }
 export default async function ExperiencePage() {
-  const [experiences, skills, page] = await Promise.all([getExperiences(), getAboutSkills(), getPageContent("experience")]);
-  const copy = page.content;
-
-  return (
-    <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]">
-      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Experience" }]} />
-      <ExperienceHero experiences={experiences} eyebrow={copy.heroEyebrow} heading={copy.heroHeading} description={copy.heroDescription} heroImageUrl={copy.heroImageUrl} heroImageAlt={copy.heroImageAlt} currentRoleLabel={copy.currentRoleLabel} locationLabel={copy.locationLabel} entriesLabel={copy.entriesLabel} primaryLabel={copy.heroPrimaryLabel} primaryUrl={copy.heroPrimaryUrl} secondaryLabel={copy.heroSecondaryLabel} secondaryUrl={copy.heroSecondaryUrl} />
-      <ExperienceList experiences={experiences} eyebrow={copy.listEyebrow} heading={copy.listHeading} description={copy.listDescription} emptyText={copy.listEmptyText} presentLabel={copy.presentLabel} currentBadgeLabel={copy.currentBadgeLabel} />
-      <ExperienceCapabilities skills={skills} heading={copy.capabilitiesHeading} />
-      <section className="bg-[var(--background-primary)] py-14 sm:py-16 lg:py-24">
-        <div className="relative mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">
-          <div className="relative grid gap-8 overflow-hidden border border-white/10 bg-[var(--surface-primary)] px-6 py-9 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_1px_auto] lg:items-center lg:gap-10 lg:px-10">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_50%,rgba(59,130,246,0.14),transparent_31%)]" aria-hidden />
-            <div className="relative border-l border-[var(--accent-primary)]/65 pl-6 sm:pl-8"><p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{copy.ctaEyebrow}</p><h2 className="mt-4 max-w-[14ch] font-display text-[clamp(2.25rem,3.2vw,3.5rem)] font-semibold leading-[1.02] tracking-[-0.045em] text-[var(--text-primary)]">{copy.ctaHeading}</h2><p className="mt-4 max-w-[38rem] text-base leading-7 text-[var(--text-secondary)]">{copy.ctaDescription}</p></div>
-            <span className="relative hidden h-full w-px bg-[var(--accent-primary)]/45 lg:block" aria-hidden />
-            <div className="relative flex flex-col gap-3 sm:flex-row lg:justify-end"><Button href={copy.ctaPrimaryUrl} variant="cine-solid" withArrow className="!rounded-md !px-7 !py-3.5">{copy.ctaPrimaryLabel}</Button><Button href={copy.ctaSecondaryUrl} variant="cine-outline" withArrow className="!rounded-md !px-7 !py-3.5">{copy.ctaSecondaryLabel}</Button></div>
-          </div>
-        </div>
-      </section>
-    </PageMotionBoundary>
-  );
+  const [experiences,skills,page,seo]=await Promise.all([getExperiences(),getAboutSkills(),getPageContent("experience"),getPageSeo("experience")]); const copy=page.content; const visibleH1=seo.pageH1||copy.heroHeading; const visibleH2=seo.pageH2||copy.listHeading;
+  return <PageMotionBoundary className="bg-[var(--background-primary)] text-[var(--text-primary)]"><Breadcrumb items={[{label:"Home",href:"/"},{label:"Experience"}]}/><ExperienceHero experiences={experiences} eyebrow={copy.heroEyebrow} heading={visibleH1} description={copy.heroDescription} heroImageUrl={copy.heroImageUrl} heroImageAlt={copy.heroImageAlt} currentRoleLabel={copy.currentRoleLabel} locationLabel={copy.locationLabel} entriesLabel={copy.entriesLabel} primaryLabel={copy.heroPrimaryLabel} primaryUrl={copy.heroPrimaryUrl} secondaryLabel={copy.heroSecondaryLabel} secondaryUrl={copy.heroSecondaryUrl}/><ExperienceList experiences={experiences} eyebrow={copy.listEyebrow} heading={visibleH2} description={copy.listDescription} emptyText={copy.listEmptyText} presentLabel={copy.presentLabel} currentBadgeLabel={copy.currentBadgeLabel}/><ExperienceCapabilities skills={skills} heading={copy.capabilitiesHeading}/><section className="bg-[var(--background-primary)] py-14 sm:py-16 lg:py-24"><div className="relative mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><div className="relative grid gap-8 overflow-hidden border border-white/10 bg-[var(--surface-primary)] px-6 py-9 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,1fr)_1px_auto] lg:items-center lg:gap-10 lg:px-10"><div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_88%_50%,rgba(59,130,246,0.14),transparent_31%)]" aria-hidden/><div className="relative border-l border-[var(--accent-primary)]/65 pl-6 sm:pl-8"><p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{copy.ctaEyebrow}</p><h2 className="mt-4 max-w-[14ch] font-display text-[clamp(2.25rem,3.2vw,3.5rem)] font-semibold leading-[1.02] tracking-[-0.045em] text-[var(--text-primary)]">{copy.ctaHeading}</h2><p className="mt-4 max-w-[38rem] text-base leading-7 text-[var(--text-secondary)]">{copy.ctaDescription}</p></div><span className="relative hidden h-full w-px bg-[var(--accent-primary)]/45 lg:block" aria-hidden/><div className="relative flex flex-col gap-3 sm:flex-row lg:justify-end"><Button href={copy.ctaPrimaryUrl} variant="cine-solid" withArrow className="!rounded-md !px-7 !py-3.5">{copy.ctaPrimaryLabel}</Button><Button href={copy.ctaSecondaryUrl} variant="cine-outline" withArrow className="!rounded-md !px-7 !py-3.5">{copy.ctaSecondaryLabel}</Button></div></div></div></section></PageMotionBoundary>;
 }
