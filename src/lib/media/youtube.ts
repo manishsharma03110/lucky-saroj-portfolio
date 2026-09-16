@@ -30,5 +30,11 @@ export function normalizeYouTubeVideoUrl(value: string | null | undefined): stri
 
 export function getYouTubeEmbedUrl(value: string | null | undefined): string | null {
   const id = getYouTubeVideoId(value);
-  return id ? `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1` : null;
+  if (!id) return null;
+
+  // Keep the supported YouTube player UI intact. YouTube deprecated
+  // `modestbranding`, and title/channel/branding surfaces cannot be reliably
+  // disabled. `rel=0` limits related videos to the same channel; playsinline
+  // keeps mobile playback responsive within the portfolio layout.
+  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`;
 }
