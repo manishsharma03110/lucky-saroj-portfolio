@@ -1,0 +1,1 @@
+CMS image source optimization target: WebP, <=2400px width, quality ladder 84/80/76/72, aiming for <=200KB when feasible without enlarging images.

@@ -1,0 +1,1 @@
+Authenticated CMS-only image upload endpoint. It intentionally does not replace the existing video direct-upload lane.

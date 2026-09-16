@@ -1,0 +1,1 @@
+The Sharp image lane reuses `createPendingMediaAsset` and `finalizePendingMediaAssetUpload`; no database schema migration is required.

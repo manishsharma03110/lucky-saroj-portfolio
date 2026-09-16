@@ -1,0 +1,1 @@
+The compressed image route requires the existing `media.upload` admin permission and writes only to a newly-created canonical owned media key with overwrite disabled. It does not expose a public upload token.
