@@ -2,17 +2,15 @@ import { z } from "zod";
 import { formDataCheckboxSchema } from "./booleans";
 import { mediaReferenceSchema } from "./urls";
 import { assetIdSchema } from "@/lib/media/ownership";
+import { getYouTubeVideoId } from "@/lib/media/youtube";
 
 const optionalAssetId = assetIdSchema.optional().or(z.literal(""));
-
-const optionalMediaReference = z.union([z.literal(""), mediaReferenceSchema]).refine(
-  (value) => value.length <= 500,
-  "Media reference must be at most 500 characters."
-);
+const optionalMediaReference = z.union([z.literal(""), mediaReferenceSchema]).refine((value) => value.length <= 500, "Media reference must be at most 500 characters.");
+const optionalYouTubeReference = z.string().trim().max(500).optional().or(z.literal("")).refine((value) => !value || Boolean(getYouTubeVideoId(value)), "Enter a valid YouTube video URL or 11-character video ID.");
 
 export const showreelSchema = z.object({
   title: z.string().trim().min(1, "Title is required").max(160),
-  videoUrl: optionalMediaReference,
+  videoUrl: optionalYouTubeReference,
   videoAssetId: optionalAssetId,
   thumbnailUrl: optionalMediaReference,
   thumbnailAssetId: optionalAssetId,
@@ -20,5 +18,4 @@ export const showreelSchema = z.object({
   isFeatured: formDataCheckboxSchema,
   status: z.enum(["draft", "published"]),
 });
-
 export type ShowreelInput = z.infer<typeof showreelSchema>;
