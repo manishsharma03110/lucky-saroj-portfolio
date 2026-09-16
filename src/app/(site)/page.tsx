@@ -18,17 +18,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [settings, showreel, content] = await Promise.all([
+  const [settings, showreel, content, seo] = await Promise.all([
     getSiteSettings(),
     getFeaturedShowreel(),
     getHomePageContent(),
+    getPageSeo("home"),
   ]);
 
   return (
     <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
       <Hero
-        heading={settings?.heroHeading ?? settings?.siteName ?? ""}
-        subheading={settings?.heroSubheading ?? ""}
+        heading={seo.pageH1 || settings?.heroHeading || settings?.siteName || ""}
+        subheading={seo.pageH2 || settings?.heroSubheading || ""}
         description={settings?.heroDescription ?? ""}
         heroImageUrl={settings?.heroImageUrl}
         heroImageAlt={content.heroImageAlt.trim() || "Lucky Saroj — Video Editor portrait and editing workspace"}
