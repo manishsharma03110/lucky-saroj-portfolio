@@ -21,7 +21,7 @@ export function PageContentForm({ pageKey, content, revision, heroImageAssetId }
   const config = PAGE_CONTENT_CONFIG[pageKey];
   const fields = pageContentFields(pageKey, config.fields);
   return (
-    <MediaForm action={action} className={styles.sectionStack}>
+    <MediaForm id={`${pageKey}-content`} action={action} className={`${styles.sectionStack} scroll-mt-24`}>
       <input type="hidden" name="pageKey" value={pageKey} /><input type="hidden" name="revision" value={revision} />
       <FormCard title={config.label}><div className="grid grid-cols-1 gap-5 lg:grid-cols-2">{fields.map((field) => {
         if (field.key === "navItemsJson") return <NavigationLinksEditor key={field.key} name={field.key} defaultValue={content[field.key] ?? field.defaultValue} />;
@@ -29,7 +29,7 @@ export function PageContentForm({ pageKey, content, revision, heroImageAssetId }
         if (field.kind === "image") return <div key={field.key} className="lg:col-span-2"><FileUpload name={field.key} assetIdName="heroImageAssetId" label={field.label} kind="image" defaultValue={content[field.key] ?? field.defaultValue} defaultAssetId={heroImageAssetId} /></div>;
         return <div key={field.key} className={field.kind === "textarea" ? "lg:col-span-2" : undefined}><Label htmlFor={`${pageKey}-${field.key}`}>{field.label}</Label>{field.kind === "textarea" ? <Textarea id={`${pageKey}-${field.key}`} name={field.key} rows={3} maxLength={field.maxLength ?? 1000} defaultValue={content[field.key] ?? field.defaultValue} /> : <Input id={`${pageKey}-${field.key}`} name={field.key} type="text" maxLength={field.maxLength ?? 300} defaultValue={content[field.key] ?? field.defaultValue} />}</div>;
       })}</div></FormCard>
-      {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}{state.status === "success" && state.message && <p className={styles.feedbackSuccess}>{state.message}</p>}
+      {state.status === "error" && state.message && <p className={styles.feedbackError}>{state.message}</p>}{state.status === "success"&&state.message&&<p className={styles.feedbackSuccess}>{state.message}</p>}
       <div className={styles.saveBar}><Button type="submit" disabled={pending}>{pending ? "Saving..." : `Save ${config.label}`}</Button></div>
     </MediaForm>
   );
