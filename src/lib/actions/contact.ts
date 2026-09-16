@@ -4,6 +4,7 @@ import { db, schema } from "@/lib/db";
 import { getServices } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
 import { parseContactOptionsConfig } from "@/lib/contact/contact-options-config";
+import { normalizeInternationalPhone } from "@/lib/contact/country-codes";
 import { createContactSubmissionHandler, type ContactFormState, type ContactSubmissionDependencies, type RawContactSubmission } from "@/lib/contact/contact-submission";
 
 export type { ContactFormState } from "@/lib/contact/contact-submission";
@@ -23,10 +24,11 @@ const handlePopupContactSubmission = createContactSubmissionHandler("popup", dep
 const handleFullContactSubmission = createContactSubmissionHandler("full", dependencies);
 
 function contactSubmissionFromFormData(formData: FormData): RawContactSubmission {
+  const countryCode = String(formData.get("countryCode") ?? "+91");
   return {
     name: String(formData.get("name") ?? ""),
     email: String(formData.get("email") ?? ""),
-    phone: String(formData.get("phone") ?? ""),
+    phone: normalizeInternationalPhone(countryCode, String(formData.get("phone") ?? "")),
     projectType: String(formData.get("projectType") ?? ""),
     budgetRange: String(formData.get("budgetRange") ?? ""),
     videoType: String(formData.get("videoType") ?? ""),
