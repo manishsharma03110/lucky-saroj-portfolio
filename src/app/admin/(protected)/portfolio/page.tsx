@@ -31,10 +31,16 @@ export default async function AdminPortfolioListPage() {
         title="All Projects"
         description={`${rows.length} project${rows.length === 1 ? "" : "s"} in your portfolio`}
         action={
-          <Link href="/admin/portfolio/new" className={styles.primaryAction}>
-            <Plus size={16} />
-            <span>Add project</span>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link href="/admin/pages#portfolio-content" className={styles.primaryAction}>
+              <Pencil size={16} />
+              <span>Edit portfolio content</span>
+            </Link>
+            <Link href="/admin/portfolio/new" className={styles.primaryAction}>
+              <Plus size={16} />
+              <span>Add project</span>
+            </Link>
+          </div>
         }
       />
 
@@ -66,19 +72,10 @@ export default async function AdminPortfolioListPage() {
                 </td>
                 <td data-label="Actions">
                   <div className={styles.actionGroup}>
-                    <Link
-                      href={`/portfolio/${project.slug}`}
-                      target="_blank"
-                      className={styles.iconAction}
-                      aria-label="View live"
-                    >
+                    <Link href={`/portfolio/${project.slug}`} target="_blank" className={styles.iconAction} aria-label="View live">
                       <ExternalLink size={15} />
                     </Link>
-                    <Link
-                      href={`/admin/portfolio/${project.id}/edit`}
-                      className={styles.iconAction}
-                      aria-label="Edit"
-                    >
+                    <Link href={`/admin/portfolio/${project.id}/edit`} className={styles.iconAction} aria-label="Edit">
                       <Pencil size={15} />
                     </Link>
                     <DeleteProjectButton id={project.id} title={project.title} />
@@ -89,9 +86,7 @@ export default async function AdminPortfolioListPage() {
           </tbody>
         </table>
 
-        {rows.length === 0 && (
-          <div className={styles.emptyState}>No projects yet. Add your first project to get started.</div>
-        )}
+        {rows.length === 0 && <div className={styles.emptyState}>No projects yet. Add your first project to get started.</div>}
       </div>
     </div>
   );
