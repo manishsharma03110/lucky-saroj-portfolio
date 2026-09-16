@@ -3,6 +3,7 @@ import { DEFAULT_CONTACT_OPTIONS_SERIALIZED } from "@/lib/contact/contact-option
 
 export const PAGE_CONTENT_EXTRA_FIELDS: Partial<Record<PageContentKey, readonly PageContentField[]>> = {
   global: [
+    { key: "navItemsJson", label: "Primary Navigation Links", kind: "textarea", maxLength: 6000, defaultValue: '[{"label":"Home","href":"/"},{"label":"About","href":"/about"},{"label":"Portfolio","href":"/portfolio"},{"label":"Services","href":"/services"},{"label":"Experience","href":"/experience"},{"label":"Contact","href":"/contact"}]' },
     { key: "popupCloseLabel", label: "Contact Popup — Close Accessibility Label", defaultValue: "Close contact form" },
     { key: "popupEyebrow", label: "Contact Popup — Eyebrow", defaultValue: "Get in touch" },
     { key: "popupHeading", label: "Contact Popup — Heading", defaultValue: "Let's talk" },
