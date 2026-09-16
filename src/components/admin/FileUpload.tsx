@@ -9,6 +9,7 @@ import { useUploadActivity } from "./MediaForm";
 import styles from "./AdminEditorial.module.css";
 
 type UploadInitiation = { assetId: string; pathname: string; kind: "image" | "video" };
+type ImageUploadResult = { assetId: string; pathname: string; kind: "image"; url: string };
 
 export function FileUpload({
   name,
@@ -51,6 +52,22 @@ export function FileUpload({
     reportUpload(true);
     setProgress(0);
     try {
+      if (kind === "image") {
+        const form = new FormData();
+        form.append("file", file);
+        setProgress(20);
+        const response = await fetch("/api/upload/image", { method: "POST", body: form });
+        if (!response.ok) throw new Error("Compressed image upload failed.");
+        const result = (await response.json()) as ImageUploadResult;
+        if (!result.assetId || !result.pathname || !result.url || result.kind !== "image") {
+          throw new Error("Invalid compressed image upload response.");
+        }
+        setProgress(100);
+        setAssetId(result.assetId);
+        setUrl(result.url);
+        return;
+      }
+
       const initiationResponse = await fetch("/api/upload/initiate", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -120,7 +137,7 @@ export function FileUpload({
           {uploading ? (
             <>
               <Loader2 size={21} className="animate-spin" />
-              <span>Uploading… {progress}%</span>
+              <span>{kind === "image" ? "Optimizing & uploading" : "Uploading"}… {progress}%</span>
             </>
           ) : (
             <>
