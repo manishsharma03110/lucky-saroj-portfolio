@@ -10,36 +10,9 @@ import { getPageContent } from "@/lib/db/page-content-service";
 import { getPageSeo } from "@/lib/db/page-seo-service";
 import { createCmsPageMetadata } from "@/lib/seo";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const [seo, settings] = await Promise.all([getPageSeo("contact"), getSiteSettings()]);
-  return createCmsPageMetadata(seo, settings?.ogImageUrl);
-}
-
+export async function generateMetadata(): Promise<Metadata> { const [seo,settings]=await Promise.all([getPageSeo("contact"),getSiteSettings()]); return createCmsPageMetadata(seo,settings?.ogImageUrl); }
 export default async function ContactPage() {
-  const [settings, profile, services, page] = await Promise.all([getSiteSettings(), getAboutProfile(), getServices(), getPageContent("contact")]);
-  const copy = page.content;
-  const socialLinks = [
-    { label: "Instagram", href: settings?.instagramUrl },
-    { label: "X / Twitter", href: settings?.twitterUrl },
-    { label: "YouTube", href: settings?.youtubeUrl },
-    { label: "LinkedIn", href: settings?.linkedinUrl },
-    { label: "Behance", href: settings?.behanceUrl },
-    { label: "Vimeo", href: settings?.vimeoUrl },
-  ];
-
-  return (
-    <PageMotionBoundary className="bg-[var(--background-primary)]">
-      <Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Contact" }]} />
-      <ContactHero eyebrow={copy.heroEyebrow} titleBefore={copy.heroTitleBefore} titleAccent={copy.heroTitleAccent} titleAfter={copy.heroTitleAfter} description={copy.heroDescription} heroImageUrl={copy.heroImageUrl} heroImageAlt={copy.heroImageAlt} />
-      <section className="bg-[var(--background-primary)] py-14 sm:py-16 lg:py-24" aria-labelledby="contact-details-heading">
-        <div className="mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16">
-          <div className="grid gap-12 rounded-lg border border-white/10 bg-[var(--background-secondary)] p-5 sm:p-8 lg:grid-cols-[minmax(18rem,0.68fr)_minmax(0,1.32fr)] lg:items-start lg:gap-10 lg:p-0 lg:pl-10 xl:grid-cols-[minmax(20rem,0.64fr)_minmax(0,1.36fr)] xl:gap-14 xl:pl-12">
-            <ContactInfo name={settings?.siteName ?? profile?.name ?? "Lucky Saroj"} email={settings?.contactEmail} phone={settings?.contactPhone} whatsapp={settings?.whatsapp} location={settings?.location} availability={settings?.availability} paymentTerms={settings?.paymentTerms} turnaroundTime={settings?.turnaroundTime} socialLinks={socialLinks} copy={{ infoEyebrow: copy.infoEyebrow, infoHeadingBefore: copy.infoHeadingBefore, infoHeadingAccent: copy.infoHeadingAccent, infoDescription: copy.infoDescription, officialDetailsLabel: copy.officialDetailsLabel, nameLabel: copy.nameLabel, emailLabel: copy.emailLabel, phoneLabel: copy.phoneLabel, whatsappLabel: copy.whatsappLabel, locationLabel: copy.locationLabel, availabilityLabel: copy.availabilityLabel, followLabel: copy.followLabel, workingTermsLabel: copy.workingTermsLabel, paymentTermsLabel: copy.paymentTermsLabel, turnaroundTimeLabel: copy.turnaroundTimeLabel }} />
-            <ContactFormShell projectCategories={services.map((service) => service.name)} content={copy} />
-          </div>
-        </div>
-      </section>
-      <ContactPortfolioCTA heading={copy.portfolioCtaHeading} description={copy.portfolioCtaDescription} label={copy.portfolioCtaLabel} url={copy.portfolioCtaUrl} />
-    </PageMotionBoundary>
-  );
+  const [settings,profile,services,page,seo]=await Promise.all([getSiteSettings(),getAboutProfile(),getServices(),getPageContent("contact"),getPageSeo("contact")]); const copy=page.content; const h1Override=seo.pageH1.trim(); const h2Override=seo.pageH2.trim();
+  const socialLinks=[{label:"Instagram",href:settings?.instagramUrl},{label:"X / Twitter",href:settings?.twitterUrl},{label:"YouTube",href:settings?.youtubeUrl},{label:"LinkedIn",href:settings?.linkedinUrl},{label:"Behance",href:settings?.behanceUrl},{label:"Vimeo",href:settings?.vimeoUrl}];
+  return <PageMotionBoundary className="bg-[var(--background-primary)]"><Breadcrumb items={[{label:"Home",href:"/"},{label:"Contact"}]}/><ContactHero eyebrow={copy.heroEyebrow} titleBefore={h1Override||copy.heroTitleBefore} titleAccent={h1Override?"":copy.heroTitleAccent} titleAfter={h1Override?"":copy.heroTitleAfter} description={copy.heroDescription} heroImageUrl={copy.heroImageUrl} heroImageAlt={copy.heroImageAlt}/><section className="bg-[var(--background-primary)] py-14 sm:py-16 lg:py-24" aria-labelledby="contact-details-heading"><div className="mx-auto w-full max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><div className="grid gap-12 rounded-lg border border-white/10 bg-[var(--background-secondary)] p-5 sm:p-8 lg:grid-cols-[minmax(18rem,0.68fr)_minmax(0,1.32fr)] lg:items-start lg:gap-10 lg:p-0 lg:pl-10 xl:grid-cols-[minmax(20rem,0.64fr)_minmax(0,1.36fr)] xl:gap-14 xl:pl-12"><ContactInfo name={settings?.siteName??profile?.name??"Lucky Saroj"} email={settings?.contactEmail} phone={settings?.contactPhone} whatsapp={settings?.whatsapp} location={settings?.location} availability={settings?.availability} paymentTerms={settings?.paymentTerms} turnaroundTime={settings?.turnaroundTime} socialLinks={socialLinks} copy={{infoEyebrow:copy.infoEyebrow,infoHeadingBefore:h2Override||copy.infoHeadingBefore,infoHeadingAccent:h2Override?"":copy.infoHeadingAccent,infoDescription:copy.infoDescription,officialDetailsLabel:copy.officialDetailsLabel,nameLabel:copy.nameLabel,emailLabel:copy.emailLabel,phoneLabel:copy.phoneLabel,whatsappLabel:copy.whatsappLabel,locationLabel:copy.locationLabel,availabilityLabel:copy.availabilityLabel,followLabel:copy.followLabel,workingTermsLabel:copy.workingTermsLabel,paymentTermsLabel:copy.paymentTermsLabel,turnaroundTimeLabel:copy.turnaroundTimeLabel}}/><ContactFormShell projectCategories={services.map(service=>service.name)} content={copy}/></div></div></section><ContactPortfolioCTA heading={copy.portfolioCtaHeading} description={copy.portfolioCtaDescription} label={copy.portfolioCtaLabel} url={copy.portfolioCtaUrl}/></PageMotionBoundary>;
 }
