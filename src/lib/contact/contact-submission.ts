@@ -19,7 +19,6 @@ export function createContactSubmissionHandler(context: ContactFormContext, depe
     const parsed = contactSchema.safeParse({ ...raw, formContext: context });
     if (!parsed.success) { const fieldErrors = publicFieldErrors(parsed.error.issues); return { status: "error", message: SAFE_VALIDATION_MESSAGE, ...(Object.keys(fieldErrors ?? {}).length ? { fieldErrors } : {}) }; }
     if (parsed.data.honeypot !== "") return { status: "error", message: SAFE_SPAM_MESSAGE };
-
     if (parsed.data.formContext === "popup") {
       let optionConfig = DEFAULT_CONTACT_OPTIONS_CONFIG;
       if (dependencies.readContactOptions) { try { optionConfig = await dependencies.readContactOptions(); } catch { return { status: "error", message: SAFE_FAILURE_MESSAGE }; } }
@@ -28,19 +27,8 @@ export function createContactSubmissionHandler(context: ContactFormContext, depe
       if (!includesOption(projectTypes, parsed.data.projectType)) return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { projectType: "Please select a supported project type." } };
       if (parsed.data.budgetRange && !includesOption(budgets, parsed.data.budgetRange)) return { status: "error", message: SAFE_VALIDATION_MESSAGE, fieldErrors: { budgetRange: "Please select a supported budget range." } };
     }
-
     const isPopup = parsed.data.formContext === "popup";
-    const message: ContactMessageInput = {
-      name: parsed.data.name,
-      email: parsed.data.email,
-      phone: parsed.data.phone || null,
-      projectType: isPopup ? parsed.data.projectType : "General inquiry",
-      budgetRange: isPopup ? (parsed.data.budgetRange || "Not specified") : "Not specified",
-      videoType: isPopup ? parsed.data.projectType : "Not specified",
-      projectTimeline: null,
-      referenceUrl: null,
-      message: parsed.data.message,
-    };
+    const message: ContactMessageInput = { name: parsed.data.name, email: parsed.data.email, phone: parsed.data.phone || null, projectType: isPopup ? parsed.data.projectType : "General inquiry", budgetRange: isPopup ? (parsed.data.budgetRange || "Not specified") : "Not specified", videoType: isPopup ? parsed.data.projectType : "Not specified", projectTimeline: null, referenceUrl: parsed.data.referenceUrl || null, message: parsed.data.message };
     try { await dependencies.createMessage(message); } catch { return { status: "error", message: SAFE_FAILURE_MESSAGE }; }
     return { status: "success", message: "Thanks — your message has been sent. I'll be in touch soon." };
   };
