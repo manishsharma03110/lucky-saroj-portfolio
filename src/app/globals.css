@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* Core palette — sampled from the approved Figma global styles panel */
   --background-primary: #08090b;
   --background-secondary: #0d0f13;
   --surface-primary: #121419;
@@ -18,251 +17,42 @@
   --border-accent: rgba(59, 130, 246, 0.5);
   --accent-soft: rgba(59, 130, 246, 0.08);
   --accent-glow: rgba(59, 130, 246, 0.14);
-
-  --color-ink: var(--background-primary);
-  --color-ink-soft: var(--surface-elevated);
-  --color-paper: var(--background-primary);
-  --color-paper-dim: var(--background-secondary);
-  --color-card: var(--surface-primary);
-  --color-line: var(--border-primary);
-  --color-line-dark: var(--border-hover);
-  --color-accent: var(--accent-primary);
-  --color-accent-soft: var(--accent-soft);
-  --color-muted: var(--text-secondary);
-
-  --font-display: var(--font-poppins);
-  --font-body: var(--font-inter);
+  --color-ink: var(--background-primary); --color-ink-soft: var(--surface-elevated); --color-paper: var(--background-primary); --color-paper-dim: var(--background-secondary); --color-card: var(--surface-primary); --color-line: var(--border-primary); --color-line-dark: var(--border-hover); --color-accent: var(--accent-primary); --color-accent-soft: var(--accent-soft); --color-muted: var(--text-secondary);
+  --font-display: var(--font-poppins); --font-body: var(--font-inter);
+  --cine-void: var(--background-primary); --cine-surface: var(--surface-primary); --cine-surface-2: var(--surface-elevated); --cine-text-primary: var(--text-primary); --cine-text-secondary: var(--text-secondary); --cine-text-tertiary: var(--text-muted); --cine-accent: var(--accent-primary); --cine-accent-soft: var(--accent-soft); --cine-border: var(--border-soft); --cine-border-strong: var(--border-hover); --cine-radius-sm: 6px; --cine-radius-md: 12px; --cine-radius-lg: 20px; --cine-ease: cubic-bezier(0.22,1,0.36,1); --cine-duration-fast: .2s; --cine-duration-base: .4s; --cine-duration-slow: .8s;
 }
 
-/* Public-site palette boundary. Admin routes remain isolated on the root tokens. */
-.public-site {
-  --public-accent-primary: #3b82f6;
-  --public-accent-hover: #60a5fa;
-  --public-accent-active: #2563eb;
-  --public-accent-subtle: rgba(59, 130, 246, 0.08);
-  --public-accent-border: rgba(59, 130, 246, 0.35);
-  --public-accent-text: #60a5fa;
-  --public-focus-ring: #60a5fa;
-  --public-accent-glow: rgba(59, 130, 246, 0.14);
-  --public-accent-gradient: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #2563eb 100%);
+.public-site { --public-accent-primary:#3b82f6; --public-accent-hover:#60a5fa; --public-accent-active:#2563eb; --public-accent-subtle:rgba(59,130,246,.08); --public-accent-border:rgba(59,130,246,.35); --public-accent-text:#60a5fa; --public-focus-ring:#60a5fa; --public-accent-glow:rgba(59,130,246,.14); --public-accent-gradient:linear-gradient(135deg,#60a5fa 0%,#3b82f6 55%,#2563eb 100%); --surface:#121419; --border-default:#242832; --border-hover:rgba(255,255,255,.16); --focus:var(--public-focus-ring); --accent-primary:var(--public-accent-primary); --accent-hover:var(--public-accent-hover); --accent-active:var(--public-accent-active); --accent-soft:var(--public-accent-subtle); --accent-glow:var(--public-accent-glow); --accent-border:var(--public-accent-border); --accent-text:var(--public-accent-text); --border-accent:var(--public-accent-border); --color-accent:var(--public-accent-primary); --color-accent-soft:var(--public-accent-subtle); --cine-accent:var(--public-accent-primary); --cine-accent-soft:var(--public-accent-subtle); }
+.public-site :focus-visible { outline-color:var(--public-focus-ring); }
 
-  --surface: #121419;
-  --border-default: #242832;
-  --border-hover: rgba(255, 255, 255, 0.16);
-  --focus: var(--public-focus-ring);
+@theme inline { --color-ink:var(--color-ink); --color-ink-soft:var(--color-ink-soft); --color-paper:var(--color-paper); --color-paper-dim:var(--color-paper-dim); --color-card:var(--color-card); --color-line:var(--color-line); --color-line-dark:var(--color-line-dark); --color-accent:var(--color-accent); --color-accent-soft:var(--color-accent-soft); --color-muted:var(--color-muted); --font-display:var(--font-display); --font-body:var(--font-body); --color-cine-void:var(--cine-void); --color-cine-surface:var(--cine-surface); --color-cine-surface-2:var(--cine-surface-2); --color-cine-text-primary:var(--cine-text-primary); --color-cine-text-secondary:var(--cine-text-secondary); --color-cine-text-tertiary:var(--cine-text-tertiary); --color-cine-accent:var(--cine-accent); --color-cine-accent-soft:var(--cine-accent-soft); --color-cine-border:var(--cine-border); --color-cine-border-strong:var(--cine-border-strong); }
 
-  --accent-primary: var(--public-accent-primary);
-  --accent-hover: var(--public-accent-hover);
-  --accent-active: var(--public-accent-active);
-  --accent-soft: var(--public-accent-subtle);
-  --accent-glow: var(--public-accent-glow);
-  --accent-border: var(--public-accent-border);
-  --accent-text: var(--public-accent-text);
-  --border-accent: var(--public-accent-border);
-  --color-accent: var(--public-accent-primary);
-  --color-accent-soft: var(--public-accent-subtle);
-  --cine-accent: var(--public-accent-primary);
-  --cine-accent-soft: var(--public-accent-subtle);
-}
+*, *::before, *::after { box-sizing:border-box; }
+html { width:100%; max-width:100%; overflow-x:clip; scroll-behavior:smooth; }
+body { width:100%; min-width:0; max-width:100%; overflow-x:clip; background:var(--background-primary); color:var(--text-primary); font-family:var(--font-body); }
+img, video, iframe, canvas, svg { max-width:100%; }
 
-.public-site :focus-visible {
-  outline-color: var(--public-focus-ring);
-}
+/* A phone/tablet using the browser's Request Desktop Site option gets a real
+   desktop layout canvas instead of a stretched mobile breakpoint. */
+html[data-requested-desktop="true"] { width:1200px; min-width:1200px; max-width:none; overflow-x:auto; }
+html[data-requested-desktop="true"] body { width:1200px; min-width:1200px; max-width:none; overflow-x:visible; }
+html[data-requested-desktop="true"] img,
+html[data-requested-desktop="true"] video,
+html[data-requested-desktop="true"] iframe,
+html[data-requested-desktop="true"] canvas,
+html[data-requested-desktop="true"] svg { max-width:100%; }
 
-@theme inline {
-  --color-ink: var(--color-ink);
-  --color-ink-soft: var(--color-ink-soft);
-  --color-paper: var(--color-paper);
-  --color-paper-dim: var(--color-paper-dim);
-  --color-card: var(--color-card);
-  --color-line: var(--color-line);
-  --color-line-dark: var(--color-line-dark);
-  --color-accent: var(--color-accent);
-  --color-accent-soft: var(--color-accent-soft);
-  --color-muted: var(--color-muted);
-  --font-display: var(--font-display);
-  --font-body: var(--font-body);
-}
-
-* {
-  scroll-behavior: smooth;
-}
-
-body {
-  background: var(--background-primary);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-}
-
-h1, h2, h3, h4, h5, .font-display {
-  font-family: var(--font-display);
-}
-
-:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-.timecode {
-  font-family: var(--font-body);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.14em;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--color-accent);
-}
-
-.scrubber {
-  position: relative;
-  height: 1px;
-  background: repeating-linear-gradient(
-    to right,
-    var(--color-line) 0,
-    var(--color-line) 1px,
-    transparent 1px,
-    transparent 8px
-  );
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-/* =============================================================================
-   CINEMATIC REDESIGN FOUNDATION
-   -----------------------------------------------------------------------------
-   Additive, namespaced tokens for the new dark/cinematic visual system.
-   These do NOT replace or override the existing --color-* tokens above —
-   every current page and the admin CMS keep using those, unchanged, until
-   each page is individually redesigned. New cinematic components (Section
-   headings, Card, MediaFrame, CustomCursor, Marquee, Playhead, etc.) read
-   from this block instead.
-   ========================================================================== */
-:root {
-  /* Surfaces */
-  --cine-void: var(--background-primary);
-  --cine-surface: var(--surface-primary);
-  --cine-surface-2: var(--surface-elevated);
-
-  /* Typography */
-  --cine-text-primary: var(--text-primary);
-  --cine-text-secondary: var(--text-secondary);
-  --cine-text-tertiary: var(--text-muted);
-
-  /* Controlled electric-blue accent for public interactive states. */
-  --cine-accent: var(--accent-primary);
-  --cine-accent-soft: var(--accent-soft);
-
-  /* Hairlines */
-  --cine-border: var(--border-soft);
-  --cine-border-strong: var(--border-hover);
-
-  /* Radii — moderate, not excessive */
-  --cine-radius-sm: 6px;
-  --cine-radius-md: 12px;
-  --cine-radius-lg: 20px;
-
-  /* Motion */
-  --cine-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --cine-duration-fast: 0.2s;
-  --cine-duration-base: 0.4s;
-  --cine-duration-slow: 0.8s;
-}
-
-@theme inline {
-  --color-cine-void: var(--cine-void);
-  --color-cine-surface: var(--cine-surface);
-  --color-cine-surface-2: var(--cine-surface-2);
-  --color-cine-text-primary: var(--cine-text-primary);
-  --color-cine-text-secondary: var(--cine-text-secondary);
-  --color-cine-text-tertiary: var(--cine-text-tertiary);
-  --color-cine-accent: var(--cine-accent);
-  --color-cine-accent-soft: var(--cine-accent-soft);
-  --color-cine-border: var(--cine-border);
-  --color-cine-border-strong: var(--cine-border-strong);
-}
-
-/* Cinematic type scale — utility classes, opt-in only */
-.cine-display {
-  font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-}
-
-.cine-eyebrow {
-  font-family: var(--font-body);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.18em;
-  font-size: 0.7rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  color: var(--cine-accent);
-}
-
-.cine-body {
-  font-family: var(--font-body);
-  color: var(--cine-text-secondary);
-  line-height: 1.6;
-}
-
-/* Cinematic hairline scrubber — same tick-mark motif as .scrubber above,
-   restyled for dark surfaces */
-.cine-scrubber {
-  position: relative;
-  height: 1px;
-  background: repeating-linear-gradient(
-    to right,
-    var(--cine-border) 0,
-    var(--cine-border) 1px,
-    transparent 1px,
-    transparent 8px
-  );
-}
-
-/* Shared hover-zoom utility for media containers */
-.cine-hover-zoom {
-  transition: transform var(--cine-duration-slow) var(--cine-ease);
-}
-.cine-hover-zoom:hover {
-  transform: scale(1.04);
-}
-
-/* Custom cursor: hide the native cursor only where the cursor component is
-   actively mounted (it self-manages this via a body class), and only above
-   the breakpoint where it applies — mobile always keeps the native cursor. */
-@media (min-width: 1024px) {
-  body.cine-cursor-active,
-  body.cine-cursor-active a,
-  body.cine-cursor-active button {
-    cursor: none;
-  }
-}
-
-@keyframes cine-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
+h1,h2,h3,h4,h5,.font-display { font-family:var(--font-display); }
+:focus-visible { outline:2px solid var(--color-accent); outline-offset:3px; }
+.timecode { font-family:var(--font-body); font-variant-numeric:tabular-nums; letter-spacing:.14em; font-size:.72rem; font-weight:500; color:var(--color-accent); }
+.scrubber,.cine-scrubber { position:relative; height:1px; background:repeating-linear-gradient(to right,var(--color-line) 0,var(--color-line) 1px,transparent 1px,transparent 8px); }
+.line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.line-clamp-3 { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.cine-display { font-family:var(--font-display); font-weight:700; line-height:1.02; letter-spacing:-.02em; }
+.cine-eyebrow { font-family:var(--font-body); font-variant-numeric:tabular-nums; letter-spacing:.18em; font-size:.7rem; font-weight:500; text-transform:uppercase; color:var(--cine-accent); }
+.cine-body { font-family:var(--font-body); color:var(--cine-text-secondary); line-height:1.6; }
+.cine-hover-zoom { transition:transform var(--cine-duration-slow) var(--cine-ease); }
+.cine-hover-zoom:hover { transform:scale(1.04); }
+@media (min-width:1024px) { body.cine-cursor-active,body.cine-cursor-active a,body.cine-cursor-active button { cursor:none; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important; scroll-behavior:auto!important; } }
+@keyframes cine-marquee { from { transform:translateX(0); } to { transform:translateX(-50%); } }

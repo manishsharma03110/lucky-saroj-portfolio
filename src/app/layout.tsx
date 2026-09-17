@@ -14,6 +14,7 @@ type Extra = { twitterCardType: "summary" | "summary_large_image"; twitterSiteUs
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,24 +48,31 @@ export async function generateMetadata(): Promise<Metadata> {
 const desktopRequestScript = `
 (function () {
   try {
-    var ua = navigator.userAgent || '';
-    var mobileUA = /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(ua);
-    var coarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    var smallPhysicalScreen = Math.min(screen.width || 9999, screen.height || 9999) <= 900;
-    var likelyMobileHardware = coarsePointer && smallPhysicalScreen;
+    var root = document.documentElement;
+    var viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) return;
 
-    // Mobile browsers normally advertise a mobile UA. When their built-in
-    // "Request Desktop Site" mode is enabled, that marker is removed while
-    // the physical device remains touch/coarse-pointer hardware.
-    if (likelyMobileHardware && !mobileUA) {
-      var viewport = document.querySelector('meta[name="viewport"]');
-      if (viewport) {
-        viewport.setAttribute('content', 'width=1200, initial-scale=1');
-      }
-      document.documentElement.dataset.requestedDesktop = 'true';
+    var ua = navigator.userAgent || '';
+    var platform = navigator.platform || '';
+    var touchPoints = navigator.maxTouchPoints || 0;
+    var mobileUA = /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(ua);
+    var iPadDesktopUA = platform === 'MacIntel' && touchPoints > 1;
+    var coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+    var screenShortSide = Math.min(screen.width || 9999, screen.height || 9999);
+    var compactTouchHardware = touchPoints > 0 && (coarsePointer || iPadDesktopUA) && screenShortSide <= 1024;
+    var requestedDesktop = compactTouchHardware && !mobileUA && !iPadDesktopUA;
+
+    if (requestedDesktop) {
+      viewport.setAttribute('content', 'width=1200, initial-scale=1, viewport-fit=cover');
+      root.dataset.requestedDesktop = 'true';
+      root.dataset.responsiveMode = 'desktop';
+    } else {
+      viewport.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
+      delete root.dataset.requestedDesktop;
+      root.dataset.responsiveMode = mobileUA || compactTouchHardware ? 'mobile' : 'desktop';
     }
   } catch (_) {
-    // Keep the standard responsive viewport if browser detection is unavailable.
+    // Fall back to Next.js' standard responsive viewport.
   }
 })();
 `;
