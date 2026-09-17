@@ -45,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const desktopRequestScript = `
+const responsiveModeScript = `
 (function () {
   try {
     var root = document.documentElement;
@@ -55,12 +55,20 @@ const desktopRequestScript = `
     var ua = navigator.userAgent || '';
     var platform = navigator.platform || '';
     var touchPoints = navigator.maxTouchPoints || 0;
-    var mobileUA = /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(ua);
-    var iPadDesktopUA = platform === 'MacIntel' && touchPoints > 1;
+    var mobileToken = /iPhone|iPad|iPod|Android|Mobile|IEMobile|Opera Mini/i.test(ua);
+    var appleMobileToken = /iPhone|iPad|iPod/i.test(ua);
+    var macStyleUA = /Macintosh/i.test(ua);
+    var iPadDesktopUA = macStyleUA && (platform === 'MacIntel' || platform === 'Macintosh') && touchPoints > 1;
     var coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    var screenShortSide = Math.min(screen.width || 9999, screen.height || 9999);
-    var compactTouchHardware = touchPoints > 0 && (coarsePointer || iPadDesktopUA) && screenShortSide <= 1024;
-    var requestedDesktop = compactTouchHardware && !mobileUA && !iPadDesktopUA;
+    var shortSide = Math.min(screen.width || 9999, screen.height || 9999);
+    var phoneSizedScreen = shortSide <= 500;
+    var touchDevice = touchPoints > 0 || coarsePointer;
+
+    // iPhone Safari's Request Desktop Website can expose a desktop/Mac-style UA.
+    // A Mac-style UA + touch + phone-sized physical screen is therefore treated
+    // as an explicit desktop-content request, while normal iPhone UA stays mobile.
+    var iphoneRequestedDesktop = macStyleUA && touchDevice && phoneSizedScreen && !appleMobileToken;
+    var requestedDesktop = iphoneRequestedDesktop || (touchDevice && shortSide <= 1024 && !mobileToken && !iPadDesktopUA);
 
     if (requestedDesktop) {
       viewport.setAttribute('content', 'width=1200, initial-scale=1, viewport-fit=cover');
@@ -69,10 +77,10 @@ const desktopRequestScript = `
     } else {
       viewport.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
       delete root.dataset.requestedDesktop;
-      root.dataset.responsiveMode = mobileUA || compactTouchHardware ? 'mobile' : 'desktop';
+      root.dataset.responsiveMode = mobileToken || touchDevice ? 'mobile' : 'desktop';
     }
   } catch (_) {
-    // Fall back to Next.js' standard responsive viewport.
+    // Keep the standards-based responsive viewport if browser signals are unavailable.
   }
 })();
 `;
@@ -81,8 +89,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Script id="desktop-site-viewport" strategy="beforeInteractive">
-          {desktopRequestScript}
+        <Script id="responsive-site-viewport" strategy="beforeInteractive">
+          {responsiveModeScript}
         </Script>
         {children}
       </body>
