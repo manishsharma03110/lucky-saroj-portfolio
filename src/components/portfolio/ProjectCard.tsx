@@ -18,14 +18,15 @@ export function hasUsableVisual(url: string | null | undefined) {
 }
 
 function ProjectVisual({ project, categoryName, mediaUrl, layout, copy }: { project: Project; categoryName?: string; mediaUrl?: string | null; layout: Layout; copy: CardCopy }) {
+  // thumbnailUrl is the canonical Project Banner. Legacy poster/media values remain
+  // read-only fallbacks so existing projects never lose their visual during migration.
   const visualUrl = hasUsableVisual(project.thumbnailUrl) ? project.thumbnailUrl : hasUsableVisual(project.posterUrl) ? project.posterUrl : hasUsableVisual(mediaUrl) ? mediaUrl : null;
   const visualAlt = project.thumbnailAlt?.trim() || `${project.title} ${copy.previewAltSuffix}`;
   const featured = layout === "featured";
   const fallbackVariant = project.title.split("").reduce((total, character) => total + character.charCodeAt(0), 0) % 3;
-  const aspect = visualUrl ? featured ? "aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/11]" : layout === "wide" ? "aspect-[4/3] sm:aspect-[16/10]" : "aspect-[4/3]" : featured ? "aspect-[16/10] sm:aspect-[16/9] lg:aspect-[2/1]" : "aspect-[16/10] sm:aspect-[16/9]";
 
   return (
-    <div className={`relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)] ${aspect}`}>
+    <div className="relative aspect-video overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)]">
       {visualUrl ? <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.025]" style={{ backgroundImage: `url('${visualUrl}')` }} role="img" aria-label={visualAlt} /> : (
         <div className={`absolute inset-0 ${fallbackVariant === 0 ? "bg-[radial-gradient(circle_at_78%_25%,rgba(59,130,246,0.12),transparent_32%),linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-primary)_76%)]" : fallbackVariant === 1 ? "bg-[radial-gradient(circle_at_20%_78%,rgba(59,130,246,0.10),transparent_30%),linear-gradient(125deg,var(--background-primary)_0%,var(--surface-elevated)_100%)]" : "bg-[linear-gradient(155deg,var(--surface-elevated)_0%,var(--surface-primary)_48%,var(--background-primary)_100%)]"}`}>
           <span className={`absolute select-none font-display text-[clamp(5rem,12vw,10rem)] leading-none text-white/[0.055] ${fallbackVariant === 1 ? "-left-2 bottom-0" : "right-5 top-2"}`} aria-hidden>{initials(project.title)}</span>
