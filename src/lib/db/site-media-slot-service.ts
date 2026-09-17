@@ -13,6 +13,7 @@ export const SITE_IMAGE_SLOTS = [
   "og_image",
   "services_hero_image",
   "experience_hero_image",
+  "portfolio_hero_image",
   "contact_hero_image",
 ] as const;
 

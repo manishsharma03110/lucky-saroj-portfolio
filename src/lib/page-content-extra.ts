@@ -5,7 +5,7 @@ export const PAGE_CONTENT_EXTRA_FIELDS: Partial<Record<PageContentKey, readonly 
   global: [
     { key: "navItemsJson", label: "Primary Navigation Links", kind: "textarea", maxLength: 6000, defaultValue: '[{"label":"Home","href":"/"},{"label":"About","href":"/about"},{"label":"Portfolio","href":"/portfolio"},{"label":"Services","href":"/services"},{"label":"Experience","href":"/experience"},{"label":"Contact","href":"/contact"}]' },
     { key: "popupCloseLabel", label: "Contact Popup — Close Accessibility Label", defaultValue: "Close contact form" },
-    { key: "popupEyebrow", label: "Contact Popup — Eyebrow", defaultValue: "Get in touch" },
+    { key: "popupEyebrow", label: "Contact Popup — Eyrow", defaultValue: "Get in touch" },
     { key: "popupHeading", label: "Contact Popup — Heading", defaultValue: "Let's talk" },
     { key: "popupHeadingAccent", label: "Contact Popup — Accent Heading", defaultValue: "About Your Project" },
     { key: "popupDescription", label: "Contact Popup — Description", kind: "textarea", maxLength: 500, defaultValue: "Have a project in mind? I'd love to hear from you. Let's create something amazing together." },
@@ -44,6 +44,12 @@ export const PAGE_CONTENT_EXTRA_FIELDS: Partial<Record<PageContentKey, readonly 
     { key: "toolsHeading", label: "Tools Section Heading", defaultValue: "The tools behind the work." },
   ],
   portfolio: [
+    { key: "heroImageUrl", label: "Portfolio Hero Image", kind: "image", defaultValue: "" },
+    { key: "heroImageAlt", label: "Portfolio Hero Image Alt Text", maxLength: 240, defaultValue: "Video editing portfolio showcase" },
+    { key: "projectsPerPage", label: "Projects Per Page", defaultValue: "12" },
+    { key: "defaultSorting", label: "Default Sorting (latest or manual)", defaultValue: "manual" },
+    { key: "showCategoryFilter", label: "Show Category Filter (true or false)", defaultValue: "true" },
+    { key: "featuredBehavior", label: "Featured Behavior (hero or inline)", defaultValue: "hero" },
     { key: "filterAllLabel", label: "Category Filter — All Label", defaultValue: "All" },
     { key: "filterAriaLabel", label: "Category Filter — Accessibility Label", defaultValue: "Filter projects by category" },
     { key: "collectionProjectSingular", label: "Collection Count — Singular", defaultValue: "project" },
