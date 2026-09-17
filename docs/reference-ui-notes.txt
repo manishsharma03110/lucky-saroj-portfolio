@@ -1,0 +1,1 @@
+YouTube iframe branding is provider-controlled. This release masks the custom frame zones and disables native embedded controls/fullscreen; it does not claim removal of provider branding from YouTube itself.

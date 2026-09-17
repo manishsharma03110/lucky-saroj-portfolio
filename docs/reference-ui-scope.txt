@@ -1,0 +1,1 @@
+Scope: Portfolio Projects admin reference layout + shared cinematic VideoPlayer reference layout. No generated images. Preserve CMS data and schema.
