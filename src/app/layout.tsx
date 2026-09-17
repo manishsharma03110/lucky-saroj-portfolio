@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
+import { headers } from "next/headers";
 import { Inter, Poppins } from "next/font/google";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -11,11 +11,25 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variabl
 const poppins = Poppins({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-poppins", display: "swap" });
 type Extra = { twitterCardType: "summary" | "summary_large_image"; twitterSiteUsername: string | null };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  viewportFit: "cover",
-};
+export async function generateViewport(): Promise<Viewport> {
+  const requestHeaders = await headers();
+  const ua = requestHeaders.get("user-agent") || "";
+  const hasMobileToken = /iPhone|iPad|iPod|Android|Mobile|IEMobile|Opera Mini/i.test(ua);
+  const safariWebKit = /AppleWebKit/i.test(ua) && /Safari/i.test(ua);
+  const macDesktopUA = /Macintosh/i.test(ua) && !hasMobileToken;
+
+  // Safari's Request Desktop Website changes the request identity before the
+  // document is returned. Choosing the viewport on the server means CSS media
+  // queries see desktop width on the very first layout pass; mutating the meta
+  // viewport after load is not reliable in iOS Safari.
+  const requestedDesktopSafari = safariWebKit && macDesktopUA;
+
+  return {
+    width: requestedDesktopSafari ? 1200 : "device-width",
+    initialScale: 1,
+    viewportFit: "cover",
+  };
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, extraRows] = await Promise.all([
@@ -45,55 +59,10 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const responsiveModeScript = `
-(function () {
-  try {
-    var root = document.documentElement;
-    var viewport = document.querySelector('meta[name="viewport"]');
-    if (!viewport) return;
-
-    var ua = navigator.userAgent || '';
-    var platform = navigator.platform || '';
-    var touchPoints = navigator.maxTouchPoints || 0;
-    var mobileToken = /iPhone|iPad|iPod|Android|Mobile|IEMobile|Opera Mini/i.test(ua);
-    var appleMobileToken = /iPhone|iPad|iPod/i.test(ua);
-    var macStyleUA = /Macintosh/i.test(ua);
-    var iPadDesktopUA = macStyleUA && (platform === 'MacIntel' || platform === 'Macintosh') && touchPoints > 1;
-    var coarsePointer = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-    var shortSide = Math.min(screen.width || 9999, screen.height || 9999);
-    var phoneSizedScreen = shortSide <= 500;
-    var touchDevice = touchPoints > 0 || coarsePointer;
-
-    // iPhone Safari's Request Desktop Website can expose a desktop/Mac-style UA.
-    // A Mac-style UA + touch + phone-sized physical screen is therefore treated
-    // as an explicit desktop-content request, while normal iPhone UA stays mobile.
-    var iphoneRequestedDesktop = macStyleUA && touchDevice && phoneSizedScreen && !appleMobileToken;
-    var requestedDesktop = iphoneRequestedDesktop || (touchDevice && shortSide <= 1024 && !mobileToken && !iPadDesktopUA);
-
-    if (requestedDesktop) {
-      viewport.setAttribute('content', 'width=1200, initial-scale=1, viewport-fit=cover');
-      root.dataset.requestedDesktop = 'true';
-      root.dataset.responsiveMode = 'desktop';
-    } else {
-      viewport.setAttribute('content', 'width=device-width, initial-scale=1, viewport-fit=cover');
-      delete root.dataset.requestedDesktop;
-      root.dataset.responsiveMode = mobileToken || touchDevice ? 'mobile' : 'desktop';
-    }
-  } catch (_) {
-    // Keep the standards-based responsive viewport if browser signals are unavailable.
-  }
-})();
-`;
-
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">
-        <Script id="responsive-site-viewport" strategy="beforeInteractive">
-          {responsiveModeScript}
-        </Script>
-        {children}
-      </body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }
