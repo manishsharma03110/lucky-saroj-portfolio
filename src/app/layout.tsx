@@ -5,6 +5,7 @@ import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { getSiteSettings } from "@/lib/db/queries";
 import { DEFAULT_SITE_DESCRIPTION, DEFAULT_SITE_TITLE, resolveSiteUrl } from "@/lib/seo";
+import { CmsLiveSync } from "@/components/CmsLiveSync";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-inter", display: "swap" });
@@ -17,18 +18,8 @@ export async function generateViewport(): Promise<Viewport> {
   const hasMobileToken = /iPhone|iPad|iPod|Android|Mobile|IEMobile|Opera Mini/i.test(ua);
   const safariWebKit = /AppleWebKit/i.test(ua) && /Safari/i.test(ua);
   const macDesktopUA = /Macintosh/i.test(ua) && !hasMobileToken;
-
-  // Safari's Request Desktop Website changes the request identity before the
-  // document is returned. Choosing the viewport on the server means CSS media
-  // queries see desktop width on the very first layout pass; mutating the meta
-  // viewport after load is not reliable in iOS Safari.
   const requestedDesktopSafari = safariWebKit && macDesktopUA;
-
-  return {
-    width: requestedDesktopSafari ? 1200 : "device-width",
-    initialScale: 1,
-    viewportFit: "cover",
-  };
+  return { width: requestedDesktopSafari ? 1200 : "device-width", initialScale: 1, viewportFit: "cover" };
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,19 +33,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const image = settings?.ogImageUrl || undefined;
   const siteName = settings?.siteName || "Lucky Saroj";
   return {
-    metadataBase: resolveSiteUrl(),
-    title: { default: title, template: `%s — ${siteName}` },
-    description,
-    alternates: { canonical: "/" },
+    metadataBase: resolveSiteUrl(), title: { default: title, template: `%s — ${siteName}` }, description, alternates: { canonical: "/" },
     ...(settings?.favicon ? { icons: { icon: settings.favicon } } : {}),
     openGraph: { type: "website", siteName, title, description, url: "/", ...(image ? { images: [image] } : {}) },
-    twitter: {
-      card: extra?.twitterCardType ?? (image ? "summary_large_image" : "summary"),
-      title,
-      description,
-      ...(extra?.twitterSiteUsername ? { site: extra.twitterSiteUsername } : {}),
-      ...(image ? { images: [image] } : {}),
-    },
+    twitter: { card: extra?.twitterCardType ?? (image ? "summary_large_image" : "summary"), title, description, ...(extra?.twitterSiteUsername ? { site: extra.twitterSiteUsername } : {}), ...(image ? { images: [image] } : {}) },
     verification: settings?.googleSiteVerification ? { google: settings.googleSiteVerification } : undefined,
   };
 }
@@ -62,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col"><CmsLiveSync />{children}</body>
     </html>
   );
 }
