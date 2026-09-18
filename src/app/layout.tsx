@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
 import { Inter, Poppins } from "next/font/google";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -12,27 +11,11 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variabl
 const poppins = Poppins({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-poppins", display: "swap" });
 type Extra = { twitterCardType: "summary" | "summary_large_image"; twitterSiteUsername: string | null };
 
-export async function generateViewport(): Promise<Viewport> {
-  const requestHeaders = await headers();
-  const ua = requestHeaders.get("user-agent") || "";
-  const chMobile = requestHeaders.get("sec-ch-ua-mobile");
-
-  // Root cause: Desktop Site can replace the phone UA with an ordinary desktop
-  // UA (Windows/Mac/Linux), so platform-specific Android/iOS detection is not
-  // reliable. Treat only explicit mobile requests as mobile. Everything else
-  // receives a desktop layout viewport; desktop browsers ignore/fit this
-  // naturally, while a phone requesting Desktop Site gets the same lg/xl
-  // breakpoint composition as desktop.
-  const explicitMobile =
-    chMobile === "?1" ||
-    /iPhone|iPod|Android.*Mobile|Windows Phone|IEMobile|Opera Mini|Mobile/i.test(ua);
-
-  return {
-    width: explicitMobile ? "device-width" : 1200,
-    initialScale: 1,
-    viewportFit: "cover",
-  };
-}
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, extraRows] = await Promise.all([
