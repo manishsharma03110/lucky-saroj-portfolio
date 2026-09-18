@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Inter, Poppins } from "next/font/google";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -11,7 +12,33 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variabl
 const poppins = Poppins({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-poppins", display: "swap" });
 type Extra = { twitterCardType: "summary" | "summary_large_image"; twitterSiteUsername: string | null };
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+export async function generateViewport(): Promise<Viewport> {
+  const requestHeaders = await headers();
+  const ua = requestHeaders.get("user-agent") || "";
+  const chMobile = requestHeaders.get("sec-ch-ua-mobile");
+  const chPlatform = requestHeaders.get("sec-ch-ua-platform") || "";
+
+  // Browsers that explicitly request a desktop site remove their normal mobile
+  // signal. Android Chromium can still expose the Android platform through UA
+  // or Client Hints; iOS/iPadOS Safari presents a Macintosh desktop UA.
+  // Give those requests a real desktop layout viewport so every Tailwind
+  // lg/xl section (header, grids, about, footer and public pages) switches as
+  // one system instead of producing a mixed mobile/desktop composition.
+  const androidDesktopRequest =
+    (/Android/i.test(ua) && !/Mobile/i.test(ua)) ||
+    (/Android/i.test(chPlatform) && chMobile === "?0");
+  const appleDesktopRequest =
+    /Macintosh/i.test(ua) &&
+    /AppleWebKit/i.test(ua) &&
+    /Safari/i.test(ua) &&
+    !/Mobile\//i.test(ua);
+
+  return {
+    width: androidDesktopRequest || appleDesktopRequest ? 1200 : "device-width",
+    initialScale: 1,
+    viewportFit: "cover",
+  };
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, extraRows] = await Promise.all([
