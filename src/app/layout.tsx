@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
 import { Inter, Poppins } from "next/font/google";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
@@ -12,15 +11,7 @@ const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variabl
 const poppins = Poppins({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-poppins", display: "swap" });
 type Extra = { twitterCardType: "summary" | "summary_large_image"; twitterSiteUsername: string | null };
 
-export async function generateViewport(): Promise<Viewport> {
-  const requestHeaders = await headers();
-  const ua = requestHeaders.get("user-agent") || "";
-  const hasMobileToken = /iPhone|iPad|iPod|Android|Mobile|IEMobile|Opera Mini/i.test(ua);
-  const safariWebKit = /AppleWebKit/i.test(ua) && /Safari/i.test(ua);
-  const macDesktopUA = /Macintosh/i.test(ua) && !hasMobileToken;
-  const requestedDesktopSafari = safariWebKit && macDesktopUA;
-  return { width: requestedDesktopSafari ? 1200 : "device-width", initialScale: 1, viewportFit: "cover" };
-}
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, extraRows] = await Promise.all([
