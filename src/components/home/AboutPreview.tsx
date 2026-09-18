@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { CountUpStat } from "@/components/home/CountUpStat";
 import { getAboutProfile } from "@/lib/db/queries";
@@ -32,7 +32,7 @@ export async function AboutPreview({ content }: { content: HomePageContent }) {
       <div className="mx-auto grid w-full max-w-[1480px] items-center gap-9 px-5 sm:px-8 md:gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:gap-16 lg:px-12 2xl:gap-24 2xl:px-16">
         <div className="relative mx-auto aspect-[4/5] w-full max-w-[470px] overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-elevated)] transition-transform duration-300 motion-safe:hover:-translate-y-1 lg:mx-0">
           {profile.profileImageUrl ? (
-            <div className="h-full w-full bg-cover bg-center grayscale-[15%]" style={{ backgroundImage: `url('${profile.profileImageUrl}')` }} role="img" aria-label={content.aboutProfileImageAlt || profile.name} />
+            <Image src={profile.profileImageUrl} alt={content.aboutProfileImageAlt || profile.name} fill sizes="(max-width: 1023px) min(100vw - 40px, 470px), 470px" className="object-cover object-center grayscale-[15%]" />
           ) : (
             <div className="relative flex h-full items-end bg-[radial-gradient(circle_at_62%_32%,var(--accent-glow),transparent_38%),linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-primary)_78%)] p-7 sm:p-9">
               <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:64px_64px]" aria-hidden />
@@ -53,7 +53,7 @@ export async function AboutPreview({ content }: { content: HomePageContent }) {
           <h2 className="mt-5 max-w-2xl text-[2.25rem] font-semibold leading-[1] tracking-[-0.045em] text-[var(--text-primary)] sm:text-4xl lg:text-5xl">{profile.headline ?? profile.name}</h2>
           {profile.biography && <p className="mt-6 max-w-[620px] text-base leading-7 text-white/58 sm:text-[1.0625rem]">{profile.biography}</p>}
           {stats.length > 0 && <dl className="mt-8 grid grid-cols-2 border-y border-white/12 sm:grid-cols-4">{stats.map((stat) => <CountUpStat key={stat.label} target={stat.target} fallback={stat.fallback} label={stat.label} />)}</dl>}
-          <Link href={content.aboutCtaUrl} className="group relative mt-9 inline-flex items-center gap-2 pb-1 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)] after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent-primary)] after:transition-transform after:duration-300 hover:after:scale-x-100"><span>{content.aboutCtaLabel}</span><ArrowUpRight size={17} className="transition-transform duration-300 motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden /></Link>
+          <Link href={content.aboutCtaUrl} className="group relative mt-9 inline-flex items-center gap-2 pb-1 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--text-primary)] transition-colors hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--surface-primary)] after:absolute after:inset-x-0 after:bottom-0 after:h-px after:origin-left after:scale-x-0 after:bg-[var(--accent-primary)] after:transition-transform after:duration-300 hover:after:scale-x-100"><span>{content.aboutCtaLabel}</span><span className="text-base leading-none transition-transform duration-300 motion-safe:group-hover:translate-x-0.5 motion-safe:group-hover:-translate-y-0.5" aria-hidden>↗</span></Link>
         </div>
       </div>
     </section>
