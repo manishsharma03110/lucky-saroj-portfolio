@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { del, put } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { compressCmsImage, IMAGE_TARGET_MAX_BYTES } from "@/lib/media/image-compression";
@@ -27,9 +27,10 @@ export async function GET(request: Request) {
     const original = Buffer.from(await response.arrayBuffer());
     const compressed = await compressCmsImage(original);
     if (compressed.byteLength > IMAGE_TARGET_MAX_BYTES) return NextResponse.json({ error: "Compressed hero exceeded 200 KB." }, { status: 500 });
-    const pathname = `cms-media/hero-compressed-${Date.now()}.webp`;
+    const assetId = randomUUID();
+    const pathname = `cms-media/${assetId}/image`;
     const blob = await put(pathname, compressed, { access: "public", addRandomSuffix: false, allowOverwrite: false, contentType: "image/webp", token });
-    return NextResponse.json({ url: blob.url, pathname: blob.pathname, originalBytes: original.byteLength, storedBytes: compressed.byteLength, under200KB: true });
+    return NextResponse.json({ assetId, url: blob.url, pathname: blob.pathname, originalBytes: original.byteLength, storedBytes: compressed.byteLength, under200KB: true });
   }
 
   if (action === "delete-old") {
