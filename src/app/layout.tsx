@@ -16,25 +16,19 @@ export async function generateViewport(): Promise<Viewport> {
   const requestHeaders = await headers();
   const ua = requestHeaders.get("user-agent") || "";
   const chMobile = requestHeaders.get("sec-ch-ua-mobile");
-  const chPlatform = requestHeaders.get("sec-ch-ua-platform") || "";
 
-  // Browsers that explicitly request a desktop site remove their normal mobile
-  // signal. Android Chromium can still expose the Android platform through UA
-  // or Client Hints; iOS/iPadOS Safari presents a Macintosh desktop UA.
-  // Give those requests a real desktop layout viewport so every Tailwind
-  // lg/xl section (header, grids, about, footer and public pages) switches as
-  // one system instead of producing a mixed mobile/desktop composition.
-  const androidDesktopRequest =
-    (/Android/i.test(ua) && !/Mobile/i.test(ua)) ||
-    (/Android/i.test(chPlatform) && chMobile === "?0");
-  const appleDesktopRequest =
-    /Macintosh/i.test(ua) &&
-    /AppleWebKit/i.test(ua) &&
-    /Safari/i.test(ua) &&
-    !/Mobile\//i.test(ua);
+  // Root cause: Desktop Site can replace the phone UA with an ordinary desktop
+  // UA (Windows/Mac/Linux), so platform-specific Android/iOS detection is not
+  // reliable. Treat only explicit mobile requests as mobile. Everything else
+  // receives a desktop layout viewport; desktop browsers ignore/fit this
+  // naturally, while a phone requesting Desktop Site gets the same lg/xl
+  // breakpoint composition as desktop.
+  const explicitMobile =
+    chMobile === "?1" ||
+    /iPhone|iPod|Android.*Mobile|Windows Phone|IEMobile|Opera Mini|Mobile/i.test(ua);
 
   return {
-    width: androidDesktopRequest || appleDesktopRequest ? 1200 : "device-width",
+    width: explicitMobile ? "device-width" : 1200,
     initialScale: 1,
     viewportFit: "cover",
   };
