@@ -43,7 +43,7 @@ export function WorkCard({
         href={`/portfolio/${project.slug}`}
         className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-primary)]"
       >
-        <div className={`relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow,transform] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)] ${large ? "aspect-[4/3] sm:aspect-[16/9] lg:aspect-[2.35/1]" : "aspect-[4/3] sm:aspect-[16/10]"}`}>
+        <div className={`relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow,transform] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)] ${large ? "aspect-[16/10] min-[480px]:aspect-[16/9] lg:aspect-[2.35/1]" : "aspect-[16/10]"}`}>
           {visualUrl ? (
             <InteractiveWorkVisual
               title={project.title}
@@ -67,7 +67,7 @@ export function WorkCard({
             </div>
           )}
 
-          <div className="pointer-events-none absolute inset-x-5 bottom-5 z-10 flex items-end justify-between gap-4 sm:inset-x-7 sm:bottom-7">
+          <div className="pointer-events-none absolute inset-x-4 bottom-4 sm:inset-x-7 sm:bottom-7 z-10 flex items-end justify-between gap-4 sm:inset-x-7 sm:bottom-7">
             <span className="text-sm font-medium text-white">View project</span>
             <ArrowUpRight size={20} className="text-[var(--accent-hover)] transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
           </div>
@@ -76,7 +76,7 @@ export function WorkCard({
         <div className={`grid gap-3 border-b border-white/[0.09] py-5 ${large ? "md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:gap-10" : ""}`}>
           <div className="min-w-0">
             {project.clientName && <p className="mb-2 break-words text-sm text-[var(--accent-primary)]">{project.clientName}</p>}
-            <h3 className={`break-words font-display font-semibold leading-tight tracking-[-0.03em] text-[var(--text-primary)] ${large ? "text-[1.75rem] sm:text-3xl lg:text-4xl" : "text-2xl sm:text-[1.75rem]"}`}>
+            <h3 className={`break-words font-display font-semibold leading-tight tracking-[-0.03em] text-[var(--text-primary)] ${large ? "text-[1.45rem] min-[480px]:text-[1.75rem] sm:text-3xl lg:text-4xl" : "text-xl min-[480px]:text-2xl sm:text-[1.75rem]"}`}>
               {project.title}
             </h3>
           </div>
