@@ -32,16 +32,6 @@ html { width:100%; max-width:100%; overflow-x:clip; scroll-behavior:smooth; }
 body { width:100%; min-width:0; max-width:100%; overflow-x:clip; background:var(--background-primary); color:var(--text-primary); font-family:var(--font-body); }
 img, video, iframe, canvas, svg { max-width:100%; }
 
-/* A phone/tablet using the browser's Request Desktop Site option gets a real
-   desktop layout canvas instead of a stretched mobile breakpoint. */
-html[data-requested-desktop="true"] { width:1200px; min-width:1200px; max-width:none; overflow-x:auto; }
-html[data-requested-desktop="true"] body { width:1200px; min-width:1200px; max-width:none; overflow-x:visible; }
-html[data-requested-desktop="true"] img,
-html[data-requested-desktop="true"] video,
-html[data-requested-desktop="true"] iframe,
-html[data-requested-desktop="true"] canvas,
-html[data-requested-desktop="true"] svg { max-width:100%; }
-
 h1,h2,h3,h4,h5,.font-display { font-family:var(--font-display); }
 :focus-visible { outline:2px solid var(--color-accent); outline-offset:3px; }
 .timecode { font-family:var(--font-body); font-variant-numeric:tabular-nums; letter-spacing:.14em; font-size:.72rem; font-weight:500; color:var(--color-accent); }
