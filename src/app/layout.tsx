@@ -1,38 +1,25 @@
 import type { Metadata, Viewport } from "next";
-import { headers } from "next/headers";
 import { Inter, Poppins } from "next/font/google";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { getSiteSettings } from "@/lib/db/queries";
 import { DEFAULT_SITE_DESCRIPTION, DEFAULT_SITE_TITLE, resolveSiteUrl } from "@/lib/seo";
 import { CmsLiveSync } from "@/components/CmsLiveSync";
+import { ViewportModeBootstrap } from "@/components/ViewportModeBootstrap";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-inter", display: "swap" });
 const poppins = Poppins({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-poppins", display: "swap" });
 type Extra = { twitterCardType: "summary" | "summary_large_image"; twitterSiteUsername: string | null };
 
-export async function generateViewport(): Promise<Viewport> {
-  const requestHeaders = await headers();
-  const ua = requestHeaders.get("user-agent") || "";
-  const chMobile = requestHeaders.get("sec-ch-ua-mobile");
-
-  // Root cause: Desktop Site can replace the phone UA with an ordinary desktop
-  // UA (Windows/Mac/Linux), so platform-specific Android/iOS detection is not
-  // reliable. Treat only explicit mobile requests as mobile. Everything else
-  // receives a desktop layout viewport; desktop browsers ignore/fit this
-  // naturally, while a phone requesting Desktop Site gets the same lg/xl
-  // breakpoint composition as desktop.
-  const explicitMobile =
-    chMobile === "?1" ||
-    /iPhone|iPod|Android.*Mobile|Windows Phone|IEMobile|Opera Mini|Mobile/i.test(ua);
-
-  return {
-    width: explicitMobile ? "device-width" : 1200,
-    initialScale: 1,
-    viewportFit: "cover",
-  };
-}
+// Keep the server response standards-compliant and mobile-first. A tiny
+// pre-hydration bootstrap upgrades only phone-sized touch hardware that is
+// genuinely presenting a desktop browser identity to the desktop layout width.
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const [settings, extraRows] = await Promise.all([
@@ -55,8 +42,18 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${poppins.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col"><CmsLiveSync />{children}</body>
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      data-viewport-mode="responsive"
+      suppressHydrationWarning
+      className={`${inter.variable} ${poppins.variable} h-full antialiased`}
+    >
+      <body className="min-h-full flex flex-col">
+        <ViewportModeBootstrap />
+        <CmsLiveSync />
+        {children}
+      </body>
     </html>
   );
 }
