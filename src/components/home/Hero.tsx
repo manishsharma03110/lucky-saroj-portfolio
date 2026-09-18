@@ -13,7 +13,7 @@ export function Hero({ heading, subheading, description, heroImageUrl, heroImage
       </div>
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(8,9,11,0.98)_0%,rgba(8,9,11,0.88)_38%,rgba(8,9,11,0.38)_70%,rgba(8,9,11,0.22)_100%)] max-lg:bg-[linear-gradient(180deg,rgba(8,9,11,0.62)_0%,rgba(8,9,11,0.8)_42%,rgba(8,9,11,0.98)_78%)]" aria-hidden />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-[var(--background-primary)] to-transparent" aria-hidden />
-      <div className={`${motionStyles.heroAmbient} pointer-events-none absolute -left-32 top-1/3 -z-10 h-80 w-80 rounded-full bg-[var(--accent-glow)] blur-[120px]`} aria-hidden />
+      
       <div className="mx-auto flex min-h-[610px] w-full max-w-[1560px] items-end px-5 pb-16 pt-24 sm:min-h-[680px] sm:px-8 sm:pb-20 sm:pt-28 md:min-h-[720px] lg:min-h-[790px] lg:items-center lg:px-12 lg:py-28 xl:min-h-[840px] 2xl:min-h-[880px] 2xl:px-16">
         <div className={`${motionStyles.heroContent} max-w-[860px] 2xl:max-w-[980px]`}>
           {subheading&&<p className="mb-5 flex items-center gap-3 text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[var(--accent-text)] sm:mb-6 sm:text-xs lg:text-[0.8rem]"><span className="h-px w-9 bg-[var(--accent-primary)] sm:w-10" aria-hidden/>{subheading}</p>}
