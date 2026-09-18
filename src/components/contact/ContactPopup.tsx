@@ -11,7 +11,6 @@ export const CONTACT_POPUP_HERO_IMAGE = "/uploads/contact/contact-popup-hero.png
 
 export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, string>; optionsConfig?: string }) {
   const [open, setOpen] = useState(false);
-  const [activated, setActivated] = useState(false);
   const [imageAvailable, setImageAvailable] = useState(true);
   const dialogRef = useRef<HTMLDivElement>(null);
   const restoreFocusRef = useRef<HTMLElement | null>(null);
@@ -24,12 +23,16 @@ export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, str
 
   useEffect(() => {
     if (sessionStorage.getItem(SESSION_KEY)) return;
-    const timer = window.setTimeout(() => {
+    const activate = () => {
       restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setOpen(true);
       sessionStorage.setItem(SESSION_KEY, "1");
-    }, 5000);
-    return () => window.clearTimeout(timer);
+      window.removeEventListener("pointerdown", activate);
+      window.removeEventListener("keydown", activate);
+    };
+    window.addEventListener("pointerdown", activate, { once: true, passive: true });
+    window.addEventListener("keydown", activate, { once: true });
+    return () => { window.removeEventListener("pointerdown", activate); window.removeEventListener("keydown", activate); };
   }, []);
 
   useEffect(() => {
