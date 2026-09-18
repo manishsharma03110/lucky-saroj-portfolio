@@ -1,4 +1,4 @@
-const DESKTOP_LAYOUT_WIDTH = 1200;
+const DESKTOP_LAYOUT_WIDTH = 1280;
 
 const viewportBootstrap = String.raw`(() => {
   const desktopLayoutWidth = ${DESKTOP_LAYOUT_WIDTH};
@@ -32,8 +32,13 @@ const viewportBootstrap = String.raw`(() => {
       phoneSizedTouchHardware &&
       (clientHintDesktop || androidDesktopUa || genericDesktopUa);
 
+    // For desktop-request mode intentionally omit initial-scale. Mobile browsers
+    // can then fit the fixed desktop layout viewport to the physical screen,
+    // matching their normal desktop-site behavior instead of showing a 1:1
+    // zoomed crop. 1280 also activates the same lg/xl composition as the
+    // minimum representative desktop target.
     const content = desktopSiteRequested
-      ? 'width=' + desktopLayoutWidth + ', initial-scale=1, viewport-fit=cover'
+      ? 'width=' + desktopLayoutWidth + ', viewport-fit=cover'
       : 'width=device-width, initial-scale=1, viewport-fit=cover';
 
     if (viewport.getAttribute('content') !== content) {
