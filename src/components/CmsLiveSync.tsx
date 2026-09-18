@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 30000;
 
 export function CmsLiveSync() {
   const router = useRouter();
@@ -30,7 +30,7 @@ export function CmsLiveSync() {
       }
     }
 
-    void check();
+    timer = setTimeout(check, POLL_INTERVAL_MS);
     const onVisibility = () => {
       if (document.visibilityState === "visible") void check();
     };
