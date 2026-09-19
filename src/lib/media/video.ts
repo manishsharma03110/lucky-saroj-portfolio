@@ -2,7 +2,7 @@ import { getYouTubeEmbedUrl, getYouTubeVideoId } from "@/lib/media/youtube";
 
 export type VideoSource =
   | { provider: "youtube"; embedUrl: string }
-  | { provider: "google-drive"; embedUrl: string }
+  | { provider: "google-drive"; embedUrl: string; mediaUrl: string }
   | { provider: "direct"; mediaUrl: string };
 
 type GoogleDriveReference = {
@@ -50,6 +50,18 @@ export function getGoogleDrivePreviewUrl(value: string | null | undefined): stri
   return previewUrl.toString();
 }
 
+export function getGoogleDriveMediaUrl(value: string | null | undefined): string | null {
+  const reference = getGoogleDriveReference(value);
+  if (!reference) return null;
+
+  const mediaUrl = new URL("https://drive.usercontent.google.com/download");
+  mediaUrl.searchParams.set("id", reference.fileId);
+  mediaUrl.searchParams.set("export", "download");
+  mediaUrl.searchParams.set("confirm", "t");
+  if (reference.resourceKey) mediaUrl.searchParams.set("resourcekey", reference.resourceKey);
+  return mediaUrl.toString();
+}
+
 export function getDirectVideoUrl(value: string | null | undefined): string | null {
   const input = value?.trim();
   if (!input) return null;
@@ -78,7 +90,10 @@ export function getVideoSource(value: string | null | undefined): VideoSource | 
   }
 
   const driveEmbedUrl = getGoogleDrivePreviewUrl(input);
-  if (driveEmbedUrl) return { provider: "google-drive", embedUrl: driveEmbedUrl };
+  const driveMediaUrl = getGoogleDriveMediaUrl(input);
+  if (driveEmbedUrl && driveMediaUrl) {
+    return { provider: "google-drive", embedUrl: driveEmbedUrl, mediaUrl: driveMediaUrl };
+  }
 
   const directUrl = getDirectVideoUrl(input);
   if (directUrl) return { provider: "direct", mediaUrl: directUrl };
