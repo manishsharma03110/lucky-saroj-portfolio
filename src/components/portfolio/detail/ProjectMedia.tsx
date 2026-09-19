@@ -1,6 +1,6 @@
 import { Play } from "lucide-react";
 import { VideoPlayer } from "@/components/ui/VideoPlayer";
-import { getYouTubeVideoId } from "@/lib/media/youtube";
+import { getVideoSource } from "@/lib/media/video";
 import type { schema } from "@/lib/db";
 import type { ProjectMediaWithSeo } from "@/lib/db/queries";
 
@@ -24,7 +24,7 @@ function usableImage(url: string | null | undefined) {
 }
 
 function playableVideo(url: string | null | undefined) {
-  return Boolean(getYouTubeVideoId(url));
+  return Boolean(getVideoSource(url));
 }
 
 function initials(title: string) {
