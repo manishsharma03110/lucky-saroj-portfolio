@@ -91,11 +91,11 @@ export function InteractiveWorkVisual({
             alt={title}
             fill
             sizes={large ? "100vw" : "(min-width: 1024px) 50vw, 100vw"}
-            className="object-contain object-center transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.01]"
+            className="object-cover object-center transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.01]"
           />
         ) : (
           <div
-            className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.01]"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.01]"
             style={{ backgroundImage: `url('${visualUrl}')` }}
             role="img"
             aria-label={title}
@@ -112,7 +112,7 @@ export function InteractiveWorkVisual({
           playsInline
           preload="metadata"
           aria-label={`${title} preview`}
-          className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-500 ${hovered && finePointer ? "opacity-100" : "pointer-events-none opacity-0"}`}
+          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${hovered && finePointer ? "opacity-100" : "pointer-events-none opacity-0"}`}
         />
       )}
 
