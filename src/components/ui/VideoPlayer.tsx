@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getVideoSource } from "@/lib/media/video";
 
 type PosterFit = "cover" | "project-banner";
+type MobileAspect = "standard" | "comfortable";
 
 export function VideoPlayer({
   videoUrl,
@@ -12,40 +13,78 @@ export function VideoPlayer({
   title,
   className = "",
   posterFit = "cover",
+  mobileAspect = "standard",
 }: {
   videoUrl?: string | null;
   posterUrl?: string | null;
   title: string;
   className?: string;
   posterFit?: PosterFit;
+  mobileAspect?: MobileAspect;
 }) {
   const [playing, setPlaying] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
+  const [driveReady, setDriveReady] = useState(false);
   const source = getVideoSource(videoUrl);
   const posterFitClass = posterFit === "project-banner"
     ? "bg-contain bg-no-repeat"
     : "bg-cover bg-no-repeat";
+  const mediaAspectClass = source?.provider === "google-drive" && mobileAspect === "comfortable"
+    ? "aspect-[4/3] sm:aspect-video"
+    : "aspect-video";
 
   function retry() {
     setLoadError(false);
+    setDriveReady(false);
     setRetryKey((value) => value + 1);
   }
 
+  const loadFailure = (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black px-6 text-center text-white">
+      <p className="text-sm text-white/80">Video could not be loaded in this page.</p>
+      <button
+        type="button"
+        onClick={retry}
+        className="rounded-full border border-[var(--accent-primary)]/50 px-4 py-2 text-xs font-semibold uppercase tracking-[.14em] text-[var(--accent-hover)] transition hover:border-[var(--accent-primary)]"
+      >
+        Retry video
+      </button>
+    </div>
+  );
+
   let media;
-  if (playing && source && loadError) {
-    media = (
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black px-6 text-center text-white">
-        <p className="text-sm text-white/80">Video could not be loaded in this page.</p>
-        <button
-          type="button"
-          onClick={retry}
-          className="rounded-full border border-white/30 px-4 py-2 text-xs font-semibold uppercase tracking-[.14em] text-white transition hover:border-white/60"
+  if (source?.provider === "google-drive") {
+    media = loadError ? loadFailure : (
+      <>
+        <iframe
+          key={retryKey}
+          src={source.embedUrl}
+          title={`${title} video`}
+          allow="autoplay; fullscreen"
+          allowFullScreen
+          loading="eager"
+          referrerPolicy="strict-origin-when-cross-origin"
+          onLoad={() => setDriveReady(true)}
+          onError={() => setLoadError(true)}
+          className="absolute inset-0 block h-full w-full border-0 bg-black"
+        />
+        <div
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#030a14] transition-opacity duration-300 ${driveReady ? "opacity-0" : "opacity-100"}`}
         >
-          Retry video
-        </button>
-      </div>
+          <div
+            className={`absolute inset-0 bg-center ${posterFitClass}`}
+            style={posterUrl ? { backgroundImage: `url('${posterUrl}')` } : undefined}
+          />
+          <span className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-[#030a14]/85 shadow-lg sm:h-12 sm:w-12">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" />
+          </span>
+        </div>
+      </>
     );
+  } else if (playing && source && loadError) {
+    media = loadFailure;
   } else if (playing && source?.provider === "youtube") {
     media = (
       <iframe
@@ -53,19 +92,6 @@ export function VideoPlayer({
         src={`${source.embedUrl}&autoplay=1&controls=1&fs=1&iv_load_policy=3`}
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-        allowFullScreen
-        referrerPolicy="strict-origin-when-cross-origin"
-        onError={() => setLoadError(true)}
-        className="absolute inset-0 block h-full w-full border-0"
-      />
-    );
-  } else if (playing && source?.provider === "google-drive") {
-    media = (
-      <iframe
-        key={retryKey}
-        src={source.embedUrl}
-        title={title}
-        allow="autoplay; fullscreen"
         allowFullScreen
         referrerPolicy="strict-origin-when-cross-origin"
         onError={() => setLoadError(true)}
@@ -115,22 +141,22 @@ export function VideoPlayer({
   }
 
   return (
-    <div className={`overflow-hidden rounded-[inherit] border border-white/10 bg-[#030a14] ${className}`}>
-      <div className="flex min-h-11 items-center justify-between gap-3 border-b border-white/10 px-4 py-2.5 sm:px-5">
-        <div className="min-w-0 border-l-2 border-[var(--accent-primary)] pl-3">
-          <p className="truncate text-[10px] font-semibold uppercase tracking-[.18em] text-white sm:text-xs">Lucky Saroj</p>
-          <p className="truncate text-[8px] uppercase tracking-[.2em] text-white/60 sm:text-[9px]">Video Editor</p>
+    <div className={`min-w-0 overflow-hidden rounded-[inherit] border border-white/10 bg-[#030a14] ${className}`}>
+      <div className="flex min-h-9 items-center justify-between gap-2 border-b border-white/10 px-3 py-2 sm:min-h-11 sm:gap-3 sm:px-5 sm:py-2.5">
+        <div className="min-w-0 border-l-2 border-[var(--accent-primary)] pl-2.5 sm:pl-3">
+          <p className="truncate text-[9px] font-semibold uppercase tracking-[.16em] text-white sm:text-xs sm:tracking-[.18em]">Lucky Saroj</p>
+          <p className="truncate text-[7px] uppercase tracking-[.18em] text-white/60 sm:text-[9px] sm:tracking-[.2em]">Video Editor</p>
         </div>
-        <span className="shrink-0 text-[8px] font-semibold uppercase tracking-[.16em] text-[var(--accent-hover)] sm:text-[9px] sm:tracking-[.18em]">Play · Edit · Create</span>
+        <span className="shrink-0 text-[7px] font-semibold uppercase tracking-[.12em] text-[var(--accent-hover)] sm:text-[9px] sm:tracking-[.18em]">Play · Edit · Create</span>
       </div>
 
-      <div className="relative aspect-video w-full bg-black">
+      <div className={`relative w-full overflow-hidden bg-black ${mediaAspectClass}`}>
         {media}
       </div>
 
-      <div className="flex min-h-10 items-center justify-between gap-4 border-t border-white/10 px-4 py-2.5 sm:px-5">
-        <span className="h-0.5 w-20 shrink-0 bg-[var(--accent-primary)] sm:w-24" aria-hidden="true" />
-        <span className="truncate text-[8px] font-semibold uppercase tracking-[.18em] text-white/55 sm:text-[9px]">Cinematic Edit</span>
+      <div className="flex min-h-8 items-center justify-between gap-3 border-t border-white/10 px-3 py-2 sm:min-h-10 sm:gap-4 sm:px-5 sm:py-2.5">
+        <span className="h-0.5 w-16 shrink-0 bg-[var(--accent-primary)] sm:w-24" aria-hidden="true" />
+        <span className="truncate text-[7px] font-semibold uppercase tracking-[.14em] text-white/55 sm:text-[9px] sm:tracking-[.18em]">Cinematic Edit</span>
       </div>
     </div>
   );
