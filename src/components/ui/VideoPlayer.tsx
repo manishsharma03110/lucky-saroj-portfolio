@@ -42,15 +42,32 @@ export function VideoPlayer({
       aria-label={title}
     />
   ) : playing && embedUrl ? (
-    <iframe
-      src={`${embedUrl}&autoplay=1${origin}`}
-      title={title}
-      allow="autoplay; encrypted-media; picture-in-picture"
-      referrerPolicy="strict-origin-when-cross-origin"
-      // The existing cinematic viewport is the only crop boundary: no extra mask layers.
-      // Mobile gets a little more overscan because YouTube's edge chrome occupies more of the frame there.
-      className="absolute left-1/2 top-1/2 block h-full w-full -translate-x-1/2 -translate-y-1/2 scale-[1.16] border-0 sm:scale-[1.14] lg:scale-[1.10] xl:scale-[1.08]"
-    />
+    <>
+      <iframe
+        src={`${embedUrl}&autoplay=1${origin}`}
+        title={title}
+        allow="autoplay; encrypted-media; picture-in-picture"
+        referrerPolicy="strict-origin-when-cross-origin"
+        className="absolute inset-0 block h-full w-full border-0"
+      />
+
+      {/* These are extensions of the existing cinematic frame, not video masks.
+          The iframe remains exactly 100% x 100% with no zoom, scale, crop or translate.
+          The frame extensions occupy only the measured YouTube branding zones and
+          intentionally intercept clicks so hidden YouTube links cannot be activated. */}
+      <div
+        aria-hidden="true"
+        className="absolute left-0 top-0 z-20 h-[44px] w-[210px] cursor-default border-b border-r border-white/10 bg-[#030a14] sm:h-[48px] sm:w-[230px] lg:h-[52px] lg:w-[250px]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 right-0 z-20 h-[34px] w-[104px] cursor-default border-l border-t border-white/10 bg-[#030a14] sm:h-[36px] sm:w-[112px] lg:h-[38px] lg:w-[120px]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 z-20 h-[32px] w-[58px] cursor-default border-r border-t border-white/10 bg-[#030a14] sm:h-[34px] sm:w-[64px] lg:h-[36px] lg:w-[70px]"
+      />
+    </>
   ) : (
     <button
       type="button"
