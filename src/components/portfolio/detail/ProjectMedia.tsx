@@ -80,12 +80,13 @@ export function ProjectMedia({
   const { primaryImage, video } = mediaState(project, media);
   const primaryVideoSource = getVideoSource(video);
   const isDriveMainVideo = primaryVideoSource?.provider === "google-drive";
+  const isPortraitMainVideo = project.slug === "motion-graphic-reel" && primaryVideoSource?.provider === "youtube";
   const previewAlt = project.thumbnailAlt?.trim() || `${project.title} ${copy.previewAltSuffix || "project preview"}`;
 
   return (
     <section className="bg-[var(--background-primary)] py-6 sm:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-8 lg:px-12 2xl:px-16">
-        <div className={`relative overflow-hidden bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${isDriveMainVideo ? "-mx-4 w-[calc(100%+2rem)] rounded-none sm:mx-0 sm:w-full sm:rounded-[12px]" : "rounded-[12px]"} ${video ? "" : "aspect-video border border-white/10"}`}>
+        <div className={`relative overflow-hidden bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${isDriveMainVideo ? "-mx-4 w-[calc(100%+2rem)] rounded-none sm:mx-0 sm:w-full sm:rounded-[12px]" : isPortraitMainVideo ? "mx-auto w-full max-w-[315px] rounded-[12px]" : "rounded-[12px]"} ${video ? "" : "aspect-video border border-white/10"}`}>
           <ProjectSlate project={project} categoryName={categoryName} hasVideo={Boolean(video)} selectedProjectLabel={copy.selectedProjectLabel} />
           {video ? (
             <div className="relative w-full min-w-0">
@@ -95,7 +96,7 @@ export function ProjectMedia({
                 posterFit="project-banner"
                 posterOnlyIdle={isDriveMainVideo}
                 title={project.title}
-                className="w-full"
+                className={`w-full ${isPortraitMainVideo ? "[&>div:nth-child(2)]:aspect-[9/16]" : ""}`}
               />
             </div>
           ) : primaryImage ? (
