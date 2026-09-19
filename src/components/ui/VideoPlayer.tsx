@@ -47,7 +47,7 @@ export function VideoPlayer({
       title={title}
       allow="autoplay; encrypted-media; picture-in-picture"
       referrerPolicy="strict-origin-when-cross-origin"
-      className="absolute left-1/2 top-1/2 block h-full w-full -translate-x-1/2 -translate-y-1/2 scale-[1.16] border-0 sm:scale-[1.14] lg:scale-[1.12]"
+      className="absolute left-1/2 top-1/2 block h-full w-full -translate-x-1/2 -translate-y-1/2 scale-[1.16] border-0 sm:scale-[1.14] lg:scale-[1.10] xl:scale-[1.08]"
     />
   ) : (
     <button
