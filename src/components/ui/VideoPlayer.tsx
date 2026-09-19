@@ -14,6 +14,7 @@ export function VideoPlayer({
   posterUrl,
   title,
   className = "",
+  mediaClassName = "aspect-video",
   posterFit = "cover",
   posterOnlyIdle = false,
 }: {
@@ -21,6 +22,7 @@ export function VideoPlayer({
   posterUrl?: string | null;
   title: string;
   className?: string;
+  mediaClassName?: string;
   posterFit?: PosterFit;
   posterOnlyIdle?: boolean;
 }) {
@@ -86,7 +88,7 @@ export function VideoPlayer({
         type="button"
         onClick={startPlayback}
         disabled={!source}
-        className={`group relative block aspect-video w-full min-w-0 overflow-hidden rounded-[inherit] border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] disabled:cursor-default ${className}`}
+        className={`group relative block w-full min-w-0 overflow-hidden rounded-[inherit] border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] disabled:cursor-default ${mediaClassName} ${className}`}
         aria-label={source ? `Play ${title}` : title}
       >
         <div
@@ -202,7 +204,7 @@ export function VideoPlayer({
         <span className="shrink-0 text-[7px] font-semibold uppercase tracking-[.12em] text-[var(--accent-hover)] sm:text-[9px] sm:tracking-[.18em]">Play · Edit · Create</span>
       </div>
 
-      <div className="relative aspect-video w-full overflow-hidden bg-black">
+      <div className={`relative w-full overflow-hidden bg-black ${mediaClassName}`}>
         {media}
       </div>
 
