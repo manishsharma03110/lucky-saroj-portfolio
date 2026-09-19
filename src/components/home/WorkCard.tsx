@@ -68,7 +68,11 @@ export function WorkCard({
           )}
 
 
-          <div className="pointer-events-none absolute inset-x-4 bottom-4 sm:inset-x-7 sm:bottom-7 z-10 flex items-end justify-between gap-4 sm:inset-x-7 sm:bottom-7">\n            <span className="text-sm font-medium text-white">View project</span>\n            <ArrowUpRight size={20} className="text-[var(--accent-hover)] transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />\n          </div>\n        </div>
+          <div className="pointer-events-none absolute inset-x-4 bottom-4 sm:inset-x-7 sm:bottom-7 z-10 flex items-end justify-between gap-4 sm:inset-x-7 sm:bottom-7">
+            <span className="text-sm font-medium text-white">View project</span>
+            <ArrowUpRight size={20} className="text-[var(--accent-hover)] transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+          </div>
+        </div>
 
         <div className={`grid gap-3 border-b border-white/[0.09] py-5 ${large ? "md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:gap-10" : ""}`}>
           <div className="min-w-0">
