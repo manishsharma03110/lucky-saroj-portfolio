@@ -35,6 +35,7 @@ export function VideoPlayer({
   const driveSrc = source?.provider === "google-drive"
     ? `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`
     : null;
+  const drivePlayback = playing && source?.provider === "google-drive";
 
   function scheduleDriveFallbackReveal() {
     if (typeof window === "undefined") return;
@@ -192,8 +193,8 @@ export function VideoPlayer({
   }
 
   return (
-    <div className={`min-w-0 overflow-hidden rounded-[inherit] border border-white/10 bg-[#030a14] ${className}`}>
-      <div className="flex min-h-9 items-center justify-between gap-2 border-b border-white/10 px-3 py-2 sm:min-h-11 sm:gap-3 sm:px-5 sm:py-2.5">
+    <div className={`min-w-0 overflow-hidden bg-[#030a14] ${drivePlayback ? "rounded-none border-y border-white/10 sm:rounded-[inherit] sm:border" : "rounded-[inherit] border border-white/10"} ${className}`}>
+      <div className={`${drivePlayback ? "hidden sm:flex" : "flex"} min-h-9 items-center justify-between gap-2 border-b border-white/10 px-3 py-2 sm:min-h-11 sm:gap-3 sm:px-5 sm:py-2.5`}>
         <div className="min-w-0 border-l-2 border-[var(--accent-primary)] pl-2.5 sm:pl-3">
           <p className="truncate text-[9px] font-semibold uppercase tracking-[.16em] text-white sm:text-xs sm:tracking-[.18em]">Lucky Saroj</p>
           <p className="truncate text-[7px] uppercase tracking-[.18em] text-white/60 sm:text-[9px] sm:tracking-[.2em]">Video Editor</p>
@@ -205,7 +206,7 @@ export function VideoPlayer({
         {media}
       </div>
 
-      <div className="flex min-h-8 items-center justify-between gap-3 border-t border-white/10 px-3 py-2 sm:min-h-10 sm:gap-4 sm:px-5 sm:py-2.5">
+      <div className={`${drivePlayback ? "hidden sm:flex" : "flex"} min-h-8 items-center justify-between gap-3 border-t border-white/10 px-3 py-2 sm:min-h-10 sm:gap-4 sm:px-5 sm:py-2.5`}>
         <span className="h-0.5 w-16 shrink-0 bg-[var(--accent-primary)] sm:w-24" aria-hidden="true" />
         <span className="truncate text-[7px] font-semibold uppercase tracking-[.14em] text-white/55 sm:text-[9px] sm:tracking-[.18em]">Cinematic Edit</span>
       </div>
