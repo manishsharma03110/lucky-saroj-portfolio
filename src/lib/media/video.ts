@@ -12,9 +12,14 @@ type GoogleDriveReference = {
 
 const GOOGLE_DRIVE_FILE_ID = /^[A-Za-z0-9_-]{10,}$/;
 const DIRECT_VIDEO_EXTENSION = /\.(?:mp4|webm)$/i;
+const VERCEL_BLOB_VIDEO_PATH = /^\/cms-media\/[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/video$/i;
 
 function isHttpUrl(url: URL) {
   return url.protocol === "http:" || url.protocol === "https:";
+}
+
+function isVercelBlobVideo(url: URL) {
+  return url.hostname.toLowerCase().endsWith(".blob.vercel-storage.com") && VERCEL_BLOB_VIDEO_PATH.test(url.pathname);
 }
 
 export function getGoogleDriveReference(value: string | null | undefined): GoogleDriveReference | null {
@@ -62,7 +67,7 @@ export function getDirectVideoUrl(value: string | null | undefined): string | nu
   try {
     const url = new URL(input);
     if (!isHttpUrl(url) || url.username || url.password) return null;
-    return DIRECT_VIDEO_EXTENSION.test(url.pathname) ? input : null;
+    return DIRECT_VIDEO_EXTENSION.test(url.pathname) || isVercelBlobVideo(url) ? input : null;
   } catch {
     return null;
   }

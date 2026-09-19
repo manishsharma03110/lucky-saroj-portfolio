@@ -88,24 +88,49 @@ export function FileUpload({
         if (!response.ok) throw new Error("Compressed image upload failed.");
         const result = (await response.json()) as ImageUploadResult;
         if (!result.assetId || !result.pathname || !result.url || result.kind !== "image") throw new Error("Invalid compressed image upload response.");
-        setProgress(100); setAssetId(result.assetId); setUrl(result.url); return;
+        setProgress(100);
+        setAssetId(result.assetId);
+        setUrl(result.url);
+        return;
       }
-      const initiationResponse = await fetch("/api/upload/initiate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ kind, originalFilename: file.name, contentType: file.type, size: file.size }) });
+
+      const initiationResponse = await fetch("/api/upload/initiate", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ kind, originalFilename: file.name, contentType: file.type, size: file.size }),
+      });
       if (!initiationResponse.ok) throw new Error("Upload initiation failed.");
       const initiation = (await initiationResponse.json()) as UploadInitiation;
       if (!initiation.assetId || !initiation.pathname || initiation.kind !== kind) throw new Error("Invalid upload initiation.");
-      const result = await upload(initiation.pathname, file, { access: "public", handleUploadUrl: "/api/upload", contentType: file.type, clientPayload: JSON.stringify({ assetId: initiation.assetId, kind }), onUploadProgress: ({ percentage }) => setProgress(percentage) });
+
+      const result = await upload(initiation.pathname, file, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+        contentType: file.type,
+        clientPayload: JSON.stringify({ assetId: initiation.assetId, kind }),
+        onUploadProgress: ({ percentage }) => setProgress(percentage),
+      });
       if (result.pathname !== initiation.pathname) throw new Error("Upload identity mismatch.");
-      setAssetId(initiation.assetId); setUrl(result.url);
-    } catch { setError("Upload failed. Please try again."); }
-    finally { setUploading(false); reportUpload(false); }
+      setAssetId(initiation.assetId);
+      setUrl(result.url);
+    } catch {
+      setError("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+      reportUpload(false);
+    }
   }
 
-  return <div><Label>{label}</Label><input type="hidden" name={name} value={url}/><input type="hidden" name={assetIdName} value={assetId}/>
+  const externalVideoInputId = `${name}-external`;
+
+  return <div>
+    <Label>{label}</Label>
+    <input type="hidden" name={name} value={url}/>
+    <input type="hidden" name={assetIdName} value={assetId}/>
     {requiredAspectRatio && kind === "image" && <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">Required: {requiredAspectRatio.label} aspect ratio. Recommended 1920×1080 px. Other ratios are blocked before upload.</p>}
-    {url ? <div className={styles.mediaPreview}>{kind === "image" ? <img src={url} alt=""/> : <video src={url} muted playsInline><track kind="captions"/></video>}<div className={styles.previewOverlay}>{kind === "video" && <Play size={22}/>}</div><button type="button" onClick={()=>{setUrl("");setAssetId("");if(inputRef.current)inputRef.current.value=""}} className={styles.removeMedia} aria-label="Remove"><X size={15}/></button></div> : <button type="button" onClick={()=>inputRef.current?.click()} disabled={uploading} className={styles.uploadZone}>{uploading?<><Loader2 size={21} className="animate-spin"/><span>{kind === "image" ? "Optimizing & uploading" : "Uploading"}… {progress}%</span></>:<><UploadCloud size={21}/><span>Click to upload {kind === "image" ? "an image" : "a video"}</span></>}</button>}
+    {url ? <div className={styles.mediaPreview}>{kind === "image" ? <img src={url} alt=""/> : <video src={url} muted playsInline preload="metadata"><track kind="captions"/></video>}<div className={styles.previewOverlay}>{kind === "video" && <Play size={22}/>}</div><button type="button" onClick={()=>{setUrl("");setAssetId("");if(inputRef.current)inputRef.current.value=""}} className={styles.removeMedia} aria-label="Remove"><X size={15}/></button></div> : <button type="button" onClick={()=>inputRef.current?.click()} disabled={uploading} className={styles.uploadZone}>{uploading?<><Loader2 size={21} className="animate-spin"/><span>{kind === "image" ? "Optimizing & uploading" : "Uploading"}… {progress}%</span></>:<><UploadCloud size={21}/><span>Click to upload {kind === "image" ? "an image" : "an MP4 / WebM video"}</span></>}</button>}
     <input ref={inputRef} type="file" accept={getUploadAcceptValue(kind)} className="hidden" onChange={event=>handleFile(event.target.files?.[0])}/>
-    {kind === "video" && <div className="mt-4"><Label htmlFor="externalVideoUrl">Or paste a YouTube / Vimeo link</Label><Input id="externalVideoUrl" name="externalVideoUrl" placeholder="https://youtube.com/watch?v=..." value={assetId || url.includes("blob.vercel-storage.com") ? "" : url} onChange={event=>{setUrl(event.target.value);setAssetId("")}}/></div>}
+    {kind === "video" && <div className="mt-4"><Label htmlFor={externalVideoInputId}>Or paste a direct MP4 / WebM URL</Label><Input id={externalVideoInputId} placeholder="https://cdn.example.com/portfolio-video.mp4" value={assetId ? "" : url} onChange={event=>{setUrl(event.target.value);setAssetId("");setError(null)}}/><p className="mt-1 text-xs text-[var(--text-muted)]">For a 100% clean player, use an uploaded file or a direct MP4/WebM URL. Existing YouTube and Google Drive links remain supported for older projects.</p></div>}
     {error&&<p className={styles.uploadError}>{error}</p>}
   </div>;
 }
