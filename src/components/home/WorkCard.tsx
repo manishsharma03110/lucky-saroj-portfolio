@@ -43,7 +43,7 @@ export function WorkCard({
         href={`/portfolio/${project.slug}`}
         className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-primary)]"
       >
-        <div className={`relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow,transform] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)] aspect-video sm:${large ? "aspect-[16/9] lg:aspect-[2.35/1]" : "aspect-[16/10]"}` }>
+        <div className="relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow,transform] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)]">
           {visualUrl ? (
             <InteractiveWorkVisual
               title={project.title}
