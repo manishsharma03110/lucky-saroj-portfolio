@@ -86,17 +86,18 @@ export function ProjectMedia({
   return (
     <section className="bg-[var(--background-primary)] py-6 sm:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-8 lg:px-12 2xl:px-16">
-        <div className={`relative overflow-hidden bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${isDriveMainVideo ? "-mx-4 w-[calc(100%+2rem)] rounded-none sm:mx-0 sm:w-full sm:rounded-[12px]" : isPortraitMainVideo ? "mx-auto w-full max-w-[315px] rounded-[12px]" : "rounded-[12px]"} ${video ? "" : "aspect-video border border-white/10"}`}>
+        <div className={`relative overflow-hidden bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${isDriveMainVideo ? "-mx-4 w-[calc(100%+2rem)] rounded-none sm:mx-0 sm:w-full sm:rounded-[12px]" : "rounded-[12px]"} ${video ? "" : "aspect-video border border-white/10"}`}>
           <ProjectSlate project={project} categoryName={categoryName} hasVideo={Boolean(video)} selectedProjectLabel={copy.selectedProjectLabel} />
           {video ? (
-            <div className="relative w-full min-w-0">
+            <div className={`relative min-w-0 ${isPortraitMainVideo ? "mx-auto w-full max-w-[315px]" : "w-full"}`}>
               <VideoPlayer
                 videoUrl={video}
                 posterUrl={primaryImage}
                 posterFit="project-banner"
                 posterOnlyIdle={isDriveMainVideo}
                 title={project.title}
-                className={`w-full ${isPortraitMainVideo ? "[&>div:nth-child(2)]:aspect-[9/16]" : ""}`}
+                mediaClassName={isPortraitMainVideo ? "aspect-[9/16]" : "aspect-video"}
+                className="w-full"
               />
             </div>
           ) : primaryImage ? (
