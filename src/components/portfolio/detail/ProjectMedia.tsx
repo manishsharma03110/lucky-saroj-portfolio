@@ -1,10 +1,19 @@
 import { Play } from "lucide-react";
-import { VideoPlayer } from "@/components/ui/VideoPlayer";
+import { ProjectVideoPlayer } from "@/components/ui/ProjectVideoPlayer";
 import { getYouTubeVideoId, isDirectVideoUrl } from "@/lib/media/youtube";
+import { DEFAULT_PROJECT_VIDEO_FRAME } from "@/lib/media/project-video-frame";
 import type { schema } from "@/lib/db";
 import type { ProjectMediaWithSeo } from "@/lib/db/queries";
 
-type Project = typeof schema.portfolioProjects.$inferSelect;
+type BaseProject = typeof schema.portfolioProjects.$inferSelect;
+type Project = BaseProject & Readonly<{
+  hostedVideoUrl?: string | null;
+  videoEditorName?: string | null;
+  videoEditorRole?: string | null;
+  videoTagline?: string | null;
+  videoBottomLabel?: string | null;
+}>;
+
 type MediaCopy = Readonly<{
   selectedProjectLabel?: string;
   mediaEyebrow?: string;
@@ -29,6 +38,15 @@ function playableVideo(url: string | null | undefined) {
 
 function initials(title: string) {
   return title.split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join("").toUpperCase();
+}
+
+function frameCopy(project: Project) {
+  return {
+    editorName: project.videoEditorName?.trim() || DEFAULT_PROJECT_VIDEO_FRAME.editorName,
+    editorRole: project.videoEditorRole?.trim() || DEFAULT_PROJECT_VIDEO_FRAME.editorRole,
+    tagline: project.videoTagline?.trim() || DEFAULT_PROJECT_VIDEO_FRAME.tagline,
+    bottomLabel: project.videoBottomLabel?.trim() || DEFAULT_PROJECT_VIDEO_FRAME.bottomLabel,
+  };
 }
 
 function ProjectSlate({
@@ -62,8 +80,15 @@ function mediaState(project: Project, media: ProjectMediaWithSeo[]) {
     : usableImage(project.posterUrl)
       ? project.posterUrl
       : galleryImages[0]?.url ?? null;
-  const video = playableVideo(project.videoUrl) ? project.videoUrl : null;
-  return { primaryImage, video, primaryGalleryId: primaryImage === galleryImages[0]?.url ? galleryImages[0]?.id : null };
+  const hostedVideo = isDirectVideoUrl(project.hostedVideoUrl) ? project.hostedVideoUrl?.trim() ?? null : null;
+  const youtubeVideo = getYouTubeVideoId(project.videoUrl) ? project.videoUrl : null;
+  return {
+    primaryImage,
+    hostedVideo,
+    youtubeVideo,
+    hasVideo: Boolean(hostedVideo || youtubeVideo),
+    primaryGalleryId: primaryImage === galleryImages[0]?.url ? galleryImages[0]?.id : null,
+  };
 }
 
 export function ProjectMedia({
@@ -77,18 +102,27 @@ export function ProjectMedia({
   media: ProjectMediaWithSeo[];
   copy?: MediaCopy;
 }) {
-  const { primaryImage, video } = mediaState(project, media);
+  const { primaryImage, hostedVideo, youtubeVideo, hasVideo } = mediaState(project, media);
   const previewAlt = project.thumbnailAlt?.trim() || `${project.title} ${copy.previewAltSuffix || "project preview"}`;
+  const frame = frameCopy(project);
 
   return (
     <section className="bg-[var(--background-primary)] py-8 sm:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-[1600px] px-5 sm:px-8 lg:px-12 2xl:px-16">
-        <div className={`relative overflow-hidden rounded-[12px] bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${video ? "" : "aspect-video border border-white/10"}`}>
-          <ProjectSlate project={project} categoryName={categoryName} hasVideo={Boolean(video)} selectedProjectLabel={copy.selectedProjectLabel} />
-          {video ? (
-            <div className="relative w-full">
-              <VideoPlayer videoUrl={video} posterUrl={primaryImage} posterFit="project-banner" title={project.title} className="w-full" />
-            </div>
+        <div className={`relative overflow-hidden rounded-[12px] bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${hasVideo ? "" : "aspect-video border border-white/10"}`}>
+          <ProjectSlate project={project} categoryName={categoryName} hasVideo={hasVideo} selectedProjectLabel={copy.selectedProjectLabel} />
+          {hasVideo ? (
+            <ProjectVideoPlayer
+              hostedVideoUrl={hostedVideo}
+              youtubeVideoUrl={youtubeVideo}
+              posterUrl={primaryImage}
+              title={project.title}
+              editorName={frame.editorName}
+              editorRole={frame.editorRole}
+              tagline={frame.tagline}
+              bottomLabel={frame.bottomLabel}
+              className="relative w-full"
+            />
           ) : primaryImage ? (
             <div
               className="absolute inset-0 bg-contain bg-center bg-no-repeat lg:bg-cover"
@@ -116,6 +150,7 @@ export function ProjectGallery({
   const items = media.filter((item) => item.id !== primaryGalleryId && (item.type === "image" ? usableImage(item.url) : playableVideo(item.url)));
   if (!items.length) return null;
   const fallbackAlt = `${project.title} ${copy.mediaAltSuffix || "project media"}`;
+  const frame = frameCopy(project);
 
   return (
     <section className="border-t border-white/10 bg-[var(--background-primary)] py-12 sm:py-16 lg:py-20 2xl:py-24">
@@ -125,10 +160,25 @@ export function ProjectGallery({
         <div className="mt-8 grid gap-5 sm:gap-6 md:grid-cols-2 lg:mt-10 lg:gap-8">
           {items.map((item, index) => {
             const label = item.altText?.trim() || item.title?.trim() || fallbackAlt;
+            const hostedVideo = item.type === "video" && isDirectVideoUrl(item.url) ? item.url : null;
+            const youtubeVideo = item.type === "video" && getYouTubeVideoId(item.url) ? item.url : null;
             return (
-              <figure key={item.id} className={`relative aspect-video overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] ${index % 3 === 0 ? "md:col-span-2" : ""}`} title={item.title ?? undefined}>
+              <figure
+                key={item.id}
+                className={`relative overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] ${item.type === "image" ? "aspect-video" : ""} ${index % 3 === 0 ? "md:col-span-2" : ""}`}
+                title={item.title ?? undefined}
+              >
                 {item.type === "video" ? (
-                  <VideoPlayer videoUrl={item.url} title={item.title?.trim() || fallbackAlt} className="h-full w-full" />
+                  <ProjectVideoPlayer
+                    hostedVideoUrl={hostedVideo}
+                    youtubeVideoUrl={youtubeVideo}
+                    title={item.title?.trim() || fallbackAlt}
+                    editorName={frame.editorName}
+                    editorRole={frame.editorRole}
+                    tagline={frame.tagline}
+                    bottomLabel={frame.bottomLabel}
+                    className="w-full"
+                  />
                 ) : (
                   <div className="h-full w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url('${item.url}')` }} role="img" aria-label={label} />
                 )}
