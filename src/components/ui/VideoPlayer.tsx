@@ -6,6 +6,9 @@ import { getVideoSource } from "@/lib/media/video";
 
 type PosterFit = "cover" | "project-banner";
 
+const MOBILE_DRIVE_REVEAL_DELAY_MS = 4500;
+const DRIVE_MAX_LOADING_OVERLAY_MS = 7000;
+
 export function VideoPlayer({
   videoUrl,
   posterUrl,
@@ -33,17 +36,32 @@ export function VideoPlayer({
     ? `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`
     : null;
 
+  function scheduleDriveFallbackReveal() {
+    if (typeof window === "undefined") return;
+    window.setTimeout(() => setDriveReady(true), DRIVE_MAX_LOADING_OVERLAY_MS);
+  }
+
   function startPlayback() {
     if (!source) return;
     setLoadError(false);
     setDriveReady(false);
     setPlaying(true);
+    if (source.provider === "google-drive") scheduleDriveFallbackReveal();
   }
 
   function retry() {
     setLoadError(false);
     setDriveReady(false);
     setRetryKey((value) => value + 1);
+    if (source?.provider === "google-drive") scheduleDriveFallbackReveal();
+  }
+
+  function revealDrivePlayer() {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches) {
+      window.setTimeout(() => setDriveReady(true), MOBILE_DRIVE_REVEAL_DELAY_MS);
+      return;
+    }
+    setDriveReady(true);
   }
 
   const poster = (
@@ -106,18 +124,21 @@ export function VideoPlayer({
           allowFullScreen
           loading="eager"
           referrerPolicy="strict-origin-when-cross-origin"
-          onLoad={() => setDriveReady(true)}
+          onLoad={revealDrivePlayer}
           onError={() => setLoadError(true)}
           className="absolute inset-0 block h-full w-full border-0 bg-black"
         />
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#030a14] transition-opacity duration-200 ${driveReady ? "opacity-0" : "opacity-100"}`}
+          className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#030a14] transition-opacity duration-300 ${driveReady ? "opacity-0" : "opacity-100"}`}
         >
           {poster}
-          <span className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-[#030a14]/85 shadow-lg sm:h-12 sm:w-12">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" />
-          </span>
+          <div className="relative flex flex-col items-center gap-2.5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-[#030a14]/85 shadow-lg sm:h-12 sm:w-12">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" />
+            </span>
+            <span className="rounded-full border border-white/10 bg-[#030a14]/80 px-3 py-1 text-[8px] font-semibold uppercase tracking-[.16em] text-white/70 sm:text-[9px]">Opening video</span>
+          </div>
         </div>
       </>
     );
