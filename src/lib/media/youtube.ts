@@ -28,32 +28,13 @@ export function normalizeYouTubeVideoUrl(value: string | null | undefined): stri
   return id ? `https://www.youtube.com/watch?v=${id}` : null;
 }
 
-export function isDirectVideoUrl(value: string | null | undefined): boolean {
-  const input = value?.trim();
-  if (!input) return false;
-
-  const directExtension = /\.(mp4|webm|ogg|ogv|mov|m4v)$/i;
-
-  try {
-    const url = new URL(input);
-    const pathname = url.pathname.toLowerCase();
-    if (directExtension.test(pathname)) return true;
-
-    // Vercel Blob media URLs created by this CMS use a stable trailing
-    // `/video` key even when the public URL has no filename extension.
-    return url.hostname.endsWith("public.blob.vercel-storage.com") && pathname.endsWith("/video");
-  } catch {
-    const cleanPath = input.split(/[?#]/, 1)[0] ?? "";
-    return directExtension.test(cleanPath) || (cleanPath.startsWith("/") && cleanPath.endsWith("/video"));
-  }
-}
-
 export function getYouTubeEmbedUrl(value: string | null | undefined): string | null {
   const id = getYouTubeVideoId(value);
   if (!id) return null;
 
-  // Only use currently supported player parameters. `modestbranding` and
-  // `showinfo` are deprecated/ignored by YouTube. controls=0/fs=0/disablekb=1
-  // reduce player chrome without masking or covering YouTube attribution.
-  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1&controls=0&fs=0&disablekb=1&iv_load_policy=3`;
+  // Keep the supported YouTube player UI intact. YouTube deprecated
+  // `modestbranding`, and title/channel/branding surfaces cannot be reliably
+  // disabled. `rel=0` limits related videos to the same channel; playsinline
+  // keeps mobile playback responsive within the portfolio layout.
+  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`;
 }
