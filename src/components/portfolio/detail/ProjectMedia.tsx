@@ -83,11 +83,11 @@ export function ProjectMedia({
   return (
     <section className="bg-[var(--background-primary)] py-8 sm:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-[1600px] px-5 sm:px-8 lg:px-12 2xl:px-16">
-        <div className="relative aspect-video overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)]">
+        <div className={`relative overflow-hidden rounded-[12px] bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${video ? "" : "aspect-video border border-white/10"}`}>
           <ProjectSlate project={project} categoryName={categoryName} hasVideo={Boolean(video)} selectedProjectLabel={copy.selectedProjectLabel} />
           {video ? (
-            <div className="absolute inset-0">
-              <VideoPlayer videoUrl={video} posterUrl={primaryImage} posterFit="project-banner" title={project.title} className="h-full w-full" />
+            <div className="relative w-full">
+              <VideoPlayer videoUrl={video} posterUrl={primaryImage} posterFit="project-banner" title={project.title} className="w-full" />
             </div>
           ) : primaryImage ? (
             <div
@@ -130,7 +130,7 @@ export function ProjectGallery({
                 {item.type === "video" ? (
                   <VideoPlayer videoUrl={item.url} title={item.title?.trim() || fallbackAlt} className="h-full w-full" />
                 ) : (
-                  <div className="h-full w-full bg-cover bg-center" style={{ backgroundImage: `url('${item.url}')` }} role="img" aria-label={label} />
+                  <div className="h-full w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url('${item.url}')` }} role="img" aria-label={label} />
                 )}
                 {item.description?.trim() ? <figcaption className="sr-only">{item.description}</figcaption> : null}
               </figure>
