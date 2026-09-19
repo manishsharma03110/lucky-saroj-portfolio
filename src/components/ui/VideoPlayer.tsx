@@ -2,7 +2,7 @@
 
 import { Play } from "lucide-react";
 import { useState } from "react";
-import { getYouTubeEmbedUrl, isDirectVideoUrl } from "@/lib/media/youtube";
+import { getYouTubeEmbedUrl } from "@/lib/media/youtube";
 
 type PosterFit = "cover" | "project-banner";
 
@@ -21,41 +21,26 @@ export function VideoPlayer({
 }) {
   const [playing, setPlaying] = useState(false);
   const embedUrl = getYouTubeEmbedUrl(videoUrl);
-  const directVideoUrl = isDirectVideoUrl(videoUrl) ? videoUrl?.trim() ?? null : null;
-  const canPlay = Boolean(embedUrl || directVideoUrl);
-  const origin = typeof window !== "undefined" ? `&origin=${encodeURIComponent(window.location.origin)}` : "";
   const posterFitClass = posterFit === "project-banner"
     ? "bg-contain bg-no-repeat"
     : "bg-cover bg-no-repeat";
 
-  const media = playing && directVideoUrl ? (
-    <video
-      src={directVideoUrl}
-      poster={posterUrl ?? undefined}
-      autoPlay
-      controls
-      playsInline
-      preload="metadata"
-      controlsList="nodownload noremoteplayback"
-      disablePictureInPicture
-      className="absolute inset-0 block h-full w-full bg-black object-contain"
-      aria-label={title}
-    />
-  ) : playing && embedUrl ? (
+  const media = playing && embedUrl ? (
     <iframe
-      src={`${embedUrl}&autoplay=1${origin}`}
+      src={`${embedUrl}&autoplay=1&controls=1&fs=1&iv_load_policy=3`}
       title={title}
-      allow="autoplay; encrypted-media; picture-in-picture"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+      allowFullScreen
       referrerPolicy="strict-origin-when-cross-origin"
       className="absolute inset-0 block h-full w-full border-0"
     />
   ) : (
     <button
       type="button"
-      onClick={() => canPlay && setPlaying(true)}
-      disabled={!canPlay}
+      onClick={() => embedUrl && setPlaying(true)}
+      disabled={!embedUrl}
       className="group absolute inset-0 block h-full w-full overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] disabled:cursor-default"
-      aria-label={canPlay ? `Play ${title} inline` : title}
+      aria-label={embedUrl ? `Play ${title} inline` : title}
     >
       <div
         className={`absolute inset-0 bg-center ${posterFitClass} transition-transform duration-500 group-hover:scale-[1.01]`}
@@ -63,7 +48,7 @@ export function VideoPlayer({
         role="img"
         aria-label={title}
       />
-      {canPlay ? (
+      {embedUrl ? (
         <span className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/90 bg-black/60 text-white shadow-lg sm:h-16 sm:w-16">
           <Play size={22} fill="currentColor" />
         </span>
@@ -81,7 +66,7 @@ export function VideoPlayer({
         <span className="shrink-0 text-[8px] font-semibold uppercase tracking-[.16em] text-[var(--accent-hover)] sm:text-[9px] sm:tracking-[.18em]">Play · Edit · Create</span>
       </div>
 
-      <div className="relative aspect-video w-full overflow-hidden bg-black">
+      <div className="relative aspect-video w-full bg-black">
         {media}
       </div>
 
