@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getVideoSource } from "@/lib/media/video";
 
 type PosterFit = "cover" | "project-banner";
+export type VideoOrientation = "landscape" | "portrait";
 
 const MOBILE_DRIVE_REVEAL_DELAY_MS = 4500;
 const DRIVE_MAX_LOADING_OVERLAY_MS = 7000;
@@ -14,7 +15,8 @@ export function VideoPlayer({
   posterUrl,
   title,
   className = "",
-  mediaClassName = "aspect-video",
+  mediaClassName,
+  orientation = "landscape",
   posterFit = "cover",
   posterOnlyIdle = false,
 }: {
@@ -23,6 +25,7 @@ export function VideoPlayer({
   title: string;
   className?: string;
   mediaClassName?: string;
+  orientation?: VideoOrientation;
   posterFit?: PosterFit;
   posterOnlyIdle?: boolean;
 }) {
@@ -31,6 +34,7 @@ export function VideoPlayer({
   const [retryKey, setRetryKey] = useState(0);
   const [driveReady, setDriveReady] = useState(false);
   const source = getVideoSource(videoUrl);
+  const resolvedMediaClassName = mediaClassName ?? (orientation === "portrait" ? "aspect-[9/16]" : "aspect-video");
   const posterFitClass = posterFit === "project-banner"
     ? "bg-contain bg-no-repeat"
     : "bg-cover bg-no-repeat";
@@ -88,7 +92,7 @@ export function VideoPlayer({
         type="button"
         onClick={startPlayback}
         disabled={!source}
-        className={`group relative block w-full min-w-0 overflow-hidden rounded-[inherit] border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] disabled:cursor-default ${mediaClassName} ${className}`}
+        className={`group relative block w-full min-w-0 overflow-hidden rounded-[inherit] border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] disabled:cursor-default ${resolvedMediaClassName} ${className}`}
         aria-label={source ? `Play ${title}` : title}
       >
         <div
@@ -204,7 +208,7 @@ export function VideoPlayer({
         <span className="shrink-0 text-[7px] font-semibold uppercase tracking-[.12em] text-[var(--accent-hover)] sm:text-[9px] sm:tracking-[.18em]">Play · Edit · Create</span>
       </div>
 
-      <div className={`relative w-full overflow-hidden bg-black ${mediaClassName}`}>
+      <div className={`relative w-full overflow-hidden bg-black ${resolvedMediaClassName}`}>
         {media}
       </div>
 

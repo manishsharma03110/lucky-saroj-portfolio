@@ -1,5 +1,5 @@
 import { Play } from "lucide-react";
-import { VideoPlayer } from "@/components/ui/VideoPlayer";
+import { VideoPlayer, type VideoOrientation } from "@/components/ui/VideoPlayer";
 import { getVideoSource } from "@/lib/media/video";
 import type { schema } from "@/lib/db";
 import type { ProjectMediaWithSeo } from "@/lib/db/queries";
@@ -12,6 +12,10 @@ type MediaCopy = Readonly<{
   previewAltSuffix?: string;
   mediaAltSuffix?: string;
 }>;
+
+const PROJECT_VIDEO_ORIENTATION: Record<string, VideoOrientation> = {
+  "motion-graphic-reel": "portrait",
+};
 
 function usableImage(url: string | null | undefined) {
   if (!url) return false;
@@ -80,7 +84,8 @@ export function ProjectMedia({
   const { primaryImage, video } = mediaState(project, media);
   const primaryVideoSource = getVideoSource(video);
   const isDriveMainVideo = primaryVideoSource?.provider === "google-drive";
-  const isPortraitMainVideo = project.slug === "motion-graphic-reel" && primaryVideoSource?.provider === "youtube";
+  const mainVideoOrientation = PROJECT_VIDEO_ORIENTATION[project.slug] ?? "landscape";
+  const isPortraitMainVideo = mainVideoOrientation === "portrait";
   const previewAlt = project.thumbnailAlt?.trim() || `${project.title} ${copy.previewAltSuffix || "project preview"}`;
 
   return (
@@ -93,10 +98,10 @@ export function ProjectMedia({
               <VideoPlayer
                 videoUrl={video}
                 posterUrl={primaryImage}
-                posterFit="project-banner"
+                posterFit={isPortraitMainVideo ? "cover" : "project-banner"}
                 posterOnlyIdle={isDriveMainVideo}
                 title={project.title}
-                mediaClassName={isPortraitMainVideo ? "aspect-[9/16]" : "aspect-video"}
+                orientation={mainVideoOrientation}
                 className="w-full"
               />
             </div>
