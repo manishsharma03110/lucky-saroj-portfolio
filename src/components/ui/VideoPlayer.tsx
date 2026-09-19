@@ -6,6 +6,8 @@ import { getYouTubeEmbedUrl, isDirectVideoUrl } from "@/lib/media/youtube";
 
 type PosterFit = "cover" | "project-banner";
 
+const YOUTUBE_MASK_COLOR = "#030a14";
+
 export function VideoPlayer({
   videoUrl,
   posterUrl,
@@ -42,13 +44,33 @@ export function VideoPlayer({
       aria-label={title}
     />
   ) : playing && embedUrl ? (
-    <iframe
-      src={`${embedUrl}&autoplay=1${origin}`}
-      title={title}
-      allow="autoplay; encrypted-media; picture-in-picture"
-      referrerPolicy="strict-origin-when-cross-origin"
-      className="absolute inset-0 block h-full w-full border-0"
-    />
+    <>
+      <iframe
+        src={`${embedUrl}&autoplay=1${origin}`}
+        title={title}
+        allow="autoplay; encrypted-media; picture-in-picture"
+        referrerPolicy="strict-origin-when-cross-origin"
+        className="absolute inset-0 block h-full w-full border-0"
+      />
+
+      {/* Visual masks are intentionally limited to the YouTube branding zones.
+          They render only after playback starts and never intercept pointer input. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-0 z-10"
+        style={{ width: "46%", height: "18%", background: YOUTUBE_MASK_COLOR, opacity: 1 }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 right-0 z-10"
+        style={{ width: "18%", height: "12%", background: YOUTUBE_MASK_COLOR, opacity: 1 }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-0 left-0 z-10"
+        style={{ width: "10%", height: "11%", background: YOUTUBE_MASK_COLOR, opacity: 1 }}
+      />
+    </>
   ) : (
     <button
       type="button"
@@ -81,7 +103,7 @@ export function VideoPlayer({
         <span className="shrink-0 text-[8px] font-semibold uppercase tracking-[.16em] text-[var(--accent-hover)] sm:text-[9px] sm:tracking-[.18em]">Play · Edit · Create</span>
       </div>
 
-      <div className="relative aspect-video w-full bg-black">
+      <div className="relative aspect-video w-full overflow-hidden bg-black">
         {media}
       </div>
 
