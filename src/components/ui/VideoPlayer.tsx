@@ -7,6 +7,7 @@ import { getVideoSource } from "@/lib/media/video";
 type PosterFit = "cover" | "project-banner";
 
 const MOBILE_DRIVE_REVEAL_DELAY_MS = 4500;
+const DRIVE_MAX_LOADING_OVERLAY_MS = 7000;
 
 export function VideoPlayer({
   videoUrl,
@@ -35,17 +36,24 @@ export function VideoPlayer({
     ? `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`
     : null;
 
+  function scheduleDriveFallbackReveal() {
+    if (typeof window === "undefined") return;
+    window.setTimeout(() => setDriveReady(true), DRIVE_MAX_LOADING_OVERLAY_MS);
+  }
+
   function startPlayback() {
     if (!source) return;
     setLoadError(false);
     setDriveReady(false);
     setPlaying(true);
+    if (source.provider === "google-drive") scheduleDriveFallbackReveal();
   }
 
   function retry() {
     setLoadError(false);
     setDriveReady(false);
     setRetryKey((value) => value + 1);
+    if (source?.provider === "google-drive") scheduleDriveFallbackReveal();
   }
 
   function revealDrivePlayer() {
