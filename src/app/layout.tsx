@@ -39,6 +39,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${poppins.variable} h-full antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://drive.google.com" />
+        <link rel="preconnect" href="https://drive.usercontent.google.com" />
+        <link rel="dns-prefetch" href="//drive.google.com" />
+        <link rel="dns-prefetch" href="//drive.usercontent.google.com" />
+      </head>
       <body className="min-h-full flex flex-col"><CmsLiveSync />{children}</body>
     </html>
   );
