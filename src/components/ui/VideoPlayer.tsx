@@ -6,8 +6,7 @@ import { getVideoSource } from "@/lib/media/video";
 
 type PosterFit = "cover" | "project-banner";
 
-const MOBILE_DRIVE_REVEAL_DELAY_MS = 4500;
-const DRIVE_MAX_LOADING_OVERLAY_MS = 7000;
+const DRIVE_NATIVE_REVEAL_FALLBACK_MS = 5000;
 
 export function VideoPlayer({
   videoUrl,
@@ -28,40 +27,32 @@ export function VideoPlayer({
   const [loadError, setLoadError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
   const [driveReady, setDriveReady] = useState(false);
+  const [driveNativeFailed, setDriveNativeFailed] = useState(false);
   const source = getVideoSource(videoUrl);
   const posterFitClass = posterFit === "project-banner"
     ? "bg-contain bg-no-repeat"
     : "bg-cover bg-no-repeat";
-  const driveSrc = source?.provider === "google-drive"
-    ? `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`
-    : null;
 
-  function scheduleDriveFallbackReveal() {
+  function scheduleDriveRevealFallback() {
     if (typeof window === "undefined") return;
-    window.setTimeout(() => setDriveReady(true), DRIVE_MAX_LOADING_OVERLAY_MS);
+    window.setTimeout(() => setDriveReady(true), DRIVE_NATIVE_REVEAL_FALLBACK_MS);
   }
 
   function startPlayback() {
     if (!source) return;
     setLoadError(false);
     setDriveReady(false);
+    setDriveNativeFailed(false);
     setPlaying(true);
-    if (source.provider === "google-drive") scheduleDriveFallbackReveal();
+    if (source.provider === "google-drive") scheduleDriveRevealFallback();
   }
 
   function retry() {
     setLoadError(false);
     setDriveReady(false);
+    setDriveNativeFailed(false);
     setRetryKey((value) => value + 1);
-    if (source?.provider === "google-drive") scheduleDriveFallbackReveal();
-  }
-
-  function revealDrivePlayer() {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches) {
-      window.setTimeout(() => setDriveReady(true), MOBILE_DRIVE_REVEAL_DELAY_MS);
-      return;
-    }
-    setDriveReady(true);
+    if (source?.provider === "google-drive") scheduleDriveRevealFallback();
   }
 
   const poster = (
@@ -112,36 +103,68 @@ export function VideoPlayer({
     </div>
   );
 
+  const driveLoadingOverlay = (
+    <div
+      aria-hidden="true"
+      className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#030a14] transition-opacity duration-300 ${driveReady ? "opacity-0" : "opacity-100"}`}
+    >
+      {poster}
+      <div className="relative flex flex-col items-center gap-2.5">
+        <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-[#030a14]/85 shadow-lg sm:h-12 sm:w-12">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" />
+        </span>
+        <span className="rounded-full border border-white/10 bg-[#030a14]/80 px-3 py-1 text-[8px] font-semibold uppercase tracking-[.16em] text-white/70 sm:text-[9px]">Opening video</span>
+      </div>
+    </div>
+  );
+
   let media;
   if (playing && source?.provider === "google-drive") {
-    media = loadError ? loadFailure : (
-      <>
-        <iframe
-          key={retryKey}
-          src={driveSrc ?? source.embedUrl}
-          title={`${title} video`}
-          allow="autoplay; fullscreen"
-          allowFullScreen
-          loading="eager"
-          referrerPolicy="strict-origin-when-cross-origin"
-          onLoad={revealDrivePlayer}
-          onError={() => setLoadError(true)}
-          className="absolute inset-0 block h-full w-full border-0 bg-black"
-        />
-        <div
-          aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#030a14] transition-opacity duration-300 ${driveReady ? "opacity-0" : "opacity-100"}`}
-        >
-          {poster}
-          <div className="relative flex flex-col items-center gap-2.5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-[#030a14]/85 shadow-lg sm:h-12 sm:w-12">
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" />
-            </span>
-            <span className="rounded-full border border-white/10 bg-[#030a14]/80 px-3 py-1 text-[8px] font-semibold uppercase tracking-[.16em] text-white/70 sm:text-[9px]">Opening video</span>
-          </div>
-        </div>
-      </>
-    );
+    if (loadError) {
+      media = loadFailure;
+    } else if (!driveNativeFailed) {
+      media = (
+        <>
+          <video
+            key={`drive-native-${retryKey}`}
+            src={source.mediaUrl}
+            controls
+            playsInline
+            autoPlay
+            preload="metadata"
+            poster={posterUrl ?? undefined}
+            aria-label={title}
+            controlsList="nodownload noremoteplayback"
+            disablePictureInPicture
+            onPlaying={() => setDriveReady(true)}
+            onError={() => {
+              setDriveReady(false);
+              setDriveNativeFailed(true);
+            }}
+            className="absolute inset-0 block h-full w-full bg-black object-contain"
+          />
+          {driveLoadingOverlay}
+        </>
+      );
+    } else {
+      media = (
+        <>
+          <iframe
+            key={`drive-preview-${retryKey}`}
+            src={`${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`}
+            title={`${title} video`}
+            allow="autoplay; fullscreen"
+            allowFullScreen
+            loading="eager"
+            referrerPolicy="strict-origin-when-cross-origin"
+            onLoad={() => setDriveReady(true)}
+            onError={() => setLoadError(true)}
+            className="absolute inset-0 block h-full w-full border-0 bg-black"
+          />
+          {driveLoadingOverlay}
+        </>
+      );
+    }
   } else if (playing && source && loadError) {
     media = loadFailure;
   } else if (playing && source?.provider === "youtube") {
