@@ -5,7 +5,6 @@ import { useState } from "react";
 import { getVideoSource } from "@/lib/media/video";
 
 type PosterFit = "cover" | "project-banner";
-type MobileAspect = "standard" | "comfortable";
 
 export function VideoPlayer({
   videoUrl,
@@ -13,14 +12,14 @@ export function VideoPlayer({
   title,
   className = "",
   posterFit = "cover",
-  mobileAspect = "standard",
+  posterOnlyIdle = false,
 }: {
   videoUrl?: string | null;
   posterUrl?: string | null;
   title: string;
   className?: string;
   posterFit?: PosterFit;
-  mobileAspect?: MobileAspect;
+  posterOnlyIdle?: boolean;
 }) {
   const [playing, setPlaying] = useState(false);
   const [loadError, setLoadError] = useState(false);
@@ -30,14 +29,56 @@ export function VideoPlayer({
   const posterFitClass = posterFit === "project-banner"
     ? "bg-contain bg-no-repeat"
     : "bg-cover bg-no-repeat";
-  const mediaAspectClass = source?.provider === "google-drive" && mobileAspect === "comfortable"
-    ? "aspect-[4/3] sm:aspect-video"
-    : "aspect-video";
+  const driveSrc = source?.provider === "google-drive"
+    ? `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`
+    : null;
+
+  function startPlayback() {
+    if (!source) return;
+    setLoadError(false);
+    setDriveReady(false);
+    setPlaying(true);
+  }
 
   function retry() {
     setLoadError(false);
     setDriveReady(false);
     setRetryKey((value) => value + 1);
+  }
+
+  const poster = (
+    <div
+      className={`absolute inset-0 bg-center ${posterFitClass}`}
+      style={posterUrl ? { backgroundImage: `url('${posterUrl}')` } : undefined}
+      role="img"
+      aria-label={title}
+    />
+  );
+
+  const playBadge = source ? (
+    <span className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/90 bg-black/60 text-white shadow-lg sm:h-16 sm:w-16">
+      <Play size={22} fill="currentColor" />
+    </span>
+  ) : null;
+
+  if (posterOnlyIdle && !playing) {
+    return (
+      <button
+        type="button"
+        onClick={startPlayback}
+        disabled={!source}
+        className={`group relative block aspect-video w-full min-w-0 overflow-hidden rounded-[inherit] border border-white/10 bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] disabled:cursor-default ${className}`}
+        aria-label={source ? `Play ${title}` : title}
+      >
+        <div
+          className={`absolute inset-0 bg-center ${posterFitClass} transition-transform duration-500 group-hover:scale-[1.01]`}
+          style={posterUrl ? { backgroundImage: `url('${posterUrl}')` } : undefined}
+          role="img"
+          aria-label={title}
+        />
+        {playBadge}
+      </button>
+    );
   }
 
   const loadFailure = (
@@ -54,12 +95,12 @@ export function VideoPlayer({
   );
 
   let media;
-  if (source?.provider === "google-drive") {
+  if (playing && source?.provider === "google-drive") {
     media = loadError ? loadFailure : (
       <>
         <iframe
           key={retryKey}
-          src={source.embedUrl}
+          src={driveSrc ?? source.embedUrl}
           title={`${title} video`}
           allow="autoplay; fullscreen"
           allowFullScreen
@@ -71,12 +112,9 @@ export function VideoPlayer({
         />
         <div
           aria-hidden="true"
-          className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#030a14] transition-opacity duration-300 ${driveReady ? "opacity-0" : "opacity-100"}`}
+          className={`pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-[#030a14] transition-opacity duration-200 ${driveReady ? "opacity-0" : "opacity-100"}`}
         >
-          <div
-            className={`absolute inset-0 bg-center ${posterFitClass}`}
-            style={posterUrl ? { backgroundImage: `url('${posterUrl}')` } : undefined}
-          />
+          {poster}
           <span className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-[#030a14]/85 shadow-lg sm:h-12 sm:w-12">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" />
           </span>
@@ -116,11 +154,7 @@ export function VideoPlayer({
     media = (
       <button
         type="button"
-        onClick={() => {
-          if (!source) return;
-          setLoadError(false);
-          setPlaying(true);
-        }}
+        onClick={startPlayback}
         disabled={!source}
         className="group absolute inset-0 block h-full w-full overflow-hidden bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--focus)] disabled:cursor-default"
         aria-label={source ? `Play ${title} inline` : title}
@@ -131,11 +165,7 @@ export function VideoPlayer({
           role="img"
           aria-label={title}
         />
-        {source ? (
-          <span className="absolute left-1/2 top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/90 bg-black/60 text-white shadow-lg sm:h-16 sm:w-16">
-            <Play size={22} fill="currentColor" />
-          </span>
-        ) : null}
+        {playBadge}
       </button>
     );
   }
@@ -150,7 +180,7 @@ export function VideoPlayer({
         <span className="shrink-0 text-[7px] font-semibold uppercase tracking-[.12em] text-[var(--accent-hover)] sm:text-[9px] sm:tracking-[.18em]">Play · Edit · Create</span>
       </div>
 
-      <div className={`relative w-full overflow-hidden bg-black ${mediaAspectClass}`}>
+      <div className="relative aspect-video w-full overflow-hidden bg-black">
         {media}
       </div>
 
