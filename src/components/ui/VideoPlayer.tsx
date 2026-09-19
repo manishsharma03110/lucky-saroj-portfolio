@@ -127,7 +127,7 @@ export function VideoPlayer({
           referrerPolicy="strict-origin-when-cross-origin"
           onLoad={revealDrivePlayer}
           onError={() => setLoadError(true)}
-          className="absolute inset-0 block h-full w-full border-0 bg-black"
+          className="absolute left-0 top-0 block h-[177.7778%] w-[177.7778%] origin-top-left border-0 bg-black [transform:scale(.5625)] sm:inset-0 sm:h-full sm:w-full sm:[transform:scale(1)]"
         />
         <div
           aria-hidden="true"
