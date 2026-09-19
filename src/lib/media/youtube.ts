@@ -28,13 +28,29 @@ export function normalizeYouTubeVideoUrl(value: string | null | undefined): stri
   return id ? `https://www.youtube.com/watch?v=${id}` : null;
 }
 
+export function isDirectVideoUrl(value: string | null | undefined): boolean {
+  const input = value?.trim();
+  if (!input) return false;
+
+  const directExtension = /\.(mp4|webm|ogg|ogv|mov|m4v)$/i;
+
+  try {
+    const url = new URL(input);
+    const pathname = url.pathname.toLowerCase();
+    if (directExtension.test(pathname)) return true;
+
+    return url.hostname.endsWith("public.blob.vercel-storage.com") && pathname.endsWith("/video");
+  } catch {
+    const cleanPath = input.split(/[?#]/, 1)[0] ?? "";
+    return directExtension.test(cleanPath) || (cleanPath.startsWith("/") && cleanPath.endsWith("/video"));
+  }
+}
+
 export function getYouTubeEmbedUrl(value: string | null | undefined): string | null {
   const id = getYouTubeVideoId(value);
   if (!id) return null;
 
-  // Keep the supported YouTube player UI intact. YouTube deprecated
-  // `modestbranding`, and title/channel/branding surfaces cannot be reliably
-  // disabled. `rel=0` limits related videos to the same channel; playsinline
-  // keeps mobile playback responsive within the portfolio layout.
+  // PR #66 behavior: preserve the standard YouTube embed surface while
+  // keeping playback inline inside the fixed project frame.
   return `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`;
 }
