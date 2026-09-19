@@ -47,6 +47,8 @@ export function VideoPlayer({
       title={title}
       allow="autoplay; encrypted-media; picture-in-picture"
       referrerPolicy="strict-origin-when-cross-origin"
+      // The existing cinematic viewport is the only crop boundary: no extra mask layers.
+      // Mobile gets a little more overscan because YouTube's edge chrome occupies more of the frame there.
       className="absolute left-1/2 top-1/2 block h-full w-full -translate-x-1/2 -translate-y-1/2 scale-[1.16] border-0 sm:scale-[1.14] lg:scale-[1.10] xl:scale-[1.08]"
     />
   ) : (
