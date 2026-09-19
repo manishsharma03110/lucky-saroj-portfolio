@@ -91,11 +91,11 @@ export function InteractiveWorkVisual({
             alt={title}
             fill
             sizes={large ? "100vw" : "(min-width: 1024px) 50vw, 100vw"}
-            className="object-cover object-center grayscale-[0.72] transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.035] group-hover:grayscale-0"
+            className="object-cover object-center transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.01]"
           />
         ) : (
           <div
-            className="absolute inset-0 bg-cover bg-center grayscale-[0.72] transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.035] group-hover:grayscale-0"
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-[transform,filter] duration-700 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.01]"
             style={{ backgroundImage: `url('${visualUrl}')` }}
             role="img"
             aria-label={title}
@@ -112,22 +112,13 @@ export function InteractiveWorkVisual({
           playsInline
           preload="metadata"
           aria-label={`${title} preview`}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${hovered && finePointer ? "opacity-100" : "pointer-events-none opacity-0"}`}
+          className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-500 ${hovered && finePointer ? "opacity-100" : "pointer-events-none opacity-0"}`}
         />
       )}
 
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-black/10 opacity-75 transition-opacity duration-300 group-hover:opacity-90" aria-hidden="true" />
+      
 
-      <div className="pointer-events-none absolute inset-x-5 top-5 flex items-start justify-between gap-4 sm:inset-x-7 sm:top-7">
-        {categoryName ? (
-          <span className="border border-white/20 bg-black/35 px-3 py-1.5 text-xs text-white/85 backdrop-blur-sm">{categoryName}</span>
-        ) : <span />}
-        {videoUrl && (
-          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/35 bg-black/30 text-white backdrop-blur-sm" aria-hidden="true">
-            <Play size={16} fill="currentColor" />
-          </span>
-        )}
-      </div>
+      {videoUrl && <span className="pointer-events-none absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/55 text-white/90 backdrop-blur-sm sm:right-4 sm:top-4" aria-hidden="true"><Play size={13} fill="currentColor" /></span>}
 
       {videoUrl && finePointer && (
         <span

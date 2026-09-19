@@ -27,14 +27,13 @@ function ProjectVisual({ project, categoryName, mediaUrl, layout, copy }: { proj
 
   return (
     <div className="relative aspect-video overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)]">
-      {visualUrl ? <div className="absolute inset-0 bg-cover bg-center transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.025]" style={{ backgroundImage: `url('${visualUrl}')` }} role="img" aria-label={visualAlt} /> : (
+      {visualUrl ? <div className="absolute inset-0 bg-contain bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]" style={{ backgroundImage: `url('${visualUrl}')` }} role="img" aria-label={visualAlt} /> : (
         <div className={`absolute inset-0 ${fallbackVariant === 0 ? "bg-[radial-gradient(circle_at_78%_25%,rgba(59,130,246,0.12),transparent_32%),linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-primary)_76%)]" : fallbackVariant === 1 ? "bg-[radial-gradient(circle_at_20%_78%,rgba(59,130,246,0.10),transparent_30%),linear-gradient(125deg,var(--background-primary)_0%,var(--surface-elevated)_100%)]" : "bg-[linear-gradient(155deg,var(--surface-elevated)_0%,var(--surface-primary)_48%,var(--background-primary)_100%)]"}`}>
           <span className={`absolute select-none font-display text-[clamp(5rem,12vw,10rem)] leading-none text-white/[0.055] ${fallbackVariant === 1 ? "-left-2 bottom-0" : "right-5 top-2"}`} aria-hidden>{initials(project.title)}</span>
           <div className="absolute inset-x-5 bottom-5 max-w-[75%] sm:inset-x-7 sm:bottom-7"><span className="block h-px w-14 bg-[var(--accent-primary)]" aria-hidden /><p className="mt-3 text-xs uppercase tracking-[0.18em] text-[var(--accent-primary)]">{categoryName ?? copy.fallbackCategoryLabel}</p><p className="mt-2 line-clamp-2 font-display text-xl font-semibold tracking-[-0.03em] text-[var(--text-primary)] sm:text-2xl">{project.title}</p></div>
         </div>
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/15 transition-colors duration-300 group-hover:from-black/75" aria-hidden />
-      <div className="absolute inset-x-4 top-4 flex items-start justify-between gap-4 sm:inset-x-5 sm:top-5">{categoryName ? <span className="border border-white/15 bg-black/45 px-3 py-1.5 text-xs text-white/85 backdrop-blur-sm">{categoryName}</span> : <span />}{project.videoUrl && <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-black/45 text-[var(--accent-hover)] backdrop-blur-sm" aria-hidden><Play size={14} fill="currentColor" /></span>}</div>
+      {project.videoUrl && <span className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/25 bg-black/55 text-white/90 backdrop-blur-sm sm:right-4 sm:top-4" aria-hidden><Play size={13} fill="currentColor" /></span>}
     </div>
   );
 }
