@@ -27,7 +27,7 @@ export function VideoPlayer({
 
   const media = playing && embedUrl ? (
     <iframe
-      src={`${embedUrl}&autoplay=1&controls=1&fs=1&iv_load_policy=3`}
+      src={`${embedUrl}&autoplay=1&controls=0&fs=0&iv_load_policy=3&disablekb=1`}
       title={title}
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
       allowFullScreen
