@@ -2,14 +2,20 @@
 
 import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
-import { UploadCloud, X, Loader2, Play } from "lucide-react";
+import { Loader2, Play, UploadCloud, X } from "lucide-react";
 import { Input, Label } from "@/components/ui/Input";
-import { getUploadAcceptValue, validateUploadFilePolicy } from "@/lib/media/upload-policy";
+import {
+  getMaximumUploadSize,
+  getUploadAcceptValue,
+  validateUploadFilePolicy,
+} from "@/lib/media/upload-policy";
 import { useUploadActivity } from "./MediaForm";
 import styles from "./AdminEditorial.module.css";
 
 type UploadInitiation = { assetId: string; pathname: string; kind: "image" | "video" };
 type ImageUploadResult = { assetId: string; pathname: string; kind: "image"; url: string };
+
+const MAX_VIDEO_UPLOAD_MB = getMaximumUploadSize("video") / (1024 * 1024);
 
 async function readImageDimensions(file: File) {
   const objectUrl = URL.createObjectURL(file);
@@ -54,9 +60,24 @@ export function FileUpload({
   async function handleFile(file: File | undefined) {
     if (!file) return;
     setError(null);
-    const policy = validateUploadFilePolicy({ kind, contentType: file.type, size: file.size });
+
+    const policy = validateUploadFilePolicy({
+      kind,
+      contentType: file.type,
+      size: file.size,
+      originalFilename: file.name,
+    });
+
     if (!policy.ok) {
-      setError(policy.reason === "invalid_type" ? `Unsupported ${kind} format.` : `${kind === "image" ? "Image" : "Video"} file is too large or empty.`);
+      setError(
+        policy.reason === "invalid_type"
+          ? kind === "video"
+            ? "Upload blocked: only MP4 and WebM video files are allowed."
+            : "Unsupported image format."
+          : kind === "video"
+            ? `Upload blocked: video must be between 1 byte and ${MAX_VIDEO_UPLOAD_MB} MB.`
+            : "Image file is too large or empty.",
+      );
       if (inputRef.current) inputRef.current.value = "";
       return;
     }
@@ -65,7 +86,9 @@ export function FileUpload({
       try {
         const dimensions = await readImageDimensions(file);
         if (dimensions.width * requiredAspectRatio.height !== dimensions.height * requiredAspectRatio.width) {
-          setError(`Upload blocked: Project Banner must be exactly ${requiredAspectRatio.label}. Selected image is ${dimensions.width}×${dimensions.height}px.`);
+          setError(
+            `Upload blocked: Project Banner must be exactly ${requiredAspectRatio.label}. Selected image is ${dimensions.width}×${dimensions.height}px.`,
+          );
           if (inputRef.current) inputRef.current.value = "";
           return;
         }
@@ -79,6 +102,7 @@ export function FileUpload({
     setUploading(true);
     reportUpload(true);
     setProgress(0);
+
     try {
       if (kind === "image") {
         const form = new FormData();
@@ -87,7 +111,9 @@ export function FileUpload({
         const response = await fetch("/api/upload/image", { method: "POST", body: form });
         if (!response.ok) throw new Error("Compressed image upload failed.");
         const result = (await response.json()) as ImageUploadResult;
-        if (!result.assetId || !result.pathname || !result.url || result.kind !== "image") throw new Error("Invalid compressed image upload response.");
+        if (!result.assetId || !result.pathname || !result.url || result.kind !== "image") {
+          throw new Error("Invalid compressed image upload response.");
+        }
         setProgress(100);
         setAssetId(result.assetId);
         setUrl(result.url);
@@ -97,11 +123,19 @@ export function FileUpload({
       const initiationResponse = await fetch("/api/upload/initiate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ kind, originalFilename: file.name, contentType: file.type, size: file.size }),
+        body: JSON.stringify({
+          kind,
+          originalFilename: file.name,
+          contentType: file.type,
+          size: file.size,
+        }),
       });
       if (!initiationResponse.ok) throw new Error("Upload initiation failed.");
+
       const initiation = (await initiationResponse.json()) as UploadInitiation;
-      if (!initiation.assetId || !initiation.pathname || initiation.kind !== kind) throw new Error("Invalid upload initiation.");
+      if (!initiation.assetId || !initiation.pathname || initiation.kind !== kind) {
+        throw new Error("Invalid upload initiation.");
+      }
 
       const result = await upload(initiation.pathname, file, {
         access: "public",
@@ -110,6 +144,7 @@ export function FileUpload({
         clientPayload: JSON.stringify({ assetId: initiation.assetId, kind }),
         onUploadProgress: ({ percentage }) => setProgress(percentage),
       });
+
       if (result.pathname !== initiation.pathname) throw new Error("Upload identity mismatch.");
       setAssetId(initiation.assetId);
       setUrl(result.url);
@@ -123,14 +158,97 @@ export function FileUpload({
 
   const externalVideoInputId = `${name}-external`;
 
-  return <div>
-    <Label>{label}</Label>
-    <input type="hidden" name={name} value={url}/>
-    <input type="hidden" name={assetIdName} value={assetId}/>
-    {requiredAspectRatio && kind === "image" && <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">Required: {requiredAspectRatio.label} aspect ratio. Recommended 1920×1080 px. Other ratios are blocked before upload.</p>}
-    {url ? <div className={styles.mediaPreview}>{kind === "image" ? <img src={url} alt=""/> : <video src={url} muted playsInline preload="metadata"><track kind="captions"/></video>}<div className={styles.previewOverlay}>{kind === "video" && <Play size={22}/>}</div><button type="button" onClick={()=>{setUrl("");setAssetId("");if(inputRef.current)inputRef.current.value=""}} className={styles.removeMedia} aria-label="Remove"><X size={15}/></button></div> : <button type="button" onClick={()=>inputRef.current?.click()} disabled={uploading} className={styles.uploadZone}>{uploading?<><Loader2 size={21} className="animate-spin"/><span>{kind === "image" ? "Optimizing & uploading" : "Uploading"}… {progress}%</span></>:<><UploadCloud size={21}/><span>Click to upload {kind === "image" ? "an image" : "an MP4 / WebM video"}</span></>}</button>}
-    <input ref={inputRef} type="file" accept={getUploadAcceptValue(kind)} className="hidden" onChange={event=>handleFile(event.target.files?.[0])}/>
-    {kind === "video" && <div className="mt-4"><Label htmlFor={externalVideoInputId}>Or paste a direct MP4 / WebM URL</Label><Input id={externalVideoInputId} placeholder="https://cdn.example.com/portfolio-video.mp4" value={assetId ? "" : url} onChange={event=>{setUrl(event.target.value);setAssetId("");setError(null)}}/><p className="mt-1 text-xs text-[var(--text-muted)]">For a 100% clean player, use an uploaded file or a direct MP4/WebM URL. Existing YouTube and Google Drive links remain supported for older projects.</p></div>}
-    {error&&<p className={styles.uploadError}>{error}</p>}
-  </div>;
+  return (
+    <div>
+      <Label>{label}</Label>
+      <input type="hidden" name={name} value={url} />
+      <input type="hidden" name={assetIdName} value={assetId} />
+
+      {requiredAspectRatio && kind === "image" && (
+        <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">
+          Required: {requiredAspectRatio.label} aspect ratio. Recommended 1920×1080 px. Other ratios are blocked before upload.
+        </p>
+      )}
+
+      {kind === "video" && (
+        <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">
+          MP4/WebM only · Maximum {MAX_VIDEO_UPLOAD_MB} MB · Upload is validated in the browser and again on the server.
+        </p>
+      )}
+
+      {url ? (
+        <div className={styles.mediaPreview}>
+          {kind === "image" ? (
+            <img src={url} alt="" />
+          ) : (
+            <video src={url} muted playsInline preload="metadata">
+              <track kind="captions" />
+            </video>
+          )}
+          <div className={styles.previewOverlay}>{kind === "video" && <Play size={22} />}</div>
+          <button
+            type="button"
+            onClick={() => {
+              setUrl("");
+              setAssetId("");
+              setError(null);
+              if (inputRef.current) inputRef.current.value = "";
+            }}
+            className={styles.removeMedia}
+            aria-label="Remove"
+          >
+            <X size={15} />
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className={styles.uploadZone}
+        >
+          {uploading ? (
+            <>
+              <Loader2 size={21} className="animate-spin" />
+              <span>{kind === "image" ? "Optimizing & uploading" : "Uploading"}… {Math.round(progress)}%</span>
+            </>
+          ) : (
+            <>
+              <UploadCloud size={21} />
+              <span>Click to upload {kind === "image" ? "an image" : "an MP4 / WebM video"}</span>
+            </>
+          )}
+        </button>
+      )}
+
+      <input
+        ref={inputRef}
+        type="file"
+        accept={getUploadAcceptValue(kind)}
+        className="hidden"
+        onChange={(event) => handleFile(event.target.files?.[0])}
+      />
+
+      {kind === "video" && (
+        <div className="mt-4">
+          <Label htmlFor={externalVideoInputId}>Or paste a direct MP4 / WebM URL</Label>
+          <Input
+            id={externalVideoInputId}
+            placeholder="https://cdn.example.com/portfolio-video.mp4"
+            value={assetId ? "" : url}
+            onChange={(event) => {
+              setUrl(event.target.value);
+              setAssetId("");
+              setError(null);
+            }}
+          />
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
+            For a 100% clean player, use an uploaded file or a direct MP4/WebM URL. Existing YouTube and Google Drive links remain supported for older projects.
+          </p>
+        </div>
+      )}
+
+      {error && <p className={styles.uploadError}>{error}</p>}
+    </div>
+  );
 }
