@@ -1,7 +1,7 @@
 "use client";
 
-import { Play } from "lucide-react";
-import { useState } from "react";
+import { Maximize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { getVideoSource } from "@/lib/media/video";
 
 type PosterFit = "cover" | "project-banner";
@@ -9,6 +9,165 @@ export type VideoOrientation = "landscape" | "portrait";
 
 const MOBILE_DRIVE_REVEAL_DELAY_MS = 4500;
 const DRIVE_MAX_LOADING_OVERLAY_MS = 7000;
+
+function formatTime(seconds: number) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
+  const minutes = Math.floor(seconds / 60);
+  const remainder = Math.floor(seconds % 60).toString().padStart(2, "0");
+  return `${minutes}:${remainder}`;
+}
+
+function DirectVideoMedia({
+  src,
+  title,
+  retryKey,
+  onError,
+}: {
+  src: string;
+  title: string;
+  retryKey: number;
+  onError: () => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(true);
+  const [muted, setMuted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    void video.play().catch(() => setPaused(true));
+  }, [src, retryKey]);
+
+  async function togglePlayback() {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      await video.play().catch(() => setPaused(true));
+      return;
+    }
+    video.pause();
+  }
+
+  function toggleMute() {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setMuted(video.muted);
+  }
+
+  async function toggleFullscreen() {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      return;
+    }
+
+    const container = containerRef.current;
+    if (container?.requestFullscreen) {
+      await container.requestFullscreen();
+      return;
+    }
+
+    const iosVideo = videoRef.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    iosVideo?.webkitEnterFullscreen?.();
+  }
+
+  return (
+    <div ref={containerRef} className="absolute inset-0 bg-black">
+      <video
+        ref={videoRef}
+        key={retryKey}
+        src={src}
+        playsInline
+        autoPlay
+        preload="metadata"
+        controls={false}
+        disablePictureInPicture
+        controlsList="nodownload noplaybackrate noremoteplayback"
+        aria-label={title}
+        onClick={togglePlayback}
+        onLoadedMetadata={(event) => {
+          setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0);
+        }}
+        onDurationChange={(event) => {
+          setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0);
+        }}
+        onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
+        onPlay={() => setPaused(false)}
+        onPause={() => setPaused(true)}
+        onEnded={() => setPaused(true)}
+        onVolumeChange={(event) => setMuted(event.currentTarget.muted)}
+        onError={onError}
+        className="absolute inset-0 block h-full w-full cursor-pointer bg-black object-contain"
+      />
+
+      {paused ? (
+        <button
+          type="button"
+          onClick={togglePlayback}
+          className="absolute left-1/2 top-1/2 z-20 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/90 bg-black/60 text-white shadow-lg backdrop-blur-sm transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:h-16 sm:w-16"
+          aria-label={`Play ${title}`}
+        >
+          <Play size={22} fill="currentColor" />
+        </button>
+      ) : null}
+
+      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/55 to-transparent px-3 pb-3 pt-10 sm:px-4 sm:pb-4">
+        <input
+          type="range"
+          min={0}
+          max={duration > 0 ? duration : 1}
+          step={0.05}
+          value={duration > 0 ? Math.min(currentTime, duration) : 0}
+          onChange={(event) => {
+            const video = videoRef.current;
+            if (!video || duration <= 0) return;
+            const nextTime = Number(event.target.value);
+            video.currentTime = nextTime;
+            setCurrentTime(nextTime);
+          }}
+          aria-label="Video progress"
+          className="block h-1.5 w-full cursor-pointer accent-[var(--accent-primary)]"
+        />
+
+        <div className="mt-2.5 flex items-center gap-3 text-white">
+          <button
+            type="button"
+            onClick={togglePlayback}
+            className="rounded p-1 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            aria-label={paused ? "Play video" : "Pause video"}
+          >
+            {paused ? <Play size={18} fill="currentColor" /> : <Pause size={18} fill="currentColor" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleMute}
+            className="rounded p-1 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            aria-label={muted ? "Unmute video" : "Mute video"}
+          >
+            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          </button>
+
+          <span className="text-[10px] tabular-nums text-white/70 sm:text-xs">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="ml-auto rounded p-1 transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            aria-label="Open video fullscreen"
+          >
+            <Maximize2 size={18} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function VideoPlayer({
   videoUrl,
@@ -166,16 +325,11 @@ export function VideoPlayer({
     );
   } else if (playing && source?.provider === "direct") {
     media = (
-      <video
-        key={retryKey}
+      <DirectVideoMedia
         src={source.mediaUrl}
-        controls
-        playsInline
-        autoPlay
-        preload="metadata"
-        aria-label={title}
+        title={title}
+        retryKey={retryKey}
         onError={() => setLoadError(true)}
-        className="absolute inset-0 block h-full w-full object-contain"
       />
     );
   } else {
