@@ -15,7 +15,12 @@ export function createUploadInitiationHandler({ authorizeAdmin, createPendingAss
     if (!authorization.ok) return authorization.response;
     try {
       const input = uploadInitiationSchema.parse(await request.json());
-      const policy = validateUploadFilePolicy({ kind: input.kind, contentType: input.contentType, size: input.size });
+      const policy = validateUploadFilePolicy({
+        kind: input.kind,
+        contentType: input.contentType,
+        size: input.size,
+        originalFilename: input.originalFilename,
+      });
       if (!policy.ok) {
         return NextResponse.json({ error: "Selected file is not allowed." }, { status: 400 });
       }
