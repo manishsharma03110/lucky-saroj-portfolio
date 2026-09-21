@@ -111,11 +111,6 @@ export function ProjectForm({
     onChange: (event: ChangeEvent<HTMLTextAreaElement>) => setField(name, event.target.value),
   });
 
-  const bannerRatio =
-    videoOrientation === "portrait"
-      ? { width: 9, height: 16, label: "9:16", recommended: "1080×1920 px" }
-      : { width: 16, height: 9, label: "16:9", recommended: "1920×1080 px" };
-
   return (
     <MediaForm action={formAction} className={styles.formGrid} autoComplete="off">
       {project && <input type="hidden" name="revision" value={project.revision} />}
@@ -211,14 +206,13 @@ export function ProjectForm({
         <FileUpload
           name="thumbnailUrl"
           assetIdName="thumbnailAssetId"
-          label={`Project Banner — ${bannerRatio.label}`}
+          label="Project Banner — optional"
           kind="image"
           defaultValue={project?.thumbnailUrl}
           defaultAssetId={mediaAssetIds?.thumbnail}
-          requiredAspectRatio={bannerRatio}
         />
         <p className={styles.helper}>
-          Banner ratio follows the selected video orientation. Portrait video requires a 9:16 banner; landscape requires 16:9. If no banner is uploaded, the website uses the existing dark/blue palette project slate automatically.
+          Upload a portrait, landscape, or square banner at any aspect ratio. Dimensions and orientation are optional; banners are centered and cropped to fit each display frame. With no banner, the existing project slate is used.
         </p>
         <div>
           <Label htmlFor="thumbnailAlt">Project Banner Alt Text</Label>

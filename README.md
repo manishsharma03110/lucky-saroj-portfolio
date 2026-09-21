@@ -70,3 +70,5 @@ See [database migrations](docs/database-migrations.md) and [PR audit](docs/pr-au
 
 ## SEO
 CMS metadata includes page/project titles and descriptions, H1/H2 overrides, canonical/social metadata, JSON-LD, Google verification and optional Analytics. Contact inquiries are stored in the CMS inbox.
+
+Project banners accept portrait, landscape and square images without required dimensions/aspect ratio. Video orientation defaults to Auto; neither it nor banner dimensions need manual entry. See [video workflow](docs/video-workflow.md).

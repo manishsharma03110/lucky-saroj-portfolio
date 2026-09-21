@@ -23,15 +23,18 @@ export default async function setup() {
     await client.query("UPDATE about_profile SET headline=$1 WHERE id=$2", ["E2E video editor", "singleton:about"]);
     const base = process.env.E2E_BASE_URL || "http://127.0.0.1:3000";
     for (const [index, orientation] of ["portrait","landscape"].entries()) {
-      await client.query(`INSERT INTO portfolio_projects(id,title,slug,status,is_featured,display_order,video_url,thumbnail_url,video_orientation)
-        VALUES ($1,$2,$3,'published',true,$4,$5,$6,$7)
-        ON CONFLICT(slug) DO UPDATE SET video_url=EXCLUDED.video_url,thumbnail_url=EXCLUDED.thumbnail_url,video_orientation=EXCLUDED.video_orientation`,
-        [randomUUID(),`E2E ${orientation}`,`e2e-${orientation}`,1000+index,`${base}/e2e/${orientation}.mp4`,"/e2e/poster.png",orientation]);
+      await client.query(`INSERT INTO portfolio_projects(id,title,slug,status,is_featured,display_order,video_url,thumbnail_url,thumbnail_alt,video_orientation)
+        VALUES ($1,$2,$3,'published',true,$4,$5,$6,$7,$8)
+        ON CONFLICT(slug) DO UPDATE SET video_url=EXCLUDED.video_url,thumbnail_url=EXCLUDED.thumbnail_url,thumbnail_alt=EXCLUDED.thumbnail_alt,video_orientation=EXCLUDED.video_orientation`,
+        [randomUUID(),`E2E ${orientation}`,`e2e-${orientation}`,1000+index,`${base}/e2e/${orientation}.mp4`,`/e2e/banner-${orientation}.png`,`E2E ${orientation} banner`,orientation]);
     }
   } finally { await client.end(); }
   await mkdir("../public/e2e", { recursive: true });
   for (const [name,size] of [["portrait","180x320"],["landscape","320x180"]]) {
     execFileSync("ffmpeg", ["-y","-f","lavfi","-i",`testsrc2=size=${size}:rate=12`,"-t","4","-pix_fmt","yuv420p","-movflags","+faststart",`../public/e2e/${name}.mp4`], { stdio: "ignore" });
+  }
+  for (const [name,size] of [["portrait","210:330"],["landscape","350:190"]]) {
+    execFileSync("ffmpeg", ["-y","-i",`../public/e2e/${name}.mp4`,"-vf",`scale=${size}`,"-frames:v","1",`../public/e2e/banner-${name}.png`], { stdio: "ignore" });
   }
   execFileSync("ffmpeg", ["-y","-i","../public/e2e/landscape.mp4","-frames:v","1","../public/e2e/poster.png"], { stdio: "ignore" });
 }
