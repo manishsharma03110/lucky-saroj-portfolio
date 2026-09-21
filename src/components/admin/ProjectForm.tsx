@@ -182,7 +182,7 @@ export function ProjectForm({
           <FileUpload
             name="videoUrl"
             assetIdName="videoAssetId"
-            label="Project Video"
+            label="Upload Project Video — MP4/WebM"
             kind="video"
             defaultValue={project?.videoUrl}
             defaultAssetId={mediaAssetIds?.video}

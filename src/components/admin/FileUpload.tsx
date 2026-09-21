@@ -216,7 +216,7 @@ export function FileUpload({
 
       {kind === "video" && (
         <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">
-          Upload MP4/WebM up to {MAX_VIDEO_UPLOAD_MB} MB, or paste any valid http(s) video/page URL below. Pinterest, YouTube and Google Drive are recognized automatically.
+          Upload a compressed MP4/WebM up to {MAX_VIDEO_UPLOAD_MB} MB. Existing external videos remain available under Advanced / Legacy.
         </p>
       )}
 
@@ -247,6 +247,7 @@ export function FileUpload({
               if (inputRef.current) inputRef.current.value = "";
             }}
             className={styles.removeMedia}
+            disabled={uploading}
             aria-label="Remove"
           >
             <X size={15} />
@@ -273,7 +274,15 @@ export function FileUpload({
         </button>
       )}
 
+      {url && (
+        <button type="button" disabled={uploading} className="mt-3 rounded-md border border-white/20 px-4 py-2 text-sm"
+          onClick={() => inputRef.current?.click()}>
+          {uploading ? `Uploading… ${Math.round(progress)}%` : kind === "video" ? "Replace with MP4 / WebM upload" : "Replace image"}
+        </button>
+      )}
       <input
+        aria-label={`Upload ${label}`}
+        disabled={uploading}
         ref={inputRef}
         type="file"
         accept={getUploadAcceptValue(kind)}
@@ -282,10 +291,15 @@ export function FileUpload({
       />
 
       {kind === "video" && (
-        <div className="mt-4">
+        <details className="mt-4 rounded-md border border-white/10 p-3">
+          <summary className="cursor-pointer text-sm font-medium">Advanced / Legacy video URL</summary>
+          {url && !assetId && <p className="my-2 text-xs text-[var(--text-muted)]">Saved source: {providerLabel(url)}. It stays unchanged unless you replace it.</p>}
           <Label htmlFor={externalVideoInputId}>Or paste any video URL</Label>
           <Input
             id={externalVideoInputId}
+            disabled={uploading}
+            autoComplete="off"
+            spellCheck={false}
             placeholder="Pinterest, YouTube, Google Drive, MP4/WebM, Vimeo, or another http(s) URL"
             value={assetId ? "" : url}
             onChange={(event) => {
@@ -297,7 +311,7 @@ export function FileUpload({
           <p className="mt-1 text-xs text-[var(--text-muted)]">
             CMS accepts any valid http(s) URL. Known providers open inside the portfolio player when supported; other sites are saved safely and get an external-source fallback instead of blocking project save.
           </p>
-        </div>
+        </details>
       )}
 
       {error && <p className={styles.uploadError}>{error}</p>}
