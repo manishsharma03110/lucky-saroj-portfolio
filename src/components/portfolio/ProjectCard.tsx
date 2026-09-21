@@ -1,6 +1,5 @@
 import { ArrowUpRight, Play } from "lucide-react";
 import Link from "next/link";
-import { VideoLaunchSurface } from "@/components/ui/VideoLaunchSurface";
 import type { PortfolioProjectWithVideo } from "@/lib/db/queries";
 import { getVideoSource } from "@/lib/media/video";
 
@@ -86,28 +85,14 @@ function ProjectVisual({
       )}
       {playable && (
         <span className="pointer-events-none absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/60 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/90 backdrop-blur-md sm:bottom-5 sm:left-5">
-          Play video
+          Open project
         </span>
       )}
     </div>
   );
 
-  if (playable && project.videoUrl) {
-    return (
-      <VideoLaunchSurface
-        videoUrl={project.videoUrl}
-        title={project.title}
-        posterUrl={visualUrl}
-        orientation={project.videoOrientation}
-        className="group w-full"
-      >
-        {visual}
-      </VideoLaunchSurface>
-    );
-  }
-
   return (
-    <Link href={`/portfolio/${project.slug}`} className="group block rounded-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">
+    <Link href={`/portfolio/${project.slug}`} className="group block rounded-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]" aria-label={playable ? `Open ${project.title} project and video` : `Open ${project.title} project`}>
       {visual}
     </Link>
   );

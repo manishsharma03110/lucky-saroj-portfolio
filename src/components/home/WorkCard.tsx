@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { InteractiveWorkVisual } from "@/components/home/InteractiveWorkVisual";
-import { VideoLaunchSurface } from "@/components/ui/VideoLaunchSurface";
 import type { PortfolioProjectWithVideo } from "@/lib/db/queries";
 import { getVideoSource } from "@/lib/media/video";
 
@@ -43,6 +42,7 @@ export function WorkCard({
   const large = size === "large";
   const metadata = [categoryName, project.year].filter(Boolean).join(" · ");
   const playable = Boolean(project.videoUrl && getVideoSource(project.videoUrl));
+  const projectHref = `/portfolio/${project.slug}`;
 
   const visual = (
     <div className="relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--background-secondary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)]">
@@ -73,7 +73,7 @@ export function WorkCard({
 
       <div className="pointer-events-none absolute inset-x-3 bottom-3 z-30 flex items-center justify-between gap-2 sm:inset-x-4 sm:bottom-4">
         <span className="rounded-full border border-white/15 bg-black/60 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-md sm:text-xs">
-          {playable ? "Play video" : "View project"}
+          {playable ? "Open project" : "View project"}
         </span>
         <ArrowUpRight size={18} className="text-[var(--accent-hover)] transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
       </div>
@@ -82,27 +82,16 @@ export function WorkCard({
 
   return (
     <article className="group/card min-w-0">
-      {playable && project.videoUrl ? (
-        <VideoLaunchSurface
-          videoUrl={project.videoUrl}
-          title={project.title}
-          posterUrl={visualUrl}
-          orientation={project.videoOrientation}
-          className="group w-full"
-        >
-          {visual}
-        </VideoLaunchSurface>
-      ) : (
-        <Link
-          href={`/portfolio/${project.slug}`}
-          className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-primary)]"
-        >
-          {visual}
-        </Link>
-      )}
+      <Link
+        href={projectHref}
+        className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--accent-primary)]"
+        aria-label={playable ? `Open ${project.title} project and video` : `Open ${project.title} project`}
+      >
+        {visual}
+      </Link>
 
       <Link
-        href={`/portfolio/${project.slug}`}
+        href={projectHref}
         className={`grid gap-3 border-b border-white/[0.09] py-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] ${large ? "md:grid-cols-[minmax(0,1fr)_auto] md:items-end md:gap-10" : ""}`}
       >
         <div className="min-w-0">
