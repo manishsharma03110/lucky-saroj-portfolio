@@ -1,10 +1,11 @@
+import { AuthorizationError } from "@/lib/auth/authorization-core";
 import { sql } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { requirePermission } from "@/lib/auth/authorization";
 import { AdminControls, CreateAdminForm } from "@/components/admin/AccountForms";
 export default async function UsersPage() {
-  const actor = await requirePermission("admin_users.manage");
+  const actor = await requirePermission("admin_users.manage").catch(error => { if (error instanceof AuthorizationError) notFound(); throw error; });
   if (actor.role !== "SUPER_ADMIN") notFound();
   const users = await db.execute<{ id: string; name: string; email: string; role: string; is_active: boolean; last_login_at: Date | null }>(sql`
     SELECT a.id,a.name,a.email,r.key AS role,a.is_active,a.last_login_at

@@ -83,7 +83,7 @@ test("new and edit project preserve single field values and legacy source", asyn
   await page.getByRole("tab", { name: "Projects", exact: true }).click();
   const row = page.locator("tr").filter({ hasText: title });
   await row.locator('a[href^="/admin/portfolio/"]').first().click();
-  await expect(page).toHaveURL(/\/admin\/portfolio\/[^/]+$/);
+  await expect(page).toHaveURL(/\/admin\/portfolio\/[^/]+\/edit$/);
   const editURL = page.url();
   await expect(page.getByLabel("Project Title", { exact: true })).toHaveValue(title);
   const changed = title + " revised";
