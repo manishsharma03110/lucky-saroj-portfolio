@@ -28,12 +28,13 @@ for (const orientation of ["portrait", "landscape"]) {
     await login(page);
     const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
     await db.connect();
-    const id = randomUUID(), pathname = `cms-media/${id}/image`, url = `/e2e/banner-${orientation}.png`;
+    const id = randomUUID(), pathname = `cms-media/${id}/image`, url = `https://e2e.public.blob.vercel-storage.com/${pathname}`;
     try {
       // Simulate only Blob transport. Save, ownership attachment and reopen use the real local database.
       await db.query(`INSERT INTO media_assets(id,provider,provider_key,kind,original_filename,url,uploaded_by_admin_id)
         SELECT $1,'vercel_blob',$2,'image',$3,$4,id FROM admin_users WHERE email=$5`,
         [id, pathname, `banner-${orientation}.png`, url, process.env.E2E_ADMIN_EMAIL]);
+      await page.route(url, route => route.fulfill({ path: `../public/e2e/banner-${orientation}.png`, contentType: "image/png" }));
       await page.route("**/api/upload/image", route => route.fulfill({
         status: 200, contentType: "application/json",
         body: JSON.stringify({ assetId: id, pathname, kind: "image", url })
