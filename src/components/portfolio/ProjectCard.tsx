@@ -27,6 +27,7 @@ function ProjectVisual({
   project,
   categoryName,
   mediaUrl,
+  layout,
   copy,
 }: {
   project: Project;
@@ -46,10 +47,10 @@ function ProjectVisual({
   const fallbackVariant = project.title.split("").reduce((total, character) => total + character.charCodeAt(0), 0) % 3;
   const portrait = project.videoOrientation === "portrait";
   const playable = Boolean(project.videoUrl && getVideoSource(project.videoUrl));
-  const frameClass = `relative w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)] ${portrait ? "mx-auto aspect-[9/16] max-w-[420px]" : "aspect-video"}`;
+  const featured = layout === "featured";
 
-  const visual = (
-    <div className={frameClass}>
+  const innerMedia = (
+    <>
       {visualUrl ? (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]"
@@ -76,9 +77,21 @@ function ProjectVisual({
       )}
       {playable && (
         <span className="pointer-events-none absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/60 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/90 backdrop-blur-md sm:bottom-5 sm:left-5">
-          Play fullscreen
+          Play video
         </span>
       )}
+    </>
+  );
+
+  const visual = featured ? (
+    <div className={`relative w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)] ${portrait ? "mx-auto aspect-[9/16] max-w-[420px]" : "aspect-video"}`}>
+      {innerMedia}
+    </div>
+  ) : (
+    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--background-secondary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)]">
+      <div className={`absolute left-1/2 top-1/2 overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_16px_50px_rgba(0,0,0,.32)] ${portrait ? "h-[90%] aspect-[9/16] -translate-x-1/2 -translate-y-1/2" : "w-[94%] aspect-video -translate-x-1/2 -translate-y-1/2"}`}>
+        {innerMedia}
+      </div>
     </div>
   );
 
@@ -139,7 +152,7 @@ export function ProjectCard({ project, categoryName, mediaUrl, layout = "standar
   }
 
   return (
-    <article>
+    <article className="min-w-0">
       <ProjectVisual project={project} categoryName={categoryName} mediaUrl={mediaUrl} layout={layout} copy={copy} />
       <ProjectDetailsLink project={project} metadata={metadata} copy={copy} featured={false} />
     </article>
