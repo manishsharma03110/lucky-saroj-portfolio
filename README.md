@@ -23,7 +23,7 @@ Account management: /admin/account provides current-password-verified password c
 ## Media and video workflow
 1. Upload a compressed MP4/WebM in the project form (maximum 25 MB).
 2. The server registers an owned media asset; the browser uploads to the dedicated public Vercel Blob store.
-3. Save the project to bind the uploaded asset. Images use the Sharp compression endpoint and banner ratio validation.
+3. Save the project to bind the uploaded asset. Images use the Sharp compression endpoint; project banners have no required dimensions or aspect ratio.
 4. Home cards show previews and link to project details; project media opens the global player.
 5. Direct videos use custom play/pause, seek, mute, time and fullscreen controls. The modal centers contained media in the viewport and supports Escape, close and browser Back.
 6. Legacy YouTube, Google Drive, Pinterest and valid HTTP(S) URLs remain supported through provider playback or an external-source fallback. Provider availability, embedding restrictions and branding remain controlled by the provider.

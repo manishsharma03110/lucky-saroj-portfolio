@@ -13,7 +13,7 @@ Legacy providers:
 
 Cards use centered cover artwork; the full player uses contain. A portrait clip in a landscape viewport necessarily leaves side space. Do not stretch or crop playback to remove that space.
 
-Verify both new and existing projects: typing, replacement, failed-save retention, save/reopen, source replacement, orientation and banner ratio. Test real Blob delivery only with a dedicated staging store and disposable records.
+Verify both new and existing projects: typing, replacement, failed-save retention, save/reopen, source replacement, automatic orientation and arbitrary banner ratios. Use a dedicated staging store for routine Blob tests; an explicitly authorized production smoke test should use clearly marked TEST uploads and preserve existing project media.
 
 ## Flexible project banners
 Project banners are optional and independent of video orientation. Portrait, landscape and square images are accepted without required dimensions or an exact aspect ratio. Image format/byte-size safety limits still apply; Sharp preserves proportions while optimizing. Home, Portfolio, Related Projects and Project Detail retain one centered cover artwork layer. No banner uses the existing slate. Existing URLs/assets are preserved on unrelated edits.
