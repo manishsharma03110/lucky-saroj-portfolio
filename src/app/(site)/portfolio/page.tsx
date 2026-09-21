@@ -105,17 +105,16 @@ export default async function PortfolioPage({ searchParams }: { searchParams: Pr
                     </p>
                   </div>
 
-                  <div className="columns-1 pt-10 lg:columns-2 lg:gap-10 2xl:gap-12">
+                  <div className="grid grid-cols-1 items-start gap-x-8 gap-y-10 pt-10 md:grid-cols-2 sm:gap-y-12 lg:gap-x-10 2xl:gap-x-12 2xl:gap-y-14">
                     {collection.map(({ project, category: projectCategory, galleryImageUrl }) => (
-                      <div key={project.id} className="mb-10 break-inside-avoid sm:mb-12 2xl:mb-14">
-                        <ProjectCard
-                          project={project}
-                          categoryName={projectCategory?.name}
-                          mediaUrl={galleryImageUrl}
-                          layout="standard"
-                          copy={cardCopy}
-                        />
-                      </div>
+                      <ProjectCard
+                        key={project.id}
+                        project={project}
+                        categoryName={projectCategory?.name}
+                        mediaUrl={galleryImageUrl}
+                        layout="standard"
+                        copy={cardCopy}
+                      />
                     ))}
                   </div>
                 </div>
