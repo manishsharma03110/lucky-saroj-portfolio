@@ -76,7 +76,7 @@ function ProjectVisual({
       )}
       {playable && (
         <span className="pointer-events-none absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/60 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-white/90 backdrop-blur-md sm:bottom-5 sm:left-5">
-          Play fullscreen
+          Play video
         </span>
       )}
     </div>
