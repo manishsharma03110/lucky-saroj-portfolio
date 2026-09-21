@@ -6,7 +6,7 @@ import { ExternalLink, Pencil, Plus } from "lucide-react";
 import { PortfolioRowActions, DeleteProjectButton } from "@/components/admin/PortfolioRowActions";
 import styles from "@/components/admin/AdminContent.module.css";
 
-type Row={project:{id:string;title:string;slug:string;year:number|null;status:string;isFeatured:boolean;revision:number;thumbnailUrl:string|null;thumbnailAlt:string|null;posterUrl:string|null};category:{name:string}|null};
+type Row={project:{id:string;title:string;slug:string;year:number|null;status:string;isFeatured:boolean;revision:number;thumbnailUrl:string|null;thumbnailAlt:string|null;posterUrl:string|null};category:{name:string}|null;videoOrientation:"auto"|"portrait"|"landscape"};
 
 export function PortfolioProjectManager({initialRows}:{initialRows:Row[]}){
   return <section className={styles.tableCard} aria-labelledby="portfolio-projects-heading">
@@ -16,10 +16,11 @@ export function PortfolioProjectManager({initialRows}:{initialRows:Row[]}){
     </div>
     <table className={styles.table}>
       <thead><tr><th>Project Banner</th><th>Details</th><th>Published</th><th>Featured</th><th style={{textAlign:"right"}}>Actions</th></tr></thead>
-      <tbody>{initialRows.map(({project,category})=>{
+      <tbody>{initialRows.map(({project,category,videoOrientation})=>{
         const imageUrl=project.thumbnailUrl||project.posterUrl;
+        const portrait=videoOrientation==="portrait";
         return <tr key={project.id}>
-          <td data-label="Project Banner"><div className="relative aspect-video w-[128px] overflow-hidden rounded-md border border-white/10 bg-black/35">{imageUrl?<Image src={imageUrl} alt={project.thumbnailAlt||project.title} fill sizes="128px" className="object-cover"/>:<div className="flex h-full items-center justify-center px-2 text-center text-[10px] uppercase tracking-[.14em] text-[var(--text-muted)]">No banner</div>}</div></td>
+          <td data-label="Project Banner"><div className="relative aspect-video w-[128px] overflow-hidden rounded-md border border-white/10 bg-black/35">{imageUrl?<>{portrait?<Image src={imageUrl} alt="" aria-hidden fill sizes="128px" className="scale-110 object-cover object-center opacity-45 blur-md"/>:null}<Image src={imageUrl} alt={project.thumbnailAlt||project.title} fill sizes="128px" className={`${portrait?"object-contain":"object-cover"} object-center`}/></>:<div className="flex h-full items-center justify-center px-2 text-center text-[10px] uppercase tracking-[.14em] text-[var(--text-muted)]">No banner</div>}</div></td>
           <td data-label="Details" className={styles.tableTitle}><div>{project.title}</div><div className="text-xs font-normal text-[var(--text-muted)]">{category?.name??"Uncategorized"}{project.year?` · ${project.year}`:""}</div></td>
           <td data-label="Published"><span className={project.status==="published"?styles.statusPublished:styles.statusDraft}>{project.status==="published"?"Published":"Draft"}</span></td>
           <td data-label="Featured"><PortfolioRowActions id={project.id} isFeatured={project.isFeatured} revision={project.revision}/></td>
