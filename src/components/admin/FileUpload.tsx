@@ -231,10 +231,10 @@ export function FileUpload({
 
       {kind === "video" && (
         <div className="mt-4">
-          <Label htmlFor={externalVideoInputId}>Or paste a direct MP4 / WebM URL</Label>
+          <Label htmlFor={externalVideoInputId}>Or paste a video URL</Label>
           <Input
             id={externalVideoInputId}
-            placeholder="https://cdn.example.com/portfolio-video.mp4"
+            placeholder="Direct MP4/WebM, YouTube, or Google Drive URL"
             value={assetId ? "" : url}
             onChange={(event) => {
               setUrl(event.target.value);
@@ -243,7 +243,7 @@ export function FileUpload({
             }}
           />
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            For a 100% clean player, use an uploaded file or a direct MP4/WebM URL. Existing YouTube and Google Drive links remain supported for older projects.
+            Uploaded/direct MP4 or WebM uses the clean HTML5 player. YouTube and Google Drive remain supported through their official embedded players.
           </p>
         </div>
       )}
