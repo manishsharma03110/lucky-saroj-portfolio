@@ -1,6 +1,7 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { adminRoleService } from "./admin-role-service";
 import { db, schema } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { edgeAuthConfig } from "./edge-config";
@@ -53,6 +54,7 @@ export const authConfig: NextAuthConfig = {
           return null;
         }
 
+        await adminRoleService.recordLogin({ actorId: admin.id, actorSessionVersion: admin.sessionVersion });
         clearAdminLoginFailures(rateLimitKey);
         return admin;
       },

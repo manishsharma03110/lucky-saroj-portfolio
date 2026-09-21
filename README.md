@@ -18,6 +18,8 @@ Project counts depend on published database records; they are not fixed in sourc
 
 Server actions and upload routes enforce permissions independently of navigation visibility. Roles are SUPER_ADMIN, ADMIN and EDITOR; database grants determine access. Sessions are revalidated against active state and session version. Content saves use optimistic revisions and transactional media binding.
 
+Account management: /admin/account provides current-password-verified password changes. SUPER_ADMIN with admin_users.manage uses /admin/users for accounts/role assignment; /admin/security lists security events. Apply migration 0023 before deployment. See [account management](docs/admin-accounts.md).
+
 ## Media and video workflow
 1. Upload a compressed MP4/WebM in the project form (maximum 25 MB).
 2. The server registers an owned media asset; the browser uploads to the dedicated public Vercel Blob store.

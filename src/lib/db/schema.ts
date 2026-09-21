@@ -36,6 +36,7 @@ export const adminUsers = pgTable("admin_users", {
   email: text("email").notNull().unique(),
   name: text("name").notNull(),
   passwordHash: text("password_hash").notNull(),
+  lastLoginAt: timestamp("last_login_at"),
   sessionVersion: integer("session_version").notNull().default(1),
   isActive: boolean("is_active").notNull().default(true),
   roleId: text("role_id").notNull().references(() => roles.id, { onDelete: "restrict" }),

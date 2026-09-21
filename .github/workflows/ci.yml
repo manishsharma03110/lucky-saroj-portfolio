@@ -73,6 +73,9 @@ jobs:
       - name: Install browser test dependencies
         run: npm install --prefix e2e --ignore-scripts
 
+      - name: Install fixture generator
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
       - name: Install Chromium
         run: cd e2e && npx playwright install --with-deps chromium
 
