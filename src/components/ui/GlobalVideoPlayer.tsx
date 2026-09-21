@@ -1,6 +1,6 @@
 "use client";
 
-import { Maximize2, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowLeft, Maximize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { flushSync } from "react-dom";
 import {
   createContext,
@@ -159,6 +159,7 @@ function DirectVideo({
 export function GlobalVideoPlayerProvider({ children }: { children: ReactNode }) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const nativeFullscreenRef = useRef(false);
+  const historyEntryRef = useRef(false);
   const [nativeFullscreen, setNativeFullscreen] = useState(false);
   const [request, setRequest] = useState<GlobalVideoRequest | null>(null);
   const [detectedOrientation, setDetectedOrientation] = useState<Exclude<VideoOrientation, "auto">>("landscape");
@@ -167,7 +168,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
   const resolvedOrientation = requestedOrientation === "auto" ? detectedOrientation : requestedOrientation;
   const active = Boolean(request && source);
 
-  const closeVideo = useCallback(() => {
+  const resetPlayer = useCallback(() => {
     setRequest(null);
     setDetectedOrientation("landscape");
     setNativeFullscreen(false);
@@ -176,6 +177,14 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
       void document.exitFullscreen().catch(() => undefined);
     }
   }, []);
+
+  const closeVideo = useCallback(() => {
+    if (typeof window !== "undefined" && historyEntryRef.current) {
+      historyEntryRef.current = false;
+      window.history.back();
+    }
+    resetPlayer();
+  }, [resetPlayer]);
 
   const requestNativeFullscreen = useCallback(() => {
     if (typeof document === "undefined" || document.fullscreenElement) return;
@@ -193,6 +202,12 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
   const openVideo = useCallback((next: GlobalVideoRequest) => {
     if (!getVideoSource(next.videoUrl)) return;
     const orientation = normalizeVideoOrientation(next.orientation);
+
+    if (typeof window !== "undefined" && !historyEntryRef.current) {
+      window.history.pushState({ ...(window.history.state ?? {}), portfolioVideoPlayer: true }, "", window.location.href);
+      historyEntryRef.current = true;
+    }
+
     flushSync(() => {
       setDetectedOrientation(orientation === "auto" ? "landscape" : orientation);
       setRequest({ ...next, orientation });
@@ -209,6 +224,11 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
       if (event.key === "Escape" && !document.fullscreenElement) closeVideo();
     };
 
+    const onPopState = () => {
+      historyEntryRef.current = false;
+      resetPlayer();
+    };
+
     const onFullscreenChange = () => {
       const isFullscreen = Boolean(document.fullscreenElement);
       setNativeFullscreen(isFullscreen);
@@ -217,12 +237,14 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
 
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("fullscreenchange", onFullscreenChange);
+    window.addEventListener("popstate", onPopState);
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("fullscreenchange", onFullscreenChange);
+      window.removeEventListener("popstate", onPopState);
     };
-  }, [active, closeVideo]);
+  }, [active, closeVideo, resetPlayer]);
 
   const shellStyle: CSSProperties = resolvedOrientation === "portrait"
     ? { height: "min(100dvh, calc(100vw * 16 / 9))", aspectRatio: "9 / 16" }
@@ -272,25 +294,27 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
           </div>
         ) : null}
 
+        {active ? (
+          <button
+            type="button"
+            onClick={closeVideo}
+            className="absolute left-3 top-[max(1rem,env(safe-area-inset-top))] z-50 flex h-11 items-center gap-2 rounded-full border border-white/20 bg-black/70 px-3.5 text-sm font-semibold text-white shadow-[0_10px_32px_rgba(0,0,0,.4)] backdrop-blur-md transition hover:border-[var(--accent-primary)] hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:left-5 sm:px-4"
+            aria-label="Back to project"
+          >
+            <ArrowLeft size={18} />
+            <span>Back</span>
+          </button>
+        ) : null}
+
         {!nativeFullscreen && active ? (
-          <>
-            <button
-              type="button"
-              onClick={requestNativeFullscreen}
-              className="absolute right-16 top-[max(1rem,env(safe-area-inset-top))] z-40 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/65 text-white backdrop-blur-md transition hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-              aria-label="Enter fullscreen"
-            >
-              <Maximize2 size={19} />
-            </button>
-            <button
-              type="button"
-              onClick={closeVideo}
-              className="absolute right-3 top-[max(1rem,env(safe-area-inset-top))] z-40 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/65 text-white backdrop-blur-md transition hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-              aria-label="Close video and return to project"
-            >
-              <X size={20} />
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={requestNativeFullscreen}
+            className="absolute right-3 top-[max(1rem,env(safe-area-inset-top))] z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white shadow-[0_10px_32px_rgba(0,0,0,.4)] backdrop-blur-md transition hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:right-5"
+            aria-label="Enter fullscreen"
+          >
+            <Maximize2 size={19} />
+          </button>
         ) : null}
       </div>
     </GlobalVideoContext.Provider>
