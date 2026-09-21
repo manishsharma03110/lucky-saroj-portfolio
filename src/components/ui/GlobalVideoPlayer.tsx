@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play, Volume2, VolumeX, X } from "lucide-react";
+import { ExternalLink, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -26,6 +26,10 @@ type PlayerContextValue = {
   active: boolean;
 };
 
+type PinterestWindow = Window & {
+  PinUtils?: { build?: () => void };
+};
+
 const GlobalVideoContext = createContext<PlayerContextValue | null>(null);
 
 function formatTime(value: number) {
@@ -33,6 +37,63 @@ function formatTime(value: number) {
   const minutes = Math.floor(value / 60);
   const seconds = Math.floor(value % 60).toString().padStart(2, "0");
   return `${minutes}:${seconds}`;
+}
+
+function PinterestEmbed({ pinUrl, title }: { pinUrl: string; title: string }) {
+  useEffect(() => {
+    const pinterestWindow = window as PinterestWindow;
+    const build = () => pinterestWindow.PinUtils?.build?.();
+    const existing = document.querySelector<HTMLScriptElement>("script[data-portfolio-pinterest-widget]");
+
+    if (existing) {
+      build();
+      const timer = window.setTimeout(build, 250);
+      return () => window.clearTimeout(timer);
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://assets.pinterest.com/js/pinit.js";
+    script.async = true;
+    script.defer = true;
+    script.dataset.portfolioPinterestWidget = "true";
+    script.onload = build;
+    document.body.appendChild(script);
+    return undefined;
+  }, [pinUrl]);
+
+  return (
+    <div className="flex h-full w-full items-start justify-center overflow-y-auto bg-black px-3 py-4 sm:items-center sm:px-6 sm:py-6">
+      <div className="max-h-full max-w-full overflow-auto rounded-xl bg-white p-2 shadow-[0_24px_90px_rgba(0,0,0,.65)]">
+        <a href={pinUrl} data-pin-do="embedPin" aria-label={`Pinterest video: ${title}`}>
+          View {title} on Pinterest
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function ExternalVideoFallback({ url, title }: { url: string; title: string }) {
+  return (
+    <div className="flex h-full w-full items-center justify-center bg-black px-6 text-center">
+      <div className="max-w-md">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-[var(--accent-primary)]/50 bg-[var(--accent-primary)]/10 text-[var(--accent-hover)]">
+          <ExternalLink size={24} />
+        </div>
+        <h2 className="mt-5 text-xl font-semibold text-white sm:text-2xl">{title}</h2>
+        <p className="mt-3 text-sm leading-6 text-white/60">
+          This video link was saved successfully, but this provider does not expose a supported inline player. Open the original source to watch it.
+        </p>
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+        >
+          Open video source <ExternalLink size={16} />
+        </a>
+      </div>
+    </div>
+  );
 }
 
 function DirectVideo({
@@ -240,7 +301,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
                 referrerPolicy="strict-origin-when-cross-origin"
                 className="absolute inset-0 h-full w-full border-0 bg-black"
               />
-            ) : (
+            ) : source.provider === "google-drive" ? (
               <iframe
                 src={`${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`}
                 title={request.title}
@@ -249,6 +310,10 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
                 referrerPolicy="strict-origin-when-cross-origin"
                 className="absolute inset-0 h-full w-full border-0 bg-black"
               />
+            ) : source.provider === "pinterest" ? (
+              <PinterestEmbed pinUrl={source.pinUrl} title={request.title} />
+            ) : (
+              <ExternalVideoFallback url={source.url} title={request.title} />
             )}
           </div>
         ) : null}
