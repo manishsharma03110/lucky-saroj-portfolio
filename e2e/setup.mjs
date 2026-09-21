@@ -31,7 +31,7 @@ export default async function setup() {
   } finally { await client.end(); }
   await mkdir("../public/e2e", { recursive: true });
   for (const [name,size] of [["portrait","180x320"],["landscape","320x180"]]) {
-    execFileSync("ffmpeg", ["-y","-f","lavfi","-i",`testsrc2=size=${size}:rate=12`,"-t","4","-pix_fmt","yuv420p","-movflags","+faststart",`../public/e2e/${name}.mp4`], { stdio: "ignore" });
+    execFileSync("ffmpeg", ["-y","-f","lavfi","-i",`testsrc2=size=${size}:rate=12`,"-t","20","-pix_fmt","yuv420p","-movflags","+faststart",`../public/e2e/${name}.mp4`], { stdio: "ignore" });
   }
   for (const [name,size] of [["portrait","210:330"],["landscape","350:190"]]) {
     execFileSync("ffmpeg", ["-y","-i",`../public/e2e/${name}.mp4`,"-vf",`scale=${size}`,"-frames:v","1",`../public/e2e/banner-${name}.png`], { stdio: "ignore" });

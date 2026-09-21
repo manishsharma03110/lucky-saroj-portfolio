@@ -12,7 +12,7 @@ export function FinalCTA({ content }: { content: HomePageContent }) {
           <h2 className="mt-5 text-[clamp(2.4rem,4.8vw,4.75rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-[var(--text-primary)]">
             {content.finalCtaHeading}
           </h2>
-          <p className="mt-6 max-w-xl text-base leading-7 text-white/55 sm:text-lg">
+          <p className="mt-6 max-w-xl text-base leading-7 text-[var(--text-secondary)] sm:text-lg">
             {content.finalCtaDescription}
           </p>
           <Button

@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeToggle } from "@/components/ThemeProvider";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -93,7 +94,7 @@ export function Header({
     href === "/" ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <header className={cn("sticky top-0 z-50 text-white", motionStyles.glassHeader, scrolled && motionStyles.glassHeaderScrolled)}>
+    <header className={cn("sticky top-0 z-50 text-[var(--text-primary)]", motionStyles.glassHeader, scrolled && motionStyles.glassHeaderScrolled)}>
       <Container
         className={cn(
           "flex max-w-[1560px] items-center justify-between px-5 transition-[height,padding] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:px-8 min-[960px]:px-12",
@@ -108,7 +109,7 @@ export function Header({
           </span>
           <span className="hidden flex-col leading-none sm:flex">
             <span className="font-display text-sm font-semibold uppercase tracking-wide">{siteName}</span>
-            <span className="timecode !text-white/50">{roleLabel}</span>
+            <span className="timecode !text-[var(--text-muted)]">{roleLabel}</span>
           </span>
         </Link>
 
@@ -123,7 +124,7 @@ export function Header({
                 className={cn(
                   "text-[0.875rem] font-medium hover:text-[var(--color-accent)] xl:text-[0.9375rem]",
                   motionStyles.navLink,
-                  active ? cn("text-[var(--color-accent)]", motionStyles.navLinkActive) : "text-white/80",
+                  active ? cn("text-[var(--color-accent)]", motionStyles.navLinkActive) : "text-[var(--text-secondary)]",
                 )}
               >
                 {link.label}
@@ -132,6 +133,7 @@ export function Header({
           })}
         </nav>
 
+        <div className="ml-auto mr-3 min-[960px]:ml-3"><ThemeToggle /></div>
         <div className="hidden min-[960px]:block">
           <Button href={ctaUrl} withArrow className="!bg-[#2563eb] !px-4 !py-2.5 !text-white xl:!px-5 motion-safe:transition-transform motion-safe:duration-300 hover:-translate-y-0.5">
             {ctaLabel}
@@ -141,7 +143,7 @@ export function Header({
         <button
           ref={menuButtonRef}
           type="button"
-          className="flex h-11 w-11 items-center justify-center rounded-md text-white transition-all duration-300 hover:bg-white/[0.04] hover:text-[var(--color-accent)] min-[960px]:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-md text-[var(--text-primary)] transition-all duration-300 hover:bg-white/[0.04] hover:text-[var(--color-accent)] min-[960px]:hidden"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="mobile-navigation"

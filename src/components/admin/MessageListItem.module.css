@@ -1,11 +1,11 @@
 .messageCard {
   position: relative;
   overflow: hidden;
-  border: 1px solid #242832;
+  border: 1px solid var(--tone-242832);
   border-radius: 16px;
   background:
     radial-gradient(circle at 0 0, rgba(59, 130, 246, 0.075), transparent 28%),
-    linear-gradient(180deg, #121419 0%, #0d0f13 100%);
+    linear-gradient(180deg, var(--tone-121419) 0%, var(--tone-0d0f13) 100%);
   padding: 20px;
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
   transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
@@ -26,9 +26,9 @@
   opacity: 0.75;
 }
 
-.cardRead::before { background: #626975; }
-.cardReplied::before { background: #34d399; }
-.cardArchived::before { background: #3f4652; }
+.cardRead::before { background: var(--tone-626975); }
+.cardReplied::before { background: var(--tone-34d399); }
+.cardArchived::before { background: var(--tone-3f4652); }
 
 .topBar {
   display: flex;
@@ -48,7 +48,7 @@
 
 .identityHeading h3 {
   margin: 0;
-  color: #f5f7fa;
+  color: var(--tone-f5f7fa);
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 650;
@@ -60,7 +60,7 @@
   align-items: center;
   gap: 6px;
   margin-top: 7px;
-  color: #626975;
+  color: var(--tone-626975);
   font-size: 11px;
   line-height: 1.4;
 }
@@ -80,25 +80,25 @@
 .statusNew {
   border: 1px solid rgba(59, 130, 246, 0.28);
   background: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
 }
 
 .statusRead {
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.035);
-  color: #9298a3;
+  border: 1px solid rgba(var(--foreground-rgb),0.09);
+  background: rgba(var(--foreground-rgb),0.035);
+  color: var(--tone-9298a3);
 }
 
 .statusReplied {
   border: 1px solid rgba(52, 211, 153, 0.23);
   background: rgba(16, 185, 129, 0.08);
-  color: #6ee7b7;
+  color: var(--tone-6ee7b7);
 }
 
 .statusArchived {
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(255, 255, 255, 0.025);
-  color: #626975;
+  border: 1px solid rgba(var(--foreground-rgb),0.07);
+  background: rgba(var(--foreground-rgb),0.025);
+  color: var(--tone-626975);
 }
 
 .cardActions {
@@ -112,11 +112,11 @@
 
 .statusSelect {
   min-height: 36px;
-  border: 1px solid #2b303a;
+  border: 1px solid var(--tone-2b303a);
   border-radius: 9px;
-  background: #0d0f13;
+  background: var(--tone-0d0f13);
   padding: 0 32px 0 11px;
-  color: #d5d9e0;
+  color: var(--tone-d5d9e0);
   font-size: 11px;
   font-weight: 600;
   outline: none;
@@ -124,7 +124,7 @@
 
 .statusSelect:hover { border-color: #3b82f6; }
 .statusSelect:focus-visible {
-  border-color: #60a5fa;
+  border-color: var(--tone-60a5fa);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 .statusSelect:disabled { cursor: wait; opacity: 0.65; }
@@ -141,7 +141,7 @@
   border-radius: 9px;
   background: rgba(248, 113, 113, 0.06);
   padding: 10px 12px;
-  color: #fca5a5;
+  color: var(--tone-fca5a5);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -162,9 +162,9 @@
   min-width: 0;
   align-items: center;
   gap: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(var(--foreground-rgb),0.07);
   border-radius: 11px;
-  background: rgba(255, 255, 255, 0.025);
+  background: rgba(var(--foreground-rgb),0.025);
   padding: 12px 13px;
   color: inherit;
   text-decoration: none;
@@ -186,7 +186,7 @@
   border: 1px solid rgba(59, 130, 246, 0.17);
   border-radius: 9px;
   background: rgba(59, 130, 246, 0.07);
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
 }
 
 .contactText,
@@ -198,7 +198,7 @@
 
 .contactText small,
 .referenceText small {
-  color: #626975;
+  color: var(--tone-626975);
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.06em;
@@ -208,7 +208,7 @@
 .contactText strong,
 .referenceText strong {
   overflow: hidden;
-  color: #dfe3e9;
+  color: var(--tone-dfe3e9);
   font-size: 12px;
   font-weight: 550;
   text-overflow: ellipsis;
@@ -219,9 +219,9 @@
 
 .detailCard {
   min-width: 0;
-  border: 1px solid rgba(255, 255, 255, 0.065);
+  border: 1px solid rgba(var(--foreground-rgb),0.065);
   border-radius: 11px;
-  background: #0d0f13;
+  background: var(--tone-0d0f13);
   padding: 12px;
 }
 
@@ -229,7 +229,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #626975;
+  color: var(--tone-626975);
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.055em;
@@ -241,7 +241,7 @@
 .detailCard p {
   margin: 8px 0 0;
   overflow-wrap: anywhere;
-  color: #d5d9e0;
+  color: var(--tone-d5d9e0);
   font-size: 12px;
   font-weight: 550;
   line-height: 1.5;
@@ -249,13 +249,13 @@
 
 .referenceCard { margin-top: 10px; }
 .referenceText { flex: 1; }
-.referenceArrow { flex: 0 0 auto; color: #60a5fa; }
+.referenceArrow { flex: 0 0 auto; color: var(--tone-60a5fa); }
 
 .messageSection {
   margin-top: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(var(--foreground-rgb),0.075);
   border-radius: 12px;
-  background: rgba(8, 9, 11, 0.68);
+  background: rgba(var(--background-rgb),0.68);
   padding: 15px;
 }
 
@@ -263,7 +263,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -272,17 +272,17 @@
 
 .messageBody {
   margin: 10px 0 0;
-  color: #e2e5e9;
+  color: var(--tone-e2e5e9);
   font-size: 13px;
   line-height: 1.75;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
 
-.messageCard button[aria-label="Delete"] { color: #9298a3; }
+.messageCard button[aria-label="Delete"] { color: var(--tone-9298a3); }
 .messageCard button[aria-label="Delete"]:hover {
   background: rgba(248, 113, 113, 0.08);
-  color: #fca5a5;
+  color: var(--tone-fca5a5);
 }
 
 @media (max-width: 980px) {

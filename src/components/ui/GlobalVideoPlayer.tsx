@@ -11,6 +11,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import styles from "./GlobalVideoPlayer.module.css";
 import { getVideoSource, normalizeVideoOrientation, type VideoOrientation } from "@/lib/media/video";
 
 type GlobalVideoRequest = {
@@ -55,6 +56,22 @@ function DirectVideo({
   const [duration, setDuration] = useState(0);
   const [buffering, setBuffering] = useState(true);
 
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [interacting, setInteracting] = useState(false);
+  const [keyboardFocus, setKeyboardFocus] = useState(false);
+  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const revealControls = useCallback(() => {
+    if (hideTimer.current) clearTimeout(hideTimer.current);
+    setControlsVisible(true);
+    if (!paused && !buffering && !interacting && !keyboardFocus) {
+      hideTimer.current = setTimeout(() => setControlsVisible(false), 2500);
+    }
+  }, [paused, buffering, interacting, keyboardFocus]);
+  useEffect(() => {
+    revealControls();
+    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
+  }, [revealControls]);
+
   const togglePlayback = useCallback(async () => {
     const video = videoRef.current;
     if (!video) return;
@@ -70,7 +87,9 @@ function DirectVideo({
   }, []);
 
   return (
-    <div className="absolute inset-0 overflow-hidden bg-black">
+    <div className={styles.player} onPointerMove={(event) => { if (event.pointerType === "mouse") revealControls(); }}
+      onKeyDown={revealControls}>
+      <button type="button" className={styles.reveal} aria-label="Show video controls" onClick={revealControls} />
       <video
         ref={videoRef}
         src={src}
@@ -82,7 +101,6 @@ function DirectVideo({
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
         aria-label={title}
-        onClick={togglePlayback}
         onLoadedMetadata={(event) => {
           const video = event.currentTarget;
           setDuration(Number.isFinite(video.duration) ? video.duration : 0);
@@ -97,10 +115,10 @@ function DirectVideo({
         onPause={() => setPaused(true)}
         onEnded={() => setPaused(true)}
         onVolumeChange={(event) => setMuted(event.currentTarget.muted)}
-        className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain object-center"
+        className={styles.video}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/70 via-black/15 to-transparent px-[max(16px,env(safe-area-inset-left))] pb-12 pt-[max(16px,env(safe-area-inset-top))] sm:px-6 sm:pt-5">
+      <div className={styles.title} data-visible={controlsVisible}>
         <p className="max-w-[calc(100%-4rem)] truncate text-xs font-semibold uppercase tracking-[0.16em] text-white/80 sm:text-sm">{title}</p>
       </div>
 
@@ -119,7 +137,10 @@ function DirectVideo({
         </button>
       ) : null}
 
-      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-[max(12px,env(safe-area-inset-left))] pb-[max(12px,env(safe-area-inset-bottom))] pt-14 sm:px-6 sm:pb-5 sm:pt-20">
+      <div className={styles.controls} data-visible={controlsVisible} inert={!controlsVisible}
+        onPointerDown={() => setInteracting(true)} onPointerUp={() => setInteracting(false)} onPointerCancel={() => setInteracting(false)}
+        onFocusCapture={(event) => { if (event.target.matches(":focus-visible")) setKeyboardFocus(true); revealControls(); }}
+        onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setKeyboardFocus(false); }}>
         <input
           type="range"
           min={0}
@@ -134,9 +155,9 @@ function DirectVideo({
             setCurrentTime(next);
           }}
           aria-label="Video progress"
-          className="block h-1.5 w-full cursor-pointer accent-[var(--accent-primary)] sm:h-2"
+          className={styles.timeline}
         />
-        <div className="mt-3 flex items-center gap-2 text-white sm:mt-4 sm:gap-3">
+        <div className={styles.controlRow}>
           <button
             type="button"
             onClick={togglePlayback}
@@ -156,7 +177,7 @@ function DirectVideo({
           <span className="min-w-0 text-[11px] tabular-nums text-white/70 sm:text-xs">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
-          <span className="ml-auto hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-hover)] sm:block">Lucky Saroj · Video Editor</span>
+          <span className={styles.brand}>Lucky Saroj · Video Editor</span>
         </div>
       </div>
     </div>
@@ -301,13 +322,13 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         aria-modal="true"
         aria-label={request ? `${request.title} video player` : "Video player"}
         aria-hidden={!active}
-        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+        className={`video-dialog fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
       >
         {active ? (
           <button
             type="button"
             onClick={closeVideo}
-            className="fixed z-[360] flex h-12 w-12 touch-manipulation items-center justify-center rounded-full border border-white/30 bg-black/80 text-white shadow-[0_10px_35px_rgba(0,0,0,.75)] backdrop-blur-md transition hover:border-[var(--accent-primary)] hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+            className="video-close fixed z-[360] flex h-12 w-12 touch-manipulation items-center justify-center rounded-full border border-white/30 bg-black/80 text-white shadow-[0_10px_35px_rgba(0,0,0,.75)] backdrop-blur-md transition hover:border-[var(--accent-primary)] hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
             style={{ top: "max(10px, env(safe-area-inset-top))", right: "max(10px, env(safe-area-inset-right))" }}
             aria-label="Close video"
             title="Close video"
@@ -317,7 +338,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         ) : null}
 
         {active && request && source ? (
-          <div className="relative max-h-[100dvh] max-w-[100vw] overflow-hidden bg-black" style={playerStyle}>
+          <div className="relative max-h-[100dvh] max-w-[100vw] overflow-hidden bg-black" style={source.provider === "direct" ? { width: "100%", height: "100%" } : playerStyle}>
             {source.provider === "direct" ? (
               <DirectVideo src={source.mediaUrl} posterUrl={request.posterUrl} title={request.title} />
             ) : source.provider === "youtube" ? (

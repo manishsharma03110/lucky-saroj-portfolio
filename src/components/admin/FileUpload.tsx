@@ -203,7 +203,7 @@ export function FileUpload({
   const externalVideoInputId = `${name}-external`;
 
   return (
-    <div>
+    <div className={styles.uploadField}>
       <Label>{label}</Label>
       <input type="hidden" name={name} value={url} />
       <input type="hidden" name={assetIdName} value={assetId} />
@@ -229,8 +229,8 @@ export function FileUpload({
               <track kind="captions" />
             </video>
           ) : (
-            <div className="flex h-full min-h-36 w-full items-center justify-center bg-[var(--surface-primary)] p-5 text-center">
-              <div className="max-w-full">
+            <div className="flex h-full min-h-36 min-w-0 w-full items-center justify-center bg-[var(--surface-primary)] p-5 text-center">
+              <div className="min-w-0 w-full max-w-full">
                 <Link2 className="mx-auto mb-2 text-[var(--accent-primary)]" size={24} />
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{providerLabel(url)}</p>
                 <p className="mt-1 truncate text-xs text-[var(--text-muted)]" title={url}>{url}</p>
@@ -291,7 +291,7 @@ export function FileUpload({
       />
 
       {kind === "video" && (
-        <details className="mt-4 rounded-md border border-white/10 p-3">
+        <details className="min-w-0 max-w-full mt-4 rounded-md border border-white/10 p-3">
           <summary className="cursor-pointer text-sm font-medium">Advanced / Legacy video URL</summary>
           {url && !assetId && <p className="my-2 text-xs text-[var(--text-muted)]">Saved source: {providerLabel(url)}. It stays unchanged unless you replace it.</p>}
           <Label htmlFor={externalVideoInputId}>Or paste any video URL</Label>

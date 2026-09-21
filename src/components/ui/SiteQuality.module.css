@@ -10,8 +10,8 @@
   z-index: 90;
   opacity: 0.028;
   background-image:
-    radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.9) 0 0.45px, transparent 0.65px),
-    radial-gradient(circle at 75% 65%, rgba(255, 255, 255, 0.7) 0 0.4px, transparent 0.6px);
+    radial-gradient(circle at 20% 25%, rgba(var(--foreground-rgb),0.9) 0 0.45px, transparent 0.65px),
+    radial-gradient(circle at 75% 65%, rgba(var(--foreground-rgb),0.7) 0 0.4px, transparent 0.6px);
   background-size: 5px 5px, 7px 7px;
   mix-blend-mode: soft-light;
 }
@@ -32,8 +32,8 @@
   border: 1px solid rgba(96, 165, 250, 0.45);
   border-radius: 10px;
   padding: 10px 14px;
-  background: #0d0f13;
-  color: #f5f7fa;
+  background: var(--tone-0d0f13);
+  color: var(--tone-f5f7fa);
   font-size: 0.875rem;
   font-weight: 600;
   box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35);
