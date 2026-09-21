@@ -8,9 +8,8 @@ export async function SelectedWork({ content }: { content: HomePageContent }) {
   const projects = featuredProjects.length > 0
     ? featuredProjects
     : await getPublishedProjects({ limit: 3 });
-  const [featured, ...secondary] = projects;
 
-  if (!featured) return null;
+  if (projects.length === 0) return null;
 
   return (
     <section id="home-selected-work" className="relative scroll-mt-24 bg-[var(--background-primary)] py-14 min-[480px]:py-16 md:py-28 lg:py-32 2xl:py-36">
@@ -28,15 +27,11 @@ export async function SelectedWork({ content }: { content: HomePageContent }) {
           </Button>
         </div>
 
-        <WorkCard project={featured.project} categoryName={featured.category?.name} size="large" />
-
-        {secondary.length > 0 && (
-          <div className="mt-10 grid grid-cols-1 items-start gap-10 sm:mt-12 sm:gap-12 md:mt-16 md:grid-cols-2 md:gap-8 lg:mt-18 lg:gap-12 2xl:gap-14">
-            {secondary.map(({ project, category }) => (
-              <WorkCard key={project.id} project={project} categoryName={category?.name} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-10 2xl:gap-12">
+          {projects.map(({ project, category }) => (
+            <WorkCard key={project.id} project={project} categoryName={category?.name} />
+          ))}
+        </div>
       </div>
     </section>
   );
