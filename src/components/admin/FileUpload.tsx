@@ -14,6 +14,7 @@ import styles from "./AdminEditorial.module.css";
 
 type UploadInitiation = { assetId: string; pathname: string; kind: "image" | "video" };
 type ImageUploadResult = { assetId: string; pathname: string; kind: "image"; url: string };
+type DetectedVideoOrientation = "landscape" | "portrait";
 
 const MAX_VIDEO_UPLOAD_MB = getMaximumUploadSize("video") / (1024 * 1024);
 
@@ -32,6 +33,25 @@ async function readImageDimensions(file: File) {
   }
 }
 
+async function readVideoOrientation(file: File): Promise<DetectedVideoOrientation> {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    video.muted = true;
+    video.playsInline = true;
+    await new Promise<void>((resolve, reject) => {
+      video.onloadedmetadata = () => resolve();
+      video.onerror = () => reject(new Error("Invalid video metadata."));
+      video.src = objectUrl;
+    });
+    if (!video.videoWidth || !video.videoHeight) throw new Error("Missing video dimensions.");
+    return video.videoHeight > video.videoWidth ? "portrait" : "landscape";
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 export function FileUpload({
   name,
   assetIdName,
@@ -40,6 +60,7 @@ export function FileUpload({
   defaultValue,
   defaultAssetId,
   requiredAspectRatio,
+  onDetectedVideoOrientation,
 }: {
   name: string;
   assetIdName: string;
@@ -47,7 +68,8 @@ export function FileUpload({
   kind: "image" | "video";
   defaultValue?: string | null;
   defaultAssetId?: string | null;
-  requiredAspectRatio?: { width: number; height: number; label: string };
+  requiredAspectRatio?: { width: number; height: number; label: string; recommended?: string };
+  onDetectedVideoOrientation?: (orientation: DetectedVideoOrientation) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const reportUpload = useUploadActivity();
@@ -80,6 +102,16 @@ export function FileUpload({
       );
       if (inputRef.current) inputRef.current.value = "";
       return;
+    }
+
+    if (kind === "video" && onDetectedVideoOrientation) {
+      try {
+        onDetectedVideoOrientation(await readVideoOrientation(file));
+      } catch {
+        setError("Upload blocked: video dimensions could not be verified.");
+        if (inputRef.current) inputRef.current.value = "";
+        return;
+      }
     }
 
     if (kind === "image" && requiredAspectRatio) {
@@ -166,13 +198,13 @@ export function FileUpload({
 
       {requiredAspectRatio && kind === "image" && (
         <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">
-          Required: {requiredAspectRatio.label} aspect ratio. Recommended 1920×1080 px. Other ratios are blocked before upload.
+          Required: {requiredAspectRatio.label} aspect ratio. Recommended {requiredAspectRatio.recommended ?? (requiredAspectRatio.width > requiredAspectRatio.height ? "1920×1080 px" : "1080×1920 px")}. Other ratios are blocked before upload. Uploaded images are compressed automatically.
         </p>
       )}
 
       {kind === "video" && (
         <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">
-          MP4/WebM only · Maximum {MAX_VIDEO_UPLOAD_MB} MB · Upload is validated in the browser and again on the server.
+          MP4/WebM only · Maximum {MAX_VIDEO_UPLOAD_MB} MB · Uploaded file orientation is detected automatically before upload.
         </p>
       )}
 
@@ -243,7 +275,7 @@ export function FileUpload({
             }}
           />
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Uploaded/direct MP4 or WebM uses the clean HTML5 player. YouTube and Google Drive remain supported through their official embedded players.
+            Uploaded/direct MP4 or WebM uses the clean HTML5 player. For YouTube or Google Drive portrait videos, select Portrait / Shorts manually so the banner uses 9:16 too.
           </p>
         </div>
       )}
