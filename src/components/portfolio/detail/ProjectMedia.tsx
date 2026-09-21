@@ -92,25 +92,15 @@ export function ProjectMedia({
 }) {
   const { primaryImage, video } = mediaState(project, media);
   const orientation = normalizeVideoOrientation(project.videoOrientation);
-  const portrait = orientation === "portrait";
   const previewAlt = project.thumbnailAlt?.trim() || `${project.title} ${copy.previewAltSuffix || "project preview"}`;
 
   const bannerImage = primaryImage ? (
-    <>
-      {portrait ? (
-        <div
-          className="absolute -inset-5 scale-110 bg-cover bg-center bg-no-repeat opacity-45 blur-2xl"
-          style={{ backgroundImage: `url('${primaryImage}')` }}
-          aria-hidden
-        />
-      ) : null}
-      <div
-        className={`absolute inset-0 bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-[1.01] ${portrait ? "bg-contain" : "bg-cover"}`}
-        style={{ backgroundImage: `url('${primaryImage}')` }}
-        role="img"
-        aria-label={previewAlt}
-      />
-    </>
+    <div
+      className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-[1.01]"
+      style={{ backgroundImage: `url('${primaryImage}')` }}
+      role="img"
+      aria-label={previewAlt}
+    />
   ) : null;
 
   return (
