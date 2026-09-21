@@ -97,10 +97,10 @@ function DirectVideo({
         onPause={() => setPaused(true)}
         onEnded={() => setPaused(true)}
         onVolumeChange={(event) => setMuted(event.currentTarget.muted)}
-        className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain"
+        className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain object-center"
       />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/70 via-black/15 to-transparent px-4 pb-12 pt-4 sm:px-6 sm:pt-5">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/70 via-black/15 to-transparent px-[max(16px,env(safe-area-inset-left))] pb-12 pt-[max(16px,env(safe-area-inset-top))] sm:px-6 sm:pt-5">
         <p className="max-w-[calc(100%-4rem)] truncate text-xs font-semibold uppercase tracking-[0.16em] text-white/80 sm:text-sm">{title}</p>
       </div>
 
@@ -119,7 +119,7 @@ function DirectVideo({
         </button>
       ) : null}
 
-      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-14 sm:px-6 sm:pb-5 sm:pt-20">
+      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-[max(12px,env(safe-area-inset-left))] pb-[max(12px,env(safe-area-inset-bottom))] pt-14 sm:px-6 sm:pb-5 sm:pt-20">
         <input
           type="range"
           min={0}
@@ -290,8 +290,8 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
   }, [active, closeVideo, resetPlayer]);
 
   const playerStyle = portrait
-    ? { height: "min(calc(100dvh - 16px), 960px)", aspectRatio: "9 / 16", maxWidth: "100vw" }
-    : { width: "min(100vw, 1600px)", aspectRatio: "16 / 9", maxHeight: "100dvh" };
+    ? { height: "min(100dvh, 177.7778vw)", aspectRatio: "9 / 16" }
+    : { width: "min(100vw, 177.7778dvh)", aspectRatio: "16 / 9" };
 
   return (
     <GlobalVideoContext.Provider value={{ openVideo, closeVideo, active }}>
@@ -301,7 +301,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         aria-modal="true"
         aria-label={request ? `${request.title} video player` : "Video player"}
         aria-hidden={!active}
-        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${portrait ? "p-2" : "p-0 sm:p-3"} ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
       >
         {active ? (
           <button
@@ -317,10 +317,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         ) : null}
 
         {active && request && source ? (
-          <div
-            className={`relative overflow-hidden bg-black shadow-[0_30px_100px_rgba(0,0,0,.78)] ${portrait ? "rounded-[12px] border border-white/10" : "rounded-none sm:rounded-[10px] sm:border sm:border-white/10"}`}
-            style={playerStyle}
-          >
+          <div className="relative max-h-[100dvh] max-w-[100vw] overflow-hidden bg-black" style={playerStyle}>
             {source.provider === "direct" ? (
               <DirectVideo src={source.mediaUrl} posterUrl={request.posterUrl} title={request.title} />
             ) : source.provider === "youtube" ? (

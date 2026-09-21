@@ -12,7 +12,6 @@ export function InteractiveWorkVisual({
   videoUrl,
   large,
   categoryName,
-  orientation = "landscape",
   autoPreview = false,
 }: {
   title: string;
@@ -28,8 +27,7 @@ export function InteractiveWorkVisual({
   const source = useMemo(() => getVideoSource(videoUrl), [videoUrl]);
   const directVideo = source?.provider === "direct";
   const optimizedVisual = canUseOptimizedImage(visualUrl);
-  const portrait = orientation === "portrait";
-  const previewVisible = directVideo && (autoPreview || hovered);
+  const previewVisible = autoPreview || hovered;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -43,6 +41,17 @@ export function InteractiveWorkVisual({
     }
   }, [directVideo, previewVisible]);
 
+  const providerPreviewUrl = useMemo(() => {
+    if (!autoPreview || !source || source.provider === "direct") return null;
+    if (source.provider === "youtube") {
+      return `${source.embedUrl}&autoplay=1&mute=1&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1`;
+    }
+    if (source.provider === "google-drive") {
+      return `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`;
+    }
+    return null;
+  }, [autoPreview, source]);
+
   return (
     <div
       onPointerEnter={() => setHovered(true)}
@@ -51,41 +60,20 @@ export function InteractiveWorkVisual({
     >
       {visualUrl ? (
         optimizedVisual ? (
-          <>
-            {portrait ? (
-              <Image
-                src={visualUrl}
-                alt=""
-                aria-hidden
-                fill
-                sizes="(min-width: 1024px) 34vw, 100vw"
-                className="scale-110 object-cover object-center opacity-45 blur-xl"
-              />
-            ) : null}
-            <Image
-              src={visualUrl}
-              alt={title}
-              fill
-              sizes={large ? "100vw" : "(min-width: 1024px) 34vw, (min-width: 768px) 50vw, 100vw"}
-              className={`${portrait ? "object-contain" : "object-cover"} object-center transition-transform duration-500 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.015]`}
-            />
-          </>
+          <Image
+            src={visualUrl}
+            alt={title}
+            fill
+            sizes={large ? "100vw" : "(min-width: 1024px) 34vw, (min-width: 768px) 50vw, 100vw"}
+            className="object-cover object-center transition-transform duration-500 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.015]"
+          />
         ) : (
-          <>
-            {portrait ? (
-              <div
-                className="absolute -inset-4 scale-110 bg-cover bg-center bg-no-repeat opacity-45 blur-xl"
-                style={{ backgroundImage: `url('${visualUrl}')` }}
-                aria-hidden
-              />
-            ) : null}
-            <div
-              className={`absolute inset-0 bg-center bg-no-repeat transition-transform duration-500 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.015] ${portrait ? "bg-contain" : "bg-cover"}`}
-              style={{ backgroundImage: `url('${visualUrl}')` }}
-              role="img"
-              aria-label={title}
-            />
-          </>
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 ease-[var(--cine-ease)] motion-reduce:transition-none group-hover:scale-[1.015]"
+            style={{ backgroundImage: `url('${visualUrl}')` }}
+            role="img"
+            aria-label={title}
+          />
         )
       ) : (
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_24%,var(--accent-glow),transparent_34%),linear-gradient(145deg,var(--surface-elevated),var(--background-primary))]" aria-hidden />
@@ -100,7 +88,18 @@ export function InteractiveWorkVisual({
           playsInline
           preload="metadata"
           aria-label={`${title} preview`}
-          className={`pointer-events-none absolute inset-0 z-10 h-full w-full object-center transition-opacity duration-400 ${portrait ? "object-contain" : "object-cover"} ${previewVisible ? "opacity-100" : "opacity-0"}`}
+          className={`pointer-events-none absolute inset-0 z-10 h-full w-full object-cover object-center transition-opacity duration-400 ${previewVisible ? "opacity-100" : "opacity-0"}`}
+        />
+      ) : null}
+
+      {providerPreviewUrl ? (
+        <iframe
+          src={providerPreviewUrl}
+          title={`${title} muted preview`}
+          allow="autoplay; encrypted-media; picture-in-picture"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-10 h-full w-full border-0 bg-black"
         />
       ) : null}
 
