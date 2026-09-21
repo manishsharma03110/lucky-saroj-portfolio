@@ -56,7 +56,10 @@ export function InteractiveWorkVisual({
     if (source.provider === "youtube") {
       return `${source.embedUrl}&autoplay=1&mute=1&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1`;
     }
-    return `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`;
+    if (source.provider === "google-drive") {
+      return `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`;
+    }
+    return null;
   }, [autoPreview, source]);
 
   return (
