@@ -1,5 +1,5 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { manageAdmin, changeOwnPassword, type AccountState } from "@/lib/actions/admin-accounts";
 import { ROLE_KEYS } from "@/lib/auth/permissions";
 import { Input, Label } from "@/components/ui/Input";
@@ -12,10 +12,12 @@ function Feedback({ state }: { state: AccountState }) {
 }
 export function PasswordForm() {
   const [state, action, pending] = useActionState(changeOwnPassword, idle);
+  const [values, setValues] = useState({ currentPassword: "", newPassword: "", confirmPassword: "" });
+  const bind = (name: keyof typeof values) => ({ value: values[name], onChange: (event: React.ChangeEvent<HTMLInputElement>) => setValues(current => ({ ...current, [name]: event.target.value })) });
   return <form action={action} className={`${styles.form} grid max-w-xl gap-4`}>
-    <div><Label htmlFor="currentPassword">Current password</Label><Input id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" required /></div>
-    <div><Label htmlFor="newPassword">New password</Label><Input id="newPassword" name="newPassword" type="password" autoComplete="new-password" minLength={12} maxLength={72} required /></div>
-    <div><Label htmlFor="confirmPassword">Confirm new password</Label><Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" minLength={12} maxLength={72} required /></div>
+    <div><Label htmlFor="currentPassword">Current password</Label><Input id="currentPassword" name="currentPassword" {...bind("currentPassword")} type="password" autoComplete="current-password" required /></div>
+    <div><Label htmlFor="newPassword">New password</Label><Input id="newPassword" name="newPassword" {...bind("newPassword")} type="password" autoComplete="new-password" minLength={12} maxLength={72} required /></div>
+    <div><Label htmlFor="confirmPassword">Confirm new password</Label><Input id="confirmPassword" name="confirmPassword" {...bind("confirmPassword")} type="password" autoComplete="new-password" minLength={12} maxLength={72} required /></div>
     <p className="text-sm">Changing your password signs out all existing sessions, including this one.</p>
     <Feedback state={state}/><Button type="submit" disabled={pending}>{pending ? "Saving…" : "Change password"}</Button>
   </form>;

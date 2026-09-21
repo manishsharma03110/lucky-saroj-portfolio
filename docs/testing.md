@@ -22,3 +22,5 @@ Upload policy/error tests do not prove a real Vercel Blob round trip. Verify one
 Failures retain screenshots/traces in the Playwright HTML report. Skipped, blocked or unexecuted checks are not passes.
 
 Account coverage additionally checks add/delete, bcrypt verification, last-login recording, self-delete protection, role changes invalidating sessions, denied editor access and own-password rotation with old-password rejection. Pure validation/policy tests run in CI before migrations.
+
+Public flow tests use the existing returning-visitor sessionStorage flag so the first-interaction contact popup does not intercept slider/video clicks. Fixture About headline and relative poster paths are explicitly populated. Existing upload-initiation handler and file-policy tests also run in CI.

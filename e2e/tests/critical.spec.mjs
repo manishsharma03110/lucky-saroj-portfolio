@@ -1,5 +1,10 @@
 import { test, expect } from "playwright/test";
 
+// Returning-visitor state prevents the intentionally automatic contact popup from stealing the first click.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem("contact-popup-shown", "1"));
+});
+
 async function login(page) {
   await page.goto("/admin/login");
   await page.getByLabel("Email or Username").fill(process.env.E2E_ADMIN_EMAIL);
@@ -36,7 +41,7 @@ for (const orientation of ["portrait","landscape"]) {
     await page.goto(`/portfolio/e2e-${orientation}`);
     await expect(page.locator("h1")).toContainText(`E2E ${orientation}`);
     await page.getByRole("button", { name: /play/i }).first().click();
-    const dialog = page.getByRole("dialog");
+    const dialog = page.getByRole("dialog", { name: `E2E ${orientation} video player` });
     await expect(dialog).toBeVisible();
     const video = dialog.locator("video");
     await expect(video).toBeVisible();

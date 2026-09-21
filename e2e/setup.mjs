@@ -20,12 +20,13 @@ export default async function setup() {
     await client.query(`INSERT INTO admin_users(id,email,name,password_hash,role_id)
       SELECT $1,$2,'E2E Administrator',$3,id FROM roles WHERE key='SUPER_ADMIN'
       ON CONFLICT(email) DO UPDATE SET password_hash=EXCLUDED.password_hash,is_active=true,role_id=EXCLUDED.role_id`, [randomUUID(),email,hash]);
+    await client.query("UPDATE about_profile SET headline=$1 WHERE id=$2", ["E2E video editor", "singleton:about"]);
     const base = process.env.E2E_BASE_URL || "http://127.0.0.1:3000";
     for (const [index, orientation] of ["portrait","landscape"].entries()) {
       await client.query(`INSERT INTO portfolio_projects(id,title,slug,status,is_featured,display_order,video_url,thumbnail_url,video_orientation)
         VALUES ($1,$2,$3,'published',true,$4,$5,$6,$7)
         ON CONFLICT(slug) DO UPDATE SET video_url=EXCLUDED.video_url,thumbnail_url=EXCLUDED.thumbnail_url,video_orientation=EXCLUDED.video_orientation`,
-        [randomUUID(),`E2E ${orientation}`,`e2e-${orientation}`,1000+index,`${base}/e2e/${orientation}.mp4`,`${base}/e2e/poster.png`,orientation]);
+        [randomUUID(),`E2E ${orientation}`,`e2e-${orientation}`,1000+index,`${base}/e2e/${orientation}.mp4`,"/e2e/poster.png",orientation]);
     }
   } finally { await client.end(); }
   await mkdir("../public/e2e", { recursive: true });

@@ -37,7 +37,8 @@ test("account lifecycle, password invalidation, role restrictions and audit", as
   await editor.getByLabel("New password", { exact: true }).fill(replacement);
   await editor.getByLabel("Confirm new password").fill(replacement);
   await editor.getByRole("button", { name: "Change password" }).click();
-  await expect(editor.getByRole("alert")).toBeVisible();
+  await expect(editor.getByRole("alert").filter({ hasText: "Password change rejected." })).toBeVisible();
+  await expect(editor.getByRole("button", { name: "Change password" })).toBeEnabled();
   await editor.getByLabel("Current password").fill(password);
   // React resets uncontrolled fields on action completion.
   await editor.getByLabel("New password", { exact: true }).fill(replacement);

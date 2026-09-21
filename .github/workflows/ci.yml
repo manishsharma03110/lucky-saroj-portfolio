@@ -60,7 +60,7 @@ jobs:
         run: npm run lint
 
       - name: Account validation and policy tests
-        run: npx tsx --test src/lib/auth/account-validation.test.ts
+        run: npx tsx --test src/lib/auth/account-validation.test.ts src/lib/page-content-extra.test.ts src/lib/auth/upload-initiation.runtime.test.ts src/lib/media/upload-policy.test.ts
 
       - name: Replay SQL migrations
         run: npm run ci:migrate
