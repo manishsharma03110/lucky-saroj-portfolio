@@ -29,7 +29,7 @@ export function InteractiveWorkVisual({
   const directVideo = source?.provider === "direct";
   const optimizedVisual = canUseOptimizedImage(visualUrl);
   const portrait = orientation === "portrait";
-  const previewVisible = autoPreview || hovered;
+  const previewVisible = directVideo && (autoPreview || hovered);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -43,29 +43,10 @@ export function InteractiveWorkVisual({
     }
   }, [directVideo, previewVisible]);
 
-  const onEnter = () => {
-    setHovered(true);
-  };
-
-  const onLeave = () => {
-    setHovered(false);
-  };
-
-  const providerPreviewUrl = useMemo(() => {
-    if (!autoPreview || !source || source.provider === "direct") return null;
-    if (source.provider === "youtube") {
-      return `${source.embedUrl}&autoplay=1&mute=1&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1`;
-    }
-    if (source.provider === "google-drive") {
-      return `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`;
-    }
-    return null;
-  }, [autoPreview, source]);
-
   return (
     <div
-      onPointerEnter={onEnter}
-      onPointerLeave={onLeave}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
       className="relative h-full w-full overflow-hidden bg-[var(--surface-primary)]"
     >
       {visualUrl ? (
@@ -120,17 +101,6 @@ export function InteractiveWorkVisual({
           preload="metadata"
           aria-label={`${title} preview`}
           className={`pointer-events-none absolute inset-0 z-10 h-full w-full object-center transition-opacity duration-400 ${portrait ? "object-contain" : "object-cover"} ${previewVisible ? "opacity-100" : "opacity-0"}`}
-        />
-      ) : null}
-
-      {providerPreviewUrl ? (
-        <iframe
-          src={providerPreviewUrl}
-          title={`${title} muted preview`}
-          allow="autoplay; encrypted-media; picture-in-picture"
-          tabIndex={-1}
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-10 h-full w-full border-0 bg-black"
         />
       ) : null}
 
