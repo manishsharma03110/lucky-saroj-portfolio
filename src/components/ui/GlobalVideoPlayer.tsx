@@ -1,7 +1,6 @@
 "use client";
 
 import { Maximize2, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { flushSync } from "react-dom";
 import {
   createContext,
@@ -158,7 +157,6 @@ function DirectVideo({
 }
 
 export function GlobalVideoPlayerProvider({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
   const overlayRef = useRef<HTMLDivElement>(null);
   const nativeFullscreenRef = useRef(false);
   const [nativeFullscreen, setNativeFullscreen] = useState(false);
@@ -195,16 +193,10 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
   const openVideo = useCallback((next: GlobalVideoRequest) => {
     if (!getVideoSource(next.videoUrl)) return;
     const orientation = normalizeVideoOrientation(next.orientation);
-
     flushSync(() => {
       setDetectedOrientation(orientation === "auto" ? "landscape" : orientation);
       setRequest({ ...next, orientation });
     });
-
-    // This runs inside the original click/tap event. Browsers that support the
-    // Fullscreen API therefore receive a real user gesture and can enter native
-    // fullscreen immediately. If native fullscreen is unavailable/blocked, the
-    // fixed viewport player below is already a full-screen fallback.
     requestNativeFullscreen();
   }, [requestNativeFullscreen]);
 
@@ -232,23 +224,9 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     };
   }, [active, closeVideo]);
 
-  const previousPathRef = useRef(pathname);
-  useEffect(() => {
-    if (previousPathRef.current !== pathname) {
-      previousPathRef.current = pathname;
-      if (request) closeVideo();
-    }
-  }, [pathname, request, closeVideo]);
-
   const shellStyle: CSSProperties = resolvedOrientation === "portrait"
-    ? {
-        height: "min(100dvh, calc(100vw * 16 / 9))",
-        aspectRatio: "9 / 16",
-      }
-    : {
-        width: "min(100vw, calc(100dvh * 16 / 9))",
-        aspectRatio: "16 / 9",
-      };
+    ? { height: "min(100dvh, calc(100vw * 16 / 9))", aspectRatio: "9 / 16" }
+    : { width: "min(100vw, calc(100dvh * 16 / 9))", aspectRatio: "16 / 9" };
 
   return (
     <GlobalVideoContext.Provider value={{ openVideo, closeVideo, active }}>
