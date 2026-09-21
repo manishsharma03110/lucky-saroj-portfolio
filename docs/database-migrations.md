@@ -16,6 +16,8 @@ created before reconciliation. Existing databases that already satisfy the
 baseline must use the reviewed baseline-attestation procedure; never execute
 the baseline table-creation SQL over an existing schema.
 
+The numbered migration directory now also includes RBAC/session revalidation, asset ownership, page content, activity, SEO, social metadata and video orientation migrations through 0022. Consult the SQL files themselves for the complete lineage.
+
 ## Legacy evidence
 
 The previous SQLite-oriented SQL, journal, snapshot, original ordering, and

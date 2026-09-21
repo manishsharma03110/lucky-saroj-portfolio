@@ -1,146 +1,70 @@
-# Lucky Saroj — Video Editor Portfolio & CMS
+# Lucky Saroj — Portfolio & Studio CMS
 
-A full-stack portfolio website and content management system for Lucky Saroj,
-built from the supplied Figma UI/UX design and production architecture
-document.
+Database-driven video-editor portfolio hosted on Vercel, using Neon PostgreSQL and Vercel Blob media storage.
 
 ## Stack
+Next.js 16.3.4 App Router, React 19, TypeScript, Tailwind CSS v4, Drizzle ORM, NextAuth credentials/JWT sessions, bcryptjs, Zod, Sharp and Framer Motion. Poppins/Inter load through next/font/google. The public design uses near-black surfaces and electric-blue accents.
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, Server Actions) + TypeScript |
-| Styling | Tailwind CSS v4 |
-| Animation | Framer Motion |
-| Database | Postgres (e.g. Neon) via Drizzle ORM |
-| Auth | NextAuth v5 (Credentials provider, JWT sessions, bcrypt) |
-| Validation | Zod on every mutation, client and server |
-| Icons | lucide-react + a few hand-rolled brand SVGs |
-| Fonts | Poppins (headings) / Inter (body) via `@fontsource` |
+## Public routes
+- / — hero, selected-work slider, showreel, editing styles, about/testimonial previews, contact CTA
+- /about, /portfolio, /services, /experience, /testimonials, /contact
+- /portfolio/[slug] — published project detail, video, case study, gallery, tools, related projects and navigation
+- /sitemap.xml and /robots.txt
 
-## Two substitutions from the original spec, and why
+Project counts depend on published database records; they are not fixed in source.
 
-The architecture doc specifies **Prisma** and Google Fonts via `next/font`.
-Both were swapped in this build:
+## Studio CMS
+/admin/login authenticates administrators. Protected modules include dashboard, home, about, portfolio (new and edit), categories, services, experience, contact, testimonials, navigation, pages, SEO, showreel, settings, maintenance, messages and activity.
 
-- **Prisma → Drizzle ORM.** The schema (`src/lib/db/schema.ts`) maps 1:1 to
-  what a Prisma schema would look like for these entities, and runs against
-  the same Postgres database. If you'd rather use Prisma, regenerate a
-  `schema.prisma` from `schema.ts` (same fields/relations) and swap the
-  client in `src/lib/db/index.ts` and `src/lib/db/queries.ts`.
-- **Google Fonts → `@fontsource/poppins` + `@fontsource/inter`.** Same fonts,
-  self-hosted npm packages instead of a runtime fetch from Google's CDN. If
-  you want `next/font/google` instead, swap the imports in
-  `src/app/layout.tsx`.
+Server actions and upload routes enforce permissions independently of navigation visibility. Roles are SUPER_ADMIN, ADMIN and EDITOR; database grants determine access. Sessions are revalidated against active state and session version. Content saves use optimistic revisions and transactional media binding.
 
-## Getting started
+## Media and video workflow
+1. Upload a compressed MP4/WebM in the project form (maximum 25 MB).
+2. The server registers an owned media asset; the browser uploads to the dedicated public Vercel Blob store.
+3. Save the project to bind the uploaded asset. Images use the Sharp compression endpoint and banner ratio validation.
+4. Home cards show previews and link to project details; project media opens the global player.
+5. Direct videos use custom play/pause, seek, mute, time and fullscreen controls. The modal centers contained media in the viewport and supports Escape, close and browser Back.
+6. Legacy YouTube, Google Drive, Pinterest and valid HTTP(S) URLs remain supported through provider playback or an external-source fallback. Provider availability, embedding restrictions and branding remain controlled by the provider.
 
+Portrait banners use a single centered cover layer inside landscape cards; playback preserves the whole video's aspect ratio. See [video workflow](docs/video-workflow.md).
+
+## Local setup
+Use Node.js 20+ and the committed lockfile:
 ```bash
-npm install
-cp .env.example .env   # then fill in DATABASE_URL and AUTH_SECRET
-npm run db:push         # create the schema in your Postgres database
-npm run db:seed         # seed sample content + an admin user
+npm ci
+cp .env.example .env
+```
+Configure DATABASE_URL, AUTH_SECRET and NEXT_PUBLIC_SITE_URL. Uploads also require PORTFOLIO_MEDIA_READ_WRITE_TOKEN for a dedicated Blob store. Use a disposable development database.
+
+For a fresh disposable database, replay the SQL migrations with DATABASE_URL exported, then provision approved local content/admin using the seed script:
+```bash
+npm run ci:migrate
+npm run db:seed
 npm run dev
 ```
+The seed requires ADMIN_BOOTSTRAP_EMAIL/PASSWORD when no admin exists. It does not replace existing admin passwords. Do not run bootstrap or sample seeding against existing production data.
 
-Visit `http://localhost:3000` for the public site and
-`http://localhost:3000/admin/login` for the CMS.
-
-**`.env` values you need:**
-- `DATABASE_URL` — your Postgres connection string (e.g. from Neon's
-  dashboard: Connect to your database → copy the connection string). Hosted
-  Neon production must use the pooled endpoint with `sslmode=verify-full`.
-- `AUTH_SECRET` — generate one with:
-  `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-- `ADMIN_BOOTSTRAP_EMAIL` and `ADMIN_BOOTSTRAP_PASSWORD` — required by
-  `npm run db:seed` only when no administrator exists. Use unique values and
-  never commit real credentials. The password must be at least 12 characters.
-
-The bootstrap secret is for initial provisioning, not a permanent shared
-password. Rotate production credentials separately and remove the bootstrap
-password from the environment when it is no longer needed. The seed remains
-idempotent and does not overwrite an existing administrator password. There is
-currently no in-app password-change or password-reset screen.
-
-## Project structure
-
+## Validation
+```bash
+npm run lint
+npm run build
 ```
-src/
-  app/
-    (site)/            Public pages: Home, About, Portfolio, Experience, Services, Contact
-    admin/
-      (auth)/login/     Public admin login (no sidebar)
-      (protected)/      Dashboard + all CMS CRUD screens (auth-gated by layout + middleware)
-    api/auth/           NextAuth route handler
-  components/
-    layout/             Header, Footer, MobileMenu
-    home/ about/ portfolio/ services/ testimonials/ contact/   Public-page sections
-    admin/               CMS forms, lists, sidebar
-    ui/                  Shared primitives (Button, Input, Select, Container, Badge...)
-  lib/
-    db/                  Drizzle schema, client, queries, seed script (Postgres)
-    actions/             Server actions (one file per CMS module) — Zod-validated, auth-checked
-    validations/         Zod schemas
-    auth/                NextAuth config (edge-safe + full), split per Next's Edge runtime rules
-proxy.ts                 Route protection for /admin/* (Next 16's middleware convention)
-```
+The repository already contains Node/tsx unit, runtime and database integration tests. Browser regression instructions are maintained in [testing](docs/testing.md). Never interpret skipped environment-dependent tests as passes.
 
-All public pages and the whole admin CMS are marked `force-dynamic` — they
-render fresh on every request instead of being baked in at build time, so
-edits made in the CMS show up immediately without a redeploy.
+## Deployment
+The existing GitHub/Vercel project serves production. Configure runtime secrets in Vercel, review the branch diff and CI results, rehearse any schema migration, then deploy through the established Git integration. Migrations are separate from builds and application startup. Never replay the baseline over an existing database or use db:push to change production.
 
-## What's covered
+See [database migrations](docs/database-migrations.md) and [PR audit](docs/pr-audit-2026-09-21.md).
 
-- **Public site** — all 6 pages from the Figma design, pulling live data from
-  the database (no hardcoded content in the JSX).
-- **Admin CMS** — dashboard with real stats, full CRUD for portfolio projects
-  (with tools/category/SEO fields), categories, experience, services, the About
-  singleton, showreel, testimonials, and a contact-message inbox with status
-  management. Every mutation is a Zod-validated Server Action gated by a
-  `requireAdmin()` session check, independent of the route middleware.
-- **Auth** — credentials login, bcrypt-hashed passwords, JWT sessions,
-  middleware + layout-level redirect for unauthenticated `/admin/*` access.
-- **Contact form** — public submissions land in the same `contact_messages`
-  table the admin inbox reads from.
+## Source map
+- src/app/(site): public routes; src/app/admin: CMS
+- src/app/api/upload: authenticated uploads and callbacks
+- src/components/admin: forms and media management
+- src/components/ui/GlobalVideoPlayer.tsx: global playback
+- src/lib/actions: validated server actions
+- src/lib/db: schema, transactions, queries, content and asset services
+- src/lib/auth: credentials, session revalidation, permissions and administrator policies
+- drizzle: ordered PostgreSQL migrations
 
-## What's not included
-
-- Real media upload/CDN pipeline — `thumbnailUrl` / `videoUrl` fields are
-  plain URL inputs in the CMS forms rather than a file-upload widget. The doc
-  calls for cloud storage (S3/Cloudinary-style) for this; wiring one in is a
-  matter of adding an upload endpoint and pointing these fields at it.
-  Placeholder imagery on unseeded thumbnails is pulled from Unsplash via a
-  small deterministic picker (`fallbackImage` in `ProjectCard.tsx`) rather
-  than committed image files.
-- An admin "change password" / user-management screen.
-- Automated tests. Everything was verified manually end-to-end (build, dev
-  server route checks, a full login → CRUD → public-page cycle) during
-  development, but there's no test suite committed.
-
-## Deployment (Vercel + Neon)
-
-1. Push this repo to GitHub.
-2. Provision a free Postgres database on [neon.tech](https://neon.tech) — copy
-   the connection string from the dashboard.
-3. Go to [vercel.com](https://vercel.com), import the GitHub repo. Vercel
-   auto-detects Next.js — no custom build config needed.
-4. Before the first deploy, add Environment Variables in the Vercel
-   project settings: `DATABASE_URL` (your Neon connection string) and
-   `AUTH_SECRET` (generate a fresh one — don't reuse a dev value). Supply
-   `ADMIN_BOOTSTRAP_EMAIL` and `ADMIN_BOOTSTRAP_PASSWORD` only for an
-   explicitly approved initial administrator bootstrap; never commit them.
-5. Deploy.
-6. From your own machine, point your local `.env`'s `DATABASE_URL` at the
-   same database and use the reviewed migration and provisioning procedure.
-   Run `npm run db:seed` only when database seeding has been explicitly
-   approved. It requires the bootstrap variables when no administrator exists
-   and will not replace an existing administrator password.
-
-## Scripts
-
-| Command | Purpose |
-|---|---|
-| `npm run dev` | Local dev server |
-| `npm run build` | Production build |
-| `npm run db:push` | Sync Drizzle schema to the database |
-| `npm run db:seed` | Seed sample content + admin user |
-| `npm run db:studio` | Drizzle Studio (visual DB browser) |
+## SEO
+CMS metadata includes page/project titles and descriptions, H1/H2 overrides, canonical/social metadata, JSON-LD, Google verification and optional Analytics. Contact inquiries are stored in the CMS inbox.
