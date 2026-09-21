@@ -242,6 +242,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
   const [request, setRequest] = useState<GlobalVideoRequest | null>(null);
   const source = useMemo(() => getVideoSource(request?.videoUrl), [request?.videoUrl]);
   const active = Boolean(request && source);
+  const portrait = request?.orientation === "portrait";
 
   const resetPlayer = useCallback(() => {
     setRequest(null);
@@ -288,6 +289,10 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     };
   }, [active, closeVideo, resetPlayer]);
 
+  const playerStyle = portrait
+    ? { height: "min(100dvh, 177.7778vw)", aspectRatio: "9 / 16" }
+    : { width: "min(100vw, 177.7778dvh)", aspectRatio: "16 / 9" };
+
   return (
     <GlobalVideoContext.Provider value={{ openVideo, closeVideo, active }}>
       {children}
@@ -312,7 +317,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         ) : null}
 
         {active && request && source ? (
-          <div className="relative h-[100dvh] w-screen overflow-hidden bg-black">
+          <div className="relative max-h-[100dvh] max-w-[100vw] overflow-hidden bg-black" style={playerStyle}>
             {source.provider === "direct" ? (
               <DirectVideo src={source.mediaUrl} posterUrl={request.posterUrl} title={request.title} />
             ) : source.provider === "youtube" ? (
