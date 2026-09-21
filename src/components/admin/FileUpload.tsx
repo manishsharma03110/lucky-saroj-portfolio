@@ -2,13 +2,14 @@
 
 import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
-import { Loader2, Play, UploadCloud, X } from "lucide-react";
+import { Link2, Loader2, Play, UploadCloud, X } from "lucide-react";
 import { Input, Label } from "@/components/ui/Input";
 import {
   getMaximumUploadSize,
   getUploadAcceptValue,
   validateUploadFilePolicy,
 } from "@/lib/media/upload-policy";
+import { getVideoSource } from "@/lib/media/video";
 import { useUploadActivity } from "./MediaForm";
 import styles from "./AdminEditorial.module.css";
 
@@ -52,6 +53,16 @@ async function readVideoOrientation(file: File): Promise<DetectedVideoOrientatio
   }
 }
 
+function providerLabel(url: string) {
+  const source = getVideoSource(url);
+  if (!source) return "Video URL";
+  if (source.provider === "youtube") return "YouTube URL";
+  if (source.provider === "google-drive") return "Google Drive URL";
+  if (source.provider === "pinterest") return "Pinterest URL";
+  if (source.provider === "direct") return "Direct video URL";
+  return "External video URL";
+}
+
 export function FileUpload({
   name,
   assetIdName,
@@ -78,6 +89,7 @@ export function FileUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const videoSource = kind === "video" ? getVideoSource(url) : null;
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -204,7 +216,7 @@ export function FileUpload({
 
       {kind === "video" && (
         <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">
-          MP4/WebM only · Maximum {MAX_VIDEO_UPLOAD_MB} MB · Uploaded file orientation is detected automatically before upload.
+          Upload MP4/WebM up to {MAX_VIDEO_UPLOAD_MB} MB, or paste any valid http(s) video/page URL below. Pinterest, YouTube and Google Drive are recognized automatically.
         </p>
       )}
 
@@ -212,10 +224,18 @@ export function FileUpload({
         <div className={styles.mediaPreview}>
           {kind === "image" ? (
             <img src={url} alt="" />
-          ) : (
-            <video src={url} muted playsInline preload="metadata">
+          ) : videoSource?.provider === "direct" ? (
+            <video src={videoSource.mediaUrl} muted playsInline preload="metadata">
               <track kind="captions" />
             </video>
+          ) : (
+            <div className="flex h-full min-h-36 w-full items-center justify-center bg-[var(--surface-primary)] p-5 text-center">
+              <div className="max-w-full">
+                <Link2 className="mx-auto mb-2 text-[var(--accent-primary)]" size={24} />
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{providerLabel(url)}</p>
+                <p className="mt-1 truncate text-xs text-[var(--text-muted)]" title={url}>{url}</p>
+              </div>
+            </div>
           )}
           <div className={styles.previewOverlay}>{kind === "video" && <Play size={22} />}</div>
           <button
@@ -263,10 +283,10 @@ export function FileUpload({
 
       {kind === "video" && (
         <div className="mt-4">
-          <Label htmlFor={externalVideoInputId}>Or paste a video URL</Label>
+          <Label htmlFor={externalVideoInputId}>Or paste any video URL</Label>
           <Input
             id={externalVideoInputId}
-            placeholder="Direct MP4/WebM, YouTube, or Google Drive URL"
+            placeholder="Pinterest, YouTube, Google Drive, MP4/WebM, Vimeo, or another http(s) URL"
             value={assetId ? "" : url}
             onChange={(event) => {
               setUrl(event.target.value);
@@ -275,7 +295,7 @@ export function FileUpload({
             }}
           />
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Uploaded/direct MP4 or WebM uses the clean HTML5 player. For YouTube or Google Drive portrait videos, select Portrait / Shorts manually so the banner uses 9:16 too.
+            CMS accepts any valid http(s) URL. Known providers open inside the portfolio player when supported; other sites are saved safely and get an external-source fallback instead of blocking project save.
           </p>
         </div>
       )}
