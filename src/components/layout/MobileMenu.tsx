@@ -67,7 +67,7 @@ export function MobileMenu({
           animate={{ height: "auto", opacity: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
           transition={{ duration: reduceMotion ? 0 : 0.25, ease: "easeInOut" }}
-          className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-white/10 bg-[var(--color-ink)] sm:max-h-[calc(100dvh-4.5rem)] lg:hidden"
+          className="max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-white/10 bg-[var(--color-ink)] sm:max-h-[calc(100dvh-4.5rem)] min-[960px]:hidden"
           aria-label="Mobile"
         >
           <ul className="flex flex-col gap-1 px-6 py-4">

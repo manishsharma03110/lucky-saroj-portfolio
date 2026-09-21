@@ -25,7 +25,7 @@ export const projectSchema = z.object({
   clientName: z.string().trim().max(160).optional().or(z.literal("")), year: z.coerce.number().int().min(1990).max(2100).optional(), categoryId: optionalEntityId,
   description: z.string().trim().max(2000).optional().or(z.literal("")), challenge: z.string().trim().max(2000).optional().or(z.literal("")), approach: z.string().trim().max(2000).optional().or(z.literal("")), result: z.string().trim().max(2000).optional().or(z.literal("")),
   thumbnailUrl: optionalMediaReference, thumbnailAssetId: optionalAssetId, thumbnailAlt: z.string().trim().max(300).optional().or(z.literal("")),
-  videoUrl: optionalVideoReference, videoAssetId: optionalAssetId,
+  videoUrl: optionalVideoReference, videoAssetId: optionalAssetId, videoOrientation: z.enum(["auto", "landscape", "portrait"]).default("auto"),
   isFeatured: formDataCheckboxSchema, status: z.enum(["draft", "published"]), seoTitle: z.string().trim().max(200).optional().or(z.literal("")), seoDescription: z.string().trim().max(320).optional().or(z.literal("")),
   ogTitle: z.string().trim().max(200).optional().or(z.literal("")), ogDescription: z.string().trim().max(320).optional().or(z.literal("")), ogImageUrl: optionalSocialImage.optional(),
   twitterTitle: z.string().trim().max(200).optional().or(z.literal("")), twitterDescription: z.string().trim().max(320).optional().or(z.literal("")), twitterImageUrl: optionalSocialImage.optional(),

@@ -1,4 +1,5 @@
-import { VideoPlayer } from "@/components/ui/VideoPlayer";
+import { Play } from "lucide-react";
+import { VideoLaunchSurface } from "@/components/ui/VideoLaunchSurface";
 import type { getFeaturedShowreel } from "@/lib/db/queries";
 import type { HomePageContent } from "@/lib/db/home-content-service";
 
@@ -16,9 +17,30 @@ export function ShowreelSection({ showreel, content }: { showreel: Awaited<Retur
           </div>
           {showreel.duration && <p className="max-w-md text-sm uppercase tracking-[0.16em] text-[var(--text-muted)]">{content.showreelRuntimeLabel} · {showreel.duration}</p>}
         </div>
-        <div className="relative aspect-video overflow-hidden rounded-[12px] border border-white/12 bg-[var(--surface-primary)] shadow-[0_32px_110px_rgba(0,0,0,0.46)]">
-          <VideoPlayer videoUrl={showreel.videoUrl} posterUrl={showreel.thumbnailUrl} title={showreel.title} className="h-full w-full" />
-        </div>
+
+        <VideoLaunchSurface
+          videoUrl={showreel.videoUrl}
+          posterUrl={showreel.thumbnailUrl}
+          title={showreel.title}
+          orientation="auto"
+          className="group relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/12 bg-[var(--surface-primary)] shadow-[0_32px_110px_rgba(0,0,0,0.46)]"
+        >
+          {showreel.thumbnailUrl ? (
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 group-hover:scale-[1.01]"
+              style={{ backgroundImage: `url('${showreel.thumbnailUrl}')` }}
+              role="img"
+              aria-label={`${showreel.title} showreel poster`}
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_30%,var(--accent-glow),transparent_34%),linear-gradient(145deg,var(--surface-elevated),var(--background-primary))]" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" aria-hidden />
+          <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/40 bg-black/65 text-white shadow-[0_18px_55px_rgba(0,0,0,.45)] backdrop-blur-md transition-transform duration-300 group-hover:scale-105 sm:h-20 sm:w-20">
+            <Play size={26} fill="currentColor" className="ml-1" />
+          </span>
+          <span className="absolute bottom-4 left-4 rounded-full border border-white/15 bg-black/60 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/90 backdrop-blur-md sm:bottom-5 sm:left-5">Play fullscreen</span>
+        </VideoLaunchSurface>
       </div>
     </section>
   );
