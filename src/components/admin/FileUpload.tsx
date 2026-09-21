@@ -2,13 +2,14 @@
 
 import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
-import { Loader2, Play, UploadCloud, X } from "lucide-react";
+import { Link2, Loader2, Play, UploadCloud, X } from "lucide-react";
 import { Input, Label } from "@/components/ui/Input";
 import {
   getMaximumUploadSize,
   getUploadAcceptValue,
   validateUploadFilePolicy,
 } from "@/lib/media/upload-policy";
+import { getVideoSource } from "@/lib/media/video";
 import { useUploadActivity } from "./MediaForm";
 import styles from "./AdminEditorial.module.css";
 
@@ -52,6 +53,16 @@ async function readVideoOrientation(file: File): Promise<DetectedVideoOrientatio
   }
 }
 
+function providerLabel(url: string) {
+  const source = getVideoSource(url);
+  if (!source) return "Video URL";
+  if (source.provider === "youtube") return "YouTube URL";
+  if (source.provider === "google-drive") return "Google Drive URL";
+  if (source.provider === "pinterest") return "Pinterest Pin";
+  if (source.provider === "direct") return "Direct video";
+  return "External video URL";
+}
+
 export function FileUpload({
   name,
   assetIdName,
@@ -78,6 +89,7 @@ export function FileUpload({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const videoSource = kind === "video" && url ? getVideoSource(url) : null;
 
   async function handleFile(file: File | undefined) {
     if (!file) return;
@@ -204,7 +216,7 @@ export function FileUpload({
 
       {kind === "video" && (
         <p className="mb-3 mt-1 text-xs text-[var(--text-muted)]">
-          MP4/WebM only · Maximum {MAX_VIDEO_UPLOAD_MB} MB · Uploaded file orientation is detected automatically before upload.
+          MP4/WebM upload · Maximum {MAX_VIDEO_UPLOAD_MB} MB · You can also paste YouTube, Google Drive, Pinterest, direct video, or another http/https video URL below.
         </p>
       )}
 
@@ -212,10 +224,16 @@ export function FileUpload({
         <div className={styles.mediaPreview}>
           {kind === "image" ? (
             <img src={url} alt="" />
-          ) : (
-            <video src={url} muted playsInline preload="metadata">
+          ) : videoSource?.provider === "direct" ? (
+            <video src={videoSource.mediaUrl} muted playsInline preload="metadata">
               <track kind="captions" />
             </video>
+          ) : (
+            <div className="flex h-full min-h-28 w-full flex-col items-center justify-center gap-2 bg-[var(--surface-primary)] px-4 text-center text-[var(--text-secondary)]">
+              <Link2 size={24} className="text-[var(--accent-primary)]" />
+              <span className="text-xs font-semibold uppercase tracking-[0.12em]">{providerLabel(url)}</span>
+              <span className="max-w-full truncate text-xs opacity-70">{url}</span>
+            </div>
           )}
           <div className={styles.previewOverlay}>{kind === "video" && <Play size={22} />}</div>
           <button
@@ -263,10 +281,10 @@ export function FileUpload({
 
       {kind === "video" && (
         <div className="mt-4">
-          <Label htmlFor={externalVideoInputId}>Or paste a video URL</Label>
+          <Label htmlFor={externalVideoInputId}>Or paste any video URL</Label>
           <Input
             id={externalVideoInputId}
-            placeholder="Direct MP4/WebM, YouTube, or Google Drive URL"
+            placeholder="YouTube, Google Drive, Pinterest, MP4/WebM, or any http/https video URL"
             value={assetId ? "" : url}
             onChange={(event) => {
               setUrl(event.target.value);
@@ -275,7 +293,7 @@ export function FileUpload({
             }}
           />
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Uploaded/direct MP4 or WebM uses the clean HTML5 player. For YouTube or Google Drive portrait videos, select Portrait / Shorts manually so the banner uses 9:16 too.
+            Known providers open inside the website player. Other valid http/https links are saved safely instead of being rejected by the CMS. For portrait links, select Portrait / Shorts manually.
           </p>
         </div>
       )}
