@@ -57,11 +57,8 @@ function DirectVideo({
   const togglePlayback = useCallback(async () => {
     const video = videoRef.current;
     if (!video) return;
-    if (video.paused) {
-      await video.play().catch(() => setPaused(true));
-    } else {
-      video.pause();
-    }
+    if (video.paused) await video.play().catch(() => setPaused(true));
+    else video.pause();
   }, []);
 
   const toggleMute = useCallback(() => {
@@ -223,12 +220,10 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !document.fullscreenElement) closeVideo();
     };
-
     const onPopState = () => {
       historyEntryRef.current = false;
       resetPlayer();
     };
-
     const onFullscreenChange = () => {
       const isFullscreen = Boolean(document.fullscreenElement);
       setNativeFullscreen(isFullscreen);
@@ -246,9 +241,13 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     };
   }, [active, closeVideo, resetPlayer]);
 
-  const shellStyle: CSSProperties = resolvedOrientation === "portrait"
-    ? { height: "min(100dvh, calc(100vw * 16 / 9))", aspectRatio: "9 / 16" }
-    : { width: "min(100vw, calc(100dvh * 16 / 9))", aspectRatio: "16 / 9" };
+  const playerStyle: CSSProperties = resolvedOrientation === "portrait"
+    ? { height: "min(calc(100dvh - 64px), calc(100vw * 16 / 9))", aspectRatio: "9 / 16" }
+    : { width: "min(100vw, calc((100dvh - 64px) * 16 / 9))", aspectRatio: "16 / 9" };
+
+  const railStyle: CSSProperties = resolvedOrientation === "portrait"
+    ? { width: "min(100vw, calc((100dvh - 64px) * 9 / 16))" }
+    : { width: "min(100vw, calc((100dvh - 64px) * 16 / 9))" };
 
   return (
     <GlobalVideoContext.Provider value={{ openVideo, closeVideo, active }}>
@@ -259,10 +258,36 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         aria-modal="true"
         aria-label={request ? `${request.title} video player` : "Video player"}
         aria-hidden={!active}
-        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen flex-col items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
       >
+        {active ? (
+          <div className="flex h-16 shrink-0 items-center justify-between px-1.5 sm:px-2" style={railStyle}>
+            <button
+              type="button"
+              onClick={closeVideo}
+              className="flex h-11 items-center gap-2 rounded-full border border-white/90 bg-white px-3.5 text-sm font-extrabold text-[#08090B] shadow-[0_10px_35px_rgba(0,0,0,.75)] transition hover:bg-[#F5F7FA] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-primary)] sm:px-4"
+              aria-label="Back to project"
+              title="Back to project"
+            >
+              <span aria-hidden className="text-[28px] font-black leading-none text-[var(--accent-primary)]">←</span>
+              <span>Back to project</span>
+            </button>
+
+            {!nativeFullscreen ? (
+              <button
+                type="button"
+                onClick={requestNativeFullscreen}
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,.5)] transition hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+                aria-label="Enter fullscreen"
+              >
+                <Maximize2 size={19} />
+              </button>
+            ) : <span aria-hidden className="h-11 w-11" />}
+          </div>
+        ) : null}
+
         {active && request && source ? (
-          <div className="relative max-h-[100dvh] max-w-[100vw] overflow-hidden bg-black" style={shellStyle}>
+          <div className="relative max-h-[calc(100dvh-64px)] max-w-[100vw] overflow-hidden bg-black" style={playerStyle}>
             {source.provider === "direct" ? (
               <DirectVideo
                 src={source.mediaUrl}
@@ -292,34 +317,6 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
               />
             )}
           </div>
-        ) : null}
-
-        {active ? (
-          <button
-            type="button"
-            onClick={closeVideo}
-            style={{
-              left: "max(12px, env(safe-area-inset-left))",
-              top: "max(12px, env(safe-area-inset-top))",
-            }}
-            className="fixed z-[999] flex h-12 min-w-12 items-center justify-center gap-2 rounded-full border border-white/70 bg-[var(--accent-primary)] px-3.5 text-sm font-bold text-white shadow-[0_10px_40px_rgba(0,0,0,.75),0_0_0_3px_rgba(59,130,246,.25)] transition hover:bg-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/70 sm:px-4"
-            aria-label="Back to project"
-            title="Back to project"
-          >
-            <span aria-hidden className="text-[26px] font-bold leading-none">←</span>
-            <span className="hidden sm:inline">Back</span>
-          </button>
-        ) : null}
-
-        {!nativeFullscreen && active ? (
-          <button
-            type="button"
-            onClick={requestNativeFullscreen}
-            className="absolute right-3 top-[max(1rem,env(safe-area-inset-top))] z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/70 text-white shadow-[0_10px_32px_rgba(0,0,0,.4)] backdrop-blur-md transition hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:right-5"
-            aria-label="Enter fullscreen"
-          >
-            <Maximize2 size={19} />
-          </button>
         ) : null}
       </div>
     </GlobalVideoContext.Provider>
