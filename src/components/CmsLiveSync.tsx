@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const POLL_INTERVAL_MS = 30000;
 
 export function CmsLiveSync() {
   const router = useRouter();
+  const pathname = usePathname();
   const lastVersion = useRef<string | null>(null);
+  const disabled = pathname.startsWith("/admin");
 
   useEffect(() => {
+    if (disabled) return;
+
     let stopped = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -40,7 +44,7 @@ export function CmsLiveSync() {
       if (timer) clearTimeout(timer);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [router]);
+  }, [disabled, router]);
 
   return null;
 }
