@@ -5,7 +5,6 @@ import type { schema } from "@/lib/db";
 import type { PortfolioProjectWithVideo } from "@/lib/db/queries";
 import { canUseOptimizedImage } from "@/lib/media/image-source";
 import { getVideoSource } from "@/lib/media/video";
-import { VideoLaunchSurface } from "@/components/ui/VideoLaunchSurface";
 
 type Project = PortfolioProjectWithVideo;
 type Category = typeof schema.portfolioCategories.$inferSelect;
@@ -54,13 +53,9 @@ export function RelatedProjects({ projects }: { projects: Entry[] }) {
 
             return (
               <article key={project.id} className="group min-w-0">
-                {playable && project.videoUrl ? (
-                  <VideoLaunchSurface videoUrl={project.videoUrl} title={project.title} posterUrl={imageUrl} orientation={project.videoOrientation} className="group w-full">
-                    {banner}
-                  </VideoLaunchSurface>
-                ) : (
-                  <Link href={`/portfolio/${project.slug}`} className="group block rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">{banner}</Link>
-                )}
+                <Link href={`/portfolio/${project.slug}`} className="group block rounded-[10px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]" aria-label={playable ? `Open ${project.title} project and video` : `Open ${project.title} project`}>
+                  {banner}
+                </Link>
                 <Link href={`/portfolio/${project.slug}`} className="flex items-start justify-between gap-4 py-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">
                   <div className="min-w-0">
                     {category?.name && <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent-primary)]">{category.name}</p>}
