@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play, Volume2, VolumeX, X } from "lucide-react";
+import { ExternalLink, Link2, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -24,6 +24,10 @@ type PlayerContextValue = {
   openVideo: (request: GlobalVideoRequest) => void;
   closeVideo: () => void;
   active: boolean;
+};
+
+type PinterestWindow = Window & {
+  PinUtils?: { build?: () => void };
 };
 
 const GlobalVideoContext = createContext<PlayerContextValue | null>(null);
@@ -146,6 +150,92 @@ function DirectVideo({
   );
 }
 
+function PinterestPinEmbed({ pinUrl, title }: { pinUrl: string; title: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.replaceChildren();
+    const anchor = document.createElement("a");
+    anchor.href = pinUrl;
+    anchor.setAttribute("data-pin-do", "embedPin");
+    anchor.setAttribute("aria-label", title);
+    container.appendChild(anchor);
+
+    const build = () => {
+      const pinterestWindow = window as PinterestWindow;
+      pinterestWindow.PinUtils?.build?.();
+      window.setTimeout(() => setLoaded(true), 250);
+    };
+
+    const selector = 'script[data-portfolio-pinterest="true"]';
+    const existing = document.querySelector<HTMLScriptElement>(selector);
+    if (existing) {
+      if ((window as PinterestWindow).PinUtils?.build) build();
+      else existing.addEventListener("load", build, { once: true });
+      return () => existing.removeEventListener("load", build);
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://assets.pinterest.com/js/pinit.js";
+    script.async = true;
+    script.defer = true;
+    script.dataset.portfolioPinterest = "true";
+    script.addEventListener("load", build, { once: true });
+    document.body.appendChild(script);
+
+    return () => script.removeEventListener("load", build);
+  }, [pinUrl, title]);
+
+  return (
+    <div className="absolute inset-0 overflow-y-auto bg-black px-3 py-16 sm:px-6 sm:py-14">
+      <div className="mx-auto flex min-h-full w-full max-w-[720px] items-center justify-center">
+        <div className="relative w-full rounded-xl border border-white/10 bg-[var(--surface-primary)] p-4 text-center shadow-[0_30px_100px_rgba(0,0,0,.7)] sm:p-6">
+          {!loaded ? (
+            <div className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-[var(--surface-primary)]">
+              <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" aria-label="Loading Pinterest video" />
+            </div>
+          ) : null}
+          <div ref={containerRef} className="mx-auto flex min-h-[320px] w-full items-center justify-center" />
+          <a
+            href={pinUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent-hover)] hover:text-white"
+          >
+            Open on Pinterest <ExternalLink size={14} />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExternalVideoFallback({ pageUrl, title }: { pageUrl: string; title: string }) {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-black p-5 sm:p-10">
+      <div className="w-full max-w-lg rounded-xl border border-white/10 bg-[var(--surface-primary)] p-6 text-center shadow-[0_30px_100px_rgba(0,0,0,.7)] sm:p-8">
+        <Link2 size={30} className="mx-auto text-[var(--accent-primary)]" />
+        <h2 className="mt-4 text-xl font-semibold text-white sm:text-2xl">{title}</h2>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
+          This video URL is saved in the CMS, but this provider does not expose a reliable embeddable player. Open the source directly without losing the project page.
+        </p>
+        <a
+          href={pageUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--accent-hover)]"
+        >
+          Open video source <ExternalLink size={16} />
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export function GlobalVideoPlayerProvider({ children }: { children: ReactNode }) {
   const historyEntryRef = useRef(false);
   const [request, setRequest] = useState<GlobalVideoRequest | null>(null);
@@ -240,7 +330,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
                 referrerPolicy="strict-origin-when-cross-origin"
                 className="absolute inset-0 h-full w-full border-0 bg-black"
               />
-            ) : (
+            ) : source.provider === "google-drive" ? (
               <iframe
                 src={`${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`}
                 title={request.title}
@@ -249,6 +339,10 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
                 referrerPolicy="strict-origin-when-cross-origin"
                 className="absolute inset-0 h-full w-full border-0 bg-black"
               />
+            ) : source.provider === "pinterest" ? (
+              <PinterestPinEmbed pinUrl={source.pinUrl} title={request.title} />
+            ) : (
+              <ExternalVideoFallback pageUrl={source.pageUrl} title={request.title} />
             )}
           </div>
         ) : null}
