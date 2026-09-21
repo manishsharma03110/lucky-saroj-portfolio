@@ -50,6 +50,7 @@ test("account lifecycle, password invalidation, role restrictions and audit", as
   await editor.getByLabel("Password", { exact: true }).fill(password);
   await editor.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(editor.getByRole("alert")).toContainText("Invalid");
+  await editor.getByLabel("Email or Username").fill(email);
   await editor.getByLabel("Password", { exact: true }).fill(replacement);
   await editor.getByRole("button", { name: "Sign in", exact: true }).click();
   await expect(editor).toHaveURL(/\/admin\/(?!login)/);

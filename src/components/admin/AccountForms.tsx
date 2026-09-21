@@ -4,6 +4,7 @@ import { manageAdmin, changeOwnPassword, type AccountState } from "@/lib/actions
 import { ROLE_KEYS } from "@/lib/auth/permissions";
 import { Input, Label } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import styles from "./AccountForms.module.css";
 
 const idle: AccountState = { status: "idle" };
 function Feedback({ state }: { state: AccountState }) {
@@ -11,7 +12,7 @@ function Feedback({ state }: { state: AccountState }) {
 }
 export function PasswordForm() {
   const [state, action, pending] = useActionState(changeOwnPassword, idle);
-  return <form action={action} className="grid max-w-xl gap-4">
+  return <form action={action} className={`${styles.form} grid max-w-xl gap-4`}>
     <div><Label htmlFor="currentPassword">Current password</Label><Input id="currentPassword" name="currentPassword" type="password" autoComplete="current-password" required /></div>
     <div><Label htmlFor="newPassword">New password</Label><Input id="newPassword" name="newPassword" type="password" autoComplete="new-password" minLength={12} maxLength={72} required /></div>
     <div><Label htmlFor="confirmPassword">Confirm new password</Label><Input id="confirmPassword" name="confirmPassword" type="password" autoComplete="new-password" minLength={12} maxLength={72} required /></div>
@@ -21,7 +22,7 @@ export function PasswordForm() {
 }
 export function CreateAdminForm() {
   const [state, action, pending] = useActionState(manageAdmin, idle);
-  return <form action={action} className="grid max-w-xl gap-4">
+  return <form action={action} className={`${styles.form} grid max-w-xl gap-4`}>
     <input type="hidden" name="operation" value="create"/>
     <div><Label htmlFor="adminName">Name</Label><Input id="adminName" name="name" maxLength={120} required/></div>
     <div><Label htmlFor="adminEmail">Email</Label><Input id="adminEmail" name="email" type="email" autoComplete="off" required/></div>
@@ -32,7 +33,7 @@ export function CreateAdminForm() {
 }
 export function AdminControls({ id, role, active, self }: { id: string; role: string; active: boolean; self: boolean }) {
   const [state, action, pending] = useActionState(manageAdmin, idle);
-  return <form action={action} className="flex flex-wrap items-center gap-3">
+  return <form action={action} className={`${styles.form} flex flex-wrap items-center gap-3`}>
     <input type="hidden" name="targetAdminId" value={id}/>
     <select name="role" aria-label="Assign role" defaultValue={role} disabled={pending || self} className="rounded border border-white/20 bg-[var(--surface-primary)] p-2">{ROLE_KEYS.map(key=><option key={key}>{key}</option>)}</select>
     <Button type="submit" name="operation" value="role" disabled={pending || self}>Save role</Button>

@@ -5,6 +5,7 @@ if (!["127.0.0.1", "localhost", "[::1]"].includes(new URL(baseURL).hostname)) {
 }
 export default defineConfig({
   testDir: "./tests", fullyParallel: false, workers: 1, retries: process.env.CI ? 1 : 0,
+  maxFailures: 3,
   timeout: 60000, expect: { timeout: 15000 },
   reporter: [["list"], ["html", { open: "never" }]],
   globalSetup: "./setup.mjs",

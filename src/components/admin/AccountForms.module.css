@@ -1,0 +1,10 @@
+.form label { color: var(--text-primary); }
+.form input:not([type="hidden"]):not([type="checkbox"]) {
+  color: var(--text-primary); background: var(--surface-primary);
+  border-color: var(--border-primary);
+}
+.form input:focus-visible, .form select:focus-visible {
+  outline: 2px solid var(--accent-hover); outline-offset: 2px;
+}
+.form [role="alert"] { color: #fca5a5; }
+.form [role="status"] { color: #6ee7b7; }
