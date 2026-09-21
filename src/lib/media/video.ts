@@ -1,5 +1,7 @@
 import { getYouTubeEmbedUrl, getYouTubeVideoId } from "@/lib/media/youtube";
 
+export type VideoOrientation = "auto" | "landscape" | "portrait";
+
 export type VideoSource =
   | { provider: "youtube"; embedUrl: string }
   | { provider: "google-drive"; embedUrl: string }
@@ -20,6 +22,10 @@ function isHttpUrl(url: URL) {
 
 function isVercelBlobVideo(url: URL) {
   return url.hostname.toLowerCase().endsWith(".blob.vercel-storage.com") && VERCEL_BLOB_VIDEO_PATH.test(url.pathname);
+}
+
+export function normalizeVideoOrientation(value: unknown): VideoOrientation {
+  return value === "portrait" || value === "landscape" ? value : "auto";
 }
 
 export function getGoogleDriveReference(value: string | null | undefined): GoogleDriveReference | null {
