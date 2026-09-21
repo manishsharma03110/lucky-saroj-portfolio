@@ -22,12 +22,20 @@ export function InteractiveWorkVisual({
   orientation?: VideoOrientation;
   autoPreview?: boolean;
 }) {
+  const surfaceRef = useRef<HTMLDivElement>(null);
+  const [motionAllowed, setMotionAllowed] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: no-preference) and (pointer: fine)");
+    const update = () => { setMotionAllowed(query.matches); if (!query.matches && surfaceRef.current) surfaceRef.current.style.transform = ""; };
+    update(); query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const source = useMemo(() => getVideoSource(videoUrl), [videoUrl]);
   const directVideo = source?.provider === "direct";
   const optimizedVisual = canUseOptimizedImage(visualUrl);
-  const previewVisible = autoPreview || hovered;
+  const previewVisible = autoPreview || (motionAllowed && hovered);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -54,9 +62,17 @@ export function InteractiveWorkVisual({
 
   return (
     <div
+      ref={surfaceRef}
+      onPointerMove={(event) => {
+        if (!motionAllowed || !surfaceRef.current) return;
+        const box = event.currentTarget.getBoundingClientRect();
+        const x = (event.clientX - box.left) / box.width - 0.5;
+        const y = (event.clientY - box.top) / box.height - 0.5;
+        surfaceRef.current.style.transform = `perspective(1000px) rotateX(${-y * 3}deg) rotateY(${x * 3}deg)`;
+      }}
       onPointerEnter={() => setHovered(true)}
-      onPointerLeave={() => setHovered(false)}
-      className="relative h-full w-full overflow-hidden bg-[var(--surface-primary)]"
+      onPointerLeave={() => { setHovered(false); if (surfaceRef.current) surfaceRef.current.style.transform = ""; }}
+      className="work-visual relative h-full w-full overflow-hidden bg-[var(--surface-primary)]"
     >
       {visualUrl ? (
         optimizedVisual ? (
