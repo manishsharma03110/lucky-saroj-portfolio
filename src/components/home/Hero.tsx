@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HeroParallax } from "./HeroParallax";
 
 import { Button } from "@/components/ui/Button";
 import motionStyles from "@/components/ui/DynamicMotion.module.css";
@@ -9,7 +10,7 @@ export function Hero({ heading, subheading, description, heroImageUrl, heroImage
   return (
     <section className="relative isolate overflow-hidden border-b border-white/10 bg-[var(--background-primary)]">
       <div className="absolute inset-0 -z-20 origin-center overflow-hidden bg-[var(--surface-primary)]" aria-hidden={heroImageAlt ? undefined : "true"}>
-        <Image src={visualUrl} alt={heroImageAlt} fill priority fetchPriority="high" quality={40} sizes="100vw" className={`${motionStyles.heroVisual} object-cover object-[68%_center] min-[480px]:object-[64%_center] sm:object-center lg:object-[60%_center]`} />
+        <HeroParallax><Image src={visualUrl} alt={heroImageAlt} fill priority fetchPriority="high" quality={40} sizes="100vw" className={`${motionStyles.heroVisual} object-cover object-[68%_center] min-[480px]:object-[64%_center] sm:object-center lg:object-[60%_center]`} /></HeroParallax>
       </div>
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(8,9,11,0.98)_0%,rgba(8,9,11,0.88)_38%,rgba(8,9,11,0.38)_70%,rgba(8,9,11,0.22)_100%)] max-lg:bg-[linear-gradient(180deg,rgba(8,9,11,0.62)_0%,rgba(8,9,11,0.8)_42%,rgba(8,9,11,0.98)_78%)]" aria-hidden />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-48 bg-gradient-to-t from-[var(--background-primary)] to-transparent" aria-hidden />

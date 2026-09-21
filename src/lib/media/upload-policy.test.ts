@@ -19,7 +19,13 @@ test("rejects unsupported content types and invalid sizes", () => {
   assert.deepEqual(validateUploadFilePolicy({ kind: "video", contentType: "video/mp4", size: MAX_VIDEO_UPLOAD_BYTES + 1 }), { ok: false, reason: "invalid_size" });
 });
 
-test("file picker accept values use the same exact allowlist", () => {
+test("file picker accepts browser-playable MP4/WebM and excludes MOV", () => {
   assert.equal(getUploadAcceptValue("image"), "image/jpeg,image/png,image/webp,image/gif");
-  assert.equal(getUploadAcceptValue("video"), "video/mp4,video/webm,video/quicktime");
+  assert.equal(getUploadAcceptValue("video"), ".mp4,.webm,video/mp4,video/webm");
+});
+
+test("rejects MOV MIME and misleading video filename extensions", () => {
+  assert.deepEqual(validateUploadFilePolicy({ kind: "video", contentType: "video/quicktime", size: 100, originalFilename: "clip.mov" }), { ok: false, reason: "invalid_type" });
+  assert.deepEqual(validateUploadFilePolicy({ kind: "video", contentType: "video/mp4", size: 100, originalFilename: "clip.mov" }), { ok: false, reason: "invalid_type" });
+  assert.deepEqual(validateUploadFilePolicy({ kind: "video", contentType: "video/webm", size: 100, originalFilename: "clip.webm" }), { ok: true });
 });

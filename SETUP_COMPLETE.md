@@ -1,3 +1,5 @@
+> Historical implementation notes. For the current architecture and setup, use [README.md](README.md). Claims below about dependencies, routes or completed verification may be outdated.
+
 # Lucky Saroj Portfolio - Setup Complete ✅
 
 ## Project Status: FULLY OPERATIONAL

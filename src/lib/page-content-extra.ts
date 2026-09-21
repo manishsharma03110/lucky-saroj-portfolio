@@ -84,7 +84,8 @@ export const PAGE_CONTENT_EXTRA_FIELDS: Partial<Record<PageContentKey, readonly 
 };
 
 export function pageContentFields(pageKey: PageContentKey, baseFields: readonly PageContentField[]): readonly PageContentField[] {
-  return [...baseFields, ...(PAGE_CONTENT_EXTRA_FIELDS[pageKey] ?? [])];
+  // Extensions can override a base field; render and validate each name only once.
+  return [...new Map([...baseFields, ...(PAGE_CONTENT_EXTRA_FIELDS[pageKey] ?? [])].map(field => [field.key, field])).values()];
 }
 
 export function extraPageContentDefaults(pageKey: PageContentKey): Record<string, string> {

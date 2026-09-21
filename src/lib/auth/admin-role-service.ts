@@ -1,4 +1,7 @@
 import "server-only";
+import bcrypt from "bcryptjs";
+import { randomUUID } from "node:crypto";
+import { createAdminSchema, changePasswordSchema } from "./account-validation";
 
 import { withDatabaseTransaction, type DatabaseTransaction } from "@/lib/db";
 import { isPermissionKey, isRoleKey, type PermissionKey, type RoleKey } from "./permissions";
@@ -68,8 +71,64 @@ async function assertPostInvariant(tx: DatabaseTransaction) {
   if (Number(result.rows[0]?.count ?? 0) < 1) throw new Error(POLICY_DENIED);
 }
 
+async function securityAudit(tx: DatabaseTransaction, actorId: string, action: string, targetId: string, summary: string) {
+  const result = await tx.query(
+    `INSERT INTO activity_logs(admin_user_id,actor_name,actor_email,action,resource,resource_id,summary)
+     SELECT id,name,email,$2,'admin_account',$3,$4 FROM admin_users WHERE id=$1`,
+    [actorId, action, targetId, summary]
+  );
+  if (result.rowCount !== 1) throw new Error(POLICY_DENIED);
+}
+
 export function createAdminRoleService(runTransaction: TransactionRunner = withDatabaseTransaction) {
   return {
+    async createAdmin(input: ActorSession & { name: string; email: string; password: string; role: RoleKey }) {
+      const data = createAdminSchema.parse(input);
+      return runTransaction(async (tx) => {
+        await lockSecurityDomain(tx);
+        const actor = await loadActor(tx, input, "admin_users.manage");
+        assertRoleAssignmentAllowed(actor, data.role);
+        const existing = await tx.query("SELECT 1 FROM admin_users WHERE lower(email)=$1", [data.email]);
+        if (existing.rowCount) throw new Error("Administrator already exists.");
+        const hash = await bcrypt.hash(data.password, 12);
+        const id = randomUUID();
+        const result = await tx.query(
+          `INSERT INTO admin_users(id,name,email,password_hash,role_id)
+           SELECT $1,$2,$3,$4,id FROM roles WHERE key=$5`,
+          [id, data.name, data.email, hash, data.role]
+        );
+        if (result.rowCount !== 1) throw new Error(POLICY_DENIED);
+        await securityAudit(tx, actor.id, "admin_created", id, "Created administrator account");
+        await assertPostInvariant(tx);
+        return id;
+      });
+    },
+
+    async changeOwnPassword(input: ActorSession & { currentPassword: string; newPassword: string; confirmPassword: string }) {
+      const data = changePasswordSchema.parse(input);
+      return runTransaction(async (tx) => {
+        await lockSecurityDomain(tx);
+        const result = await tx.query<{ password_hash: string; session_version: number; is_active: boolean }>(
+          "SELECT password_hash,session_version,is_active FROM admin_users WHERE id=$1 FOR UPDATE", [input.actorId]);
+        const actor = result.rows[0];
+        if (!actor?.is_active || actor.session_version !== input.actorSessionVersion ||
+            !await bcrypt.compare(data.currentPassword, actor.password_hash)) throw new Error(POLICY_DENIED);
+        const hash = await bcrypt.hash(data.newPassword, 12);
+        await tx.query("UPDATE admin_users SET password_hash=$1,session_version=session_version+1 WHERE id=$2", [hash,input.actorId]);
+        await securityAudit(tx, input.actorId, "password_changed", input.actorId, "Changed own password and revoked existing sessions");
+      });
+    },
+
+    recordLogin(input: ActorSession) {
+      return runTransaction(async (tx) => {
+        const result = await tx.query(
+          "UPDATE admin_users SET last_login_at=now() WHERE id=$1 AND is_active=true AND session_version=$2 RETURNING id",
+          [input.actorId,input.actorSessionVersion]);
+        if (result.rowCount !== 1) throw new Error(POLICY_DENIED);
+        await securityAudit(tx, input.actorId, "login_succeeded", input.actorId, "Administrator signed in");
+      });
+    },
+
     assignRole(input: ActorSession & { targetAdminId: string; role: RoleKey }) {
       return runTransaction(async (tx) => {
         await lockSecurityDomain(tx);
@@ -89,6 +148,7 @@ export function createAdminRoleService(runTransaction: TransactionRunner = withD
           [role.rows[0].id, target.id]
         );
         if (updated.rowCount !== 1) throw new Error(POLICY_DENIED);
+        await securityAudit(tx, actor.id, "role_changed", target.id, `Assigned role ${input.role}`);
         await assertPostInvariant(tx);
       });
     },
@@ -107,6 +167,7 @@ export function createAdminRoleService(runTransaction: TransactionRunner = withD
           [input.active, target.id]
         );
         if (updated.rowCount !== 1) throw new Error(POLICY_DENIED);
+        await securityAudit(tx, actor.id, input.active ? "admin_enabled" : "admin_disabled", target.id, input.active ? "Enabled administrator" : "Disabled administrator");
         await assertPostInvariant(tx);
       });
     },
@@ -122,6 +183,7 @@ export function createAdminRoleService(runTransaction: TransactionRunner = withD
         assertHighestTrustAdminInvariant(activeCount, targetPolicy, "delete");
         const deleted = await tx.query("DELETE FROM admin_users WHERE id = $1", [target.id]);
         if (deleted.rowCount !== 1) throw new Error(POLICY_DENIED);
+        await securityAudit(tx, actor.id, "admin_deleted", target.id, "Deleted administrator account");
         await assertPostInvariant(tx);
       });
     },
@@ -147,6 +209,7 @@ export function createAdminRoleService(runTransaction: TransactionRunner = withD
           [role.rows[0].id]
         );
         if (invalidated.rowCount === null) throw new Error(POLICY_DENIED);
+        await securityAudit(tx, input.actorId, "role_permissions_changed", role.rows[0].id, `Updated ${input.role} permissions`);
         await assertPostInvariant(tx);
       });
     },

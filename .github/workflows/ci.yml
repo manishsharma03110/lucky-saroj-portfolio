@@ -59,6 +59,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Account validation and policy tests
+        run: npx tsx --test src/lib/auth/account-validation.test.ts src/lib/page-content-extra.test.ts src/lib/auth/upload-initiation.runtime.test.ts src/lib/media/upload-policy.test.ts
+
       - name: Replay SQL migrations
         run: npm run ci:migrate
 
@@ -69,3 +72,35 @@ jobs:
         env:
           NODE_ENV: test
         run: npm run build
+
+      - name: Install browser test dependencies
+        run: npm install --prefix e2e --ignore-scripts
+
+      - name: Install fixture generator
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install Chromium
+        run: cd e2e && npx playwright install --with-deps chromium
+
+      - name: Prepare disposable browser database
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const c=new pg.Client({connectionString:process.env.DATABASE_URL}); await c.connect(); await c.query('CREATE DATABASE portfolio_e2e'); await c.end();"
+          DATABASE_URL=postgresql://ci:ci@127.0.0.1:5432/portfolio_e2e npm run ci:migrate
+
+      - name: Critical browser regressions
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/portfolio_e2e
+          E2E_ADMIN_EMAIL: regression@example.test
+          E2E_ADMIN_PASSWORD: ci-disposable-test-password-only
+          CMS_ALLOW_DESTRUCTIVE_LOCAL_DB_TESTS: "1"
+        run: cd e2e && npm test
+
+      - name: Upload browser report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          if-no-files-found: ignore
