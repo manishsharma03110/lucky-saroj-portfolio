@@ -5,7 +5,9 @@ export type VideoOrientation = "auto" | "landscape" | "portrait";
 export type VideoSource =
   | { provider: "youtube"; embedUrl: string }
   | { provider: "google-drive"; embedUrl: string }
-  | { provider: "direct"; mediaUrl: string };
+  | { provider: "pinterest"; pinUrl: string }
+  | { provider: "direct"; mediaUrl: string }
+  | { provider: "external"; url: string };
 
 type GoogleDriveReference = {
   fileId: string;
@@ -22,6 +24,18 @@ function isHttpUrl(url: URL) {
 
 function isVercelBlobVideo(url: URL) {
   return url.hostname.toLowerCase().endsWith(".blob.vercel-storage.com") && VERCEL_BLOB_VIDEO_PATH.test(url.pathname);
+}
+
+function parseHttpUrl(value: string | null | undefined): URL | null {
+  const input = value?.trim();
+  if (!input) return null;
+  try {
+    const url = new URL(input);
+    if (!isHttpUrl(url) || url.username || url.password) return null;
+    return url;
+  } catch {
+    return null;
+  }
 }
 
 export function normalizeVideoOrientation(value: unknown): VideoOrientation {
@@ -61,6 +75,19 @@ export function getGoogleDrivePreviewUrl(value: string | null | undefined): stri
   return previewUrl.toString();
 }
 
+export function getPinterestPinUrl(value: string | null | undefined): string | null {
+  const url = parseHttpUrl(value);
+  if (!url) return null;
+
+  const host = url.hostname.toLowerCase().replace(/^www\./, "");
+  if (!(host === "pinterest.com" || host.endsWith(".pinterest.com"))) return null;
+  if (!/^\/pin\/[^/]+\/?$/i.test(url.pathname)) return null;
+
+  url.protocol = "https:";
+  url.hash = "";
+  return url.toString();
+}
+
 export function getDirectVideoUrl(value: string | null | undefined): string | null {
   const input = value?.trim();
   if (!input) return null;
@@ -70,13 +97,16 @@ export function getDirectVideoUrl(value: string | null | undefined): string | nu
     return DIRECT_VIDEO_EXTENSION.test(pathname) ? input : null;
   }
 
-  try {
-    const url = new URL(input);
-    if (!isHttpUrl(url) || url.username || url.password) return null;
-    return DIRECT_VIDEO_EXTENSION.test(url.pathname) || isVercelBlobVideo(url) ? input : null;
-  } catch {
-    return null;
-  }
+  const url = parseHttpUrl(input);
+  if (!url) return null;
+  return DIRECT_VIDEO_EXTENSION.test(url.pathname) || isVercelBlobVideo(url) ? input : null;
+}
+
+export function getExternalVideoUrl(value: string | null | undefined): string | null {
+  const input = value?.trim();
+  if (!input) return null;
+  const url = parseHttpUrl(input);
+  return url ? input : null;
 }
 
 export function getVideoSource(value: string | null | undefined): VideoSource | null {
@@ -91,8 +121,14 @@ export function getVideoSource(value: string | null | undefined): VideoSource | 
   const driveEmbedUrl = getGoogleDrivePreviewUrl(input);
   if (driveEmbedUrl) return { provider: "google-drive", embedUrl: driveEmbedUrl };
 
+  const pinterestPinUrl = getPinterestPinUrl(input);
+  if (pinterestPinUrl) return { provider: "pinterest", pinUrl: pinterestPinUrl };
+
   const directUrl = getDirectVideoUrl(input);
   if (directUrl) return { provider: "direct", mediaUrl: directUrl };
+
+  const externalUrl = getExternalVideoUrl(input);
+  if (externalUrl) return { provider: "external", url: externalUrl };
 
   return null;
 }
