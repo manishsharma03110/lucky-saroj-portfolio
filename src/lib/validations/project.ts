@@ -4,19 +4,17 @@ import { entityIdSchema } from "./identifiers";
 import { projectSlugSchema } from "./slugs";
 import { mediaReferenceSchema } from "./urls";
 import { assetIdSchema } from "@/lib/media/ownership";
-import { getVideoSource, isGoogleDriveUrl } from "@/lib/media/video";
+import { getVideoSource } from "@/lib/media/video";
 
 const optionalEntityId = z.union([z.literal(""), entityIdSchema]);
 const optionalAssetId = assetIdSchema.optional().or(z.literal(""));
 const optionalMediaReference = z.union([z.literal(""), mediaReferenceSchema]).refine((v) => v.length <= 500, "Media reference must be at most 500 characters.");
 const optionalSocialImage = z.union([z.literal(""), mediaReferenceSchema]).refine((v) => v.length <= 2048, "Social image reference is too long.");
-const optionalVideoReference = z.string().trim().max(500).optional().or(z.literal("")).superRefine((value, ctx) => {
+const optionalVideoReference = z.string().trim().max(2048, "Video URL is too long.").optional().or(z.literal("")).superRefine((value, ctx) => {
   if (!value || getVideoSource(value)) return;
   ctx.addIssue({
     code: "custom",
-    message: isGoogleDriveUrl(value)
-      ? "Enter a valid Google Drive file share link, for example https://drive.google.com/file/d/FILE_ID/view."
-      : "Enter a valid YouTube URL/ID, Google Drive file share link, or direct MP4/WebM URL.",
+    message: "Enter a valid video URL. YouTube IDs and normal http/https video links are accepted.",
   });
 });
 
