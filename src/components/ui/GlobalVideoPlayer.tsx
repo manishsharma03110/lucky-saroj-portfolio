@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Maximize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { Maximize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { flushSync } from "react-dom";
 import {
   createContext,
@@ -298,11 +298,16 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
           <button
             type="button"
             onClick={closeVideo}
-            className="absolute left-3 top-[max(1rem,env(safe-area-inset-top))] z-50 flex h-11 items-center gap-2 rounded-full border border-white/20 bg-black/70 px-3.5 text-sm font-semibold text-white shadow-[0_10px_32px_rgba(0,0,0,.4)] backdrop-blur-md transition hover:border-[var(--accent-primary)] hover:bg-black/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:left-5 sm:px-4"
+            style={{
+              left: "max(12px, env(safe-area-inset-left))",
+              top: "max(12px, env(safe-area-inset-top))",
+            }}
+            className="fixed z-[999] flex h-12 min-w-12 items-center justify-center gap-2 rounded-full border border-white/70 bg-[var(--accent-primary)] px-3.5 text-sm font-bold text-white shadow-[0_10px_40px_rgba(0,0,0,.75),0_0_0_3px_rgba(59,130,246,.25)] transition hover:bg-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/70 sm:px-4"
             aria-label="Back to project"
+            title="Back to project"
           >
-            <ArrowLeft size={18} />
-            <span>Back</span>
+            <span aria-hidden className="text-[26px] font-bold leading-none">←</span>
+            <span className="hidden sm:inline">Back</span>
           </button>
         ) : null}
 
