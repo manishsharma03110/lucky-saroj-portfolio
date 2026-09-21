@@ -53,6 +53,7 @@ function DirectVideo({
   const [muted, setMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [buffering, setBuffering] = useState(true);
 
   const togglePlayback = useCallback(async () => {
     const video = videoRef.current;
@@ -87,6 +88,9 @@ function DirectVideo({
           setDuration(Number.isFinite(video.duration) ? video.duration : 0);
           void video.play().catch(() => setPaused(true));
         }}
+        onCanPlay={() => setBuffering(false)}
+        onPlaying={() => setBuffering(false)}
+        onWaiting={() => setBuffering(true)}
         onDurationChange={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
         onTimeUpdate={(event) => setCurrentTime(event.currentTarget.currentTime)}
         onPlay={() => setPaused(false)}
@@ -96,18 +100,26 @@ function DirectVideo({
         className="absolute inset-0 h-full w-full cursor-pointer bg-black object-contain"
       />
 
-      {paused ? (
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-gradient-to-b from-black/70 via-black/15 to-transparent px-4 pb-12 pt-4 sm:px-6 sm:pt-5">
+        <p className="max-w-[calc(100%-4rem)] truncate text-xs font-semibold uppercase tracking-[0.16em] text-white/80 sm:text-sm">{title}</p>
+      </div>
+
+      {buffering ? (
+        <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-black/55 shadow-[0_12px_40px_rgba(0,0,0,.5)] backdrop-blur-md">
+          <span className="h-6 w-6 animate-spin rounded-full border-2 border-white/20 border-t-[var(--accent-primary)]" aria-label="Loading video" />
+        </div>
+      ) : paused ? (
         <button
           type="button"
           onClick={togglePlayback}
-          className="absolute left-1/2 top-1/2 z-20 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/55 bg-black/70 text-white shadow-[0_12px_40px_rgba(0,0,0,.45)] backdrop-blur-md transition hover:scale-105 hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:h-16 sm:w-16"
+          className="absolute left-1/2 top-1/2 z-20 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/45 bg-black/65 text-white shadow-[0_14px_48px_rgba(0,0,0,.5)] backdrop-blur-md transition hover:scale-105 hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)] sm:h-20 sm:w-20"
           aria-label={`Play ${title}`}
         >
-          <Play size={24} fill="currentColor" className="ml-0.5" />
+          <Play size={28} fill="currentColor" className="ml-1" />
         </button>
       ) : null}
 
-      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/75 to-transparent px-3 pb-3 pt-12 sm:px-5 sm:pb-5 sm:pt-16">
+      <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/85 to-transparent px-3 pb-[max(12px,env(safe-area-inset-bottom))] pt-14 sm:px-6 sm:pb-5 sm:pt-20">
         <input
           type="range"
           min={0}
@@ -122,28 +134,29 @@ function DirectVideo({
             setCurrentTime(next);
           }}
           aria-label="Video progress"
-          className="block h-1.5 w-full cursor-pointer accent-[var(--accent-primary)]"
+          className="block h-1.5 w-full cursor-pointer accent-[var(--accent-primary)] sm:h-2"
         />
-        <div className="mt-3 flex items-center gap-2.5 text-white sm:gap-3">
+        <div className="mt-3 flex items-center gap-2 text-white sm:mt-4 sm:gap-3">
           <button
             type="button"
             onClick={togglePlayback}
-            className="flex h-9 w-9 items-center justify-center rounded-md transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            className="flex h-11 w-11 touch-manipulation items-center justify-center rounded-full border border-white/10 bg-white/[0.04] transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
             aria-label={paused ? "Play video" : "Pause video"}
           >
-            {paused ? <Play size={18} fill="currentColor" /> : <Pause size={18} fill="currentColor" />}
+            {paused ? <Play size={19} fill="currentColor" /> : <Pause size={19} fill="currentColor" />}
           </button>
           <button
             type="button"
             onClick={toggleMute}
-            className="flex h-9 w-9 items-center justify-center rounded-md transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
+            className="flex h-11 w-11 touch-manipulation items-center justify-center rounded-full border border-white/10 bg-white/[0.04] transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
             aria-label={muted ? "Unmute video" : "Mute video"}
           >
-            {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            {muted ? <VolumeX size={19} /> : <Volume2 size={19} />}
           </button>
-          <span className="min-w-0 text-[10px] tabular-nums text-white/70 sm:text-xs">
+          <span className="min-w-0 text-[11px] tabular-nums text-white/70 sm:text-xs">
             {formatTime(currentTime)} / {formatTime(duration)}
           </span>
+          <span className="ml-auto hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--accent-hover)] sm:block">Lucky Saroj · Video Editor</span>
         </div>
       </div>
     </div>
@@ -200,12 +213,7 @@ function PinterestPinEmbed({ pinUrl, title }: { pinUrl: string; title: string })
             </div>
           ) : null}
           <div ref={containerRef} className="mx-auto flex min-h-[320px] w-full items-center justify-center" />
-          <a
-            href={pinUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent-hover)] hover:text-white"
-          >
+          <a href={pinUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--accent-hover)] hover:text-white">
             Open on Pinterest <ExternalLink size={14} />
           </a>
         </div>
@@ -220,15 +228,8 @@ function ExternalVideoFallback({ pageUrl, title }: { pageUrl: string; title: str
       <div className="w-full max-w-lg rounded-xl border border-white/10 bg-[var(--surface-primary)] p-6 text-center shadow-[0_30px_100px_rgba(0,0,0,.7)] sm:p-8">
         <Link2 size={30} className="mx-auto text-[var(--accent-primary)]" />
         <h2 className="mt-4 text-xl font-semibold text-white sm:text-2xl">{title}</h2>
-        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">
-          This video URL is saved in the CMS, but this provider does not expose a reliable embeddable player. Open the source directly without losing the project page.
-        </p>
-        <a
-          href={pageUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--accent-hover)]"
-        >
+        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">This legacy video URL is saved in the CMS, but this provider does not expose a reliable embeddable player.</p>
+        <a href={pageUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[var(--accent-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--accent-hover)]">
           Open video source <ExternalLink size={16} />
         </a>
       </div>
@@ -241,6 +242,7 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
   const [request, setRequest] = useState<GlobalVideoRequest | null>(null);
   const source = useMemo(() => getVideoSource(request?.videoUrl), [request?.videoUrl]);
   const active = Boolean(request && source);
+  const portrait = request?.orientation === "portrait";
 
   const resetPlayer = useCallback(() => {
     setRequest(null);
@@ -287,6 +289,10 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     };
   }, [active, closeVideo, resetPlayer]);
 
+  const playerStyle = portrait
+    ? { height: "min(calc(100dvh - 16px), 960px)", aspectRatio: "9 / 16", maxWidth: "100vw" }
+    : { width: "min(100vw, 1600px)", aspectRatio: "16 / 9", maxHeight: "100dvh" };
+
   return (
     <GlobalVideoContext.Provider value={{ openVideo, closeVideo, active }}>
       {children}
@@ -295,13 +301,13 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         aria-modal="true"
         aria-label={request ? `${request.title} video player` : "Video player"}
         aria-hidden={!active}
-        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black px-2 py-11 transition-[opacity,visibility] duration-150 sm:px-4 sm:py-12 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${portrait ? "p-2" : "p-0 sm:p-3"} ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
       >
         {active ? (
           <button
             type="button"
             onClick={closeVideo}
-            className="fixed z-[360] flex h-12 w-12 touch-manipulation items-center justify-center rounded-full border border-white/40 bg-black/90 text-white shadow-[0_10px_35px_rgba(0,0,0,.75)] backdrop-blur-md transition hover:border-white/75 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+            className="fixed z-[360] flex h-12 w-12 touch-manipulation items-center justify-center rounded-full border border-white/30 bg-black/80 text-white shadow-[0_10px_35px_rgba(0,0,0,.75)] backdrop-blur-md transition hover:border-[var(--accent-primary)] hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
             style={{ top: "max(10px, env(safe-area-inset-top))", right: "max(10px, env(safe-area-inset-right))" }}
             aria-label="Close video"
             title="Close video"
@@ -312,15 +318,11 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
 
         {active && request && source ? (
           <div
-            className="relative max-w-[1600px] overflow-hidden rounded-[4px] bg-black shadow-[0_30px_100px_rgba(0,0,0,.7)]"
-            style={{ height: "min(56.25vw, calc(100dvh - 88px), 900px)", aspectRatio: "16 / 9" }}
+            className={`relative overflow-hidden bg-black shadow-[0_30px_100px_rgba(0,0,0,.78)] ${portrait ? "rounded-[12px] border border-white/10" : "rounded-none sm:rounded-[10px] sm:border sm:border-white/10"}`}
+            style={playerStyle}
           >
             {source.provider === "direct" ? (
-              <DirectVideo
-                src={source.mediaUrl}
-                posterUrl={request.posterUrl}
-                title={request.title}
-              />
+              <DirectVideo src={source.mediaUrl} posterUrl={request.posterUrl} title={request.title} />
             ) : source.provider === "youtube" ? (
               <iframe
                 src={`${source.embedUrl}&autoplay=1&controls=1&fs=1&iv_load_policy=3&modestbranding=1`}
