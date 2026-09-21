@@ -1,10 +1,9 @@
 import { Play } from "lucide-react";
-import { VideoPlayer, type VideoOrientation } from "@/components/ui/VideoPlayer";
-import { getVideoSource } from "@/lib/media/video";
-import type { schema } from "@/lib/db";
-import type { ProjectMediaWithSeo } from "@/lib/db/queries";
+import { VideoLaunchSurface } from "@/components/ui/VideoLaunchSurface";
+import { getVideoSource, normalizeVideoOrientation } from "@/lib/media/video";
+import type { PortfolioProjectWithVideo, ProjectMediaWithSeo } from "@/lib/db/queries";
 
-type Project = typeof schema.portfolioProjects.$inferSelect;
+type Project = PortfolioProjectWithVideo;
 type MediaCopy = Readonly<{
   selectedProjectLabel?: string;
   mediaEyebrow?: string;
@@ -12,10 +11,6 @@ type MediaCopy = Readonly<{
   previewAltSuffix?: string;
   mediaAltSuffix?: string;
 }>;
-
-const PROJECT_VIDEO_ORIENTATION: Record<string, VideoOrientation> = {
-  "motion-graphic-reel": "portrait",
-};
 
 function usableImage(url: string | null | undefined) {
   if (!url) return false;
@@ -54,7 +49,11 @@ function ProjectSlate({
         <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--accent-primary)]">{categoryName ?? selectedProjectLabel}</p>
         <p className="mt-2 break-words font-display text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)] sm:text-4xl">{project.title}</p>
       </div>
-      {hasVideo && <span className="absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-black/35 text-[var(--accent-hover)]"><Play size={15} fill="currentColor" /></span>}
+      {hasVideo ? (
+        <span className="absolute right-6 top-6 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/60 bg-black/35 text-[var(--accent-hover)] shadow-[0_12px_34px_rgba(0,0,0,.35)]">
+          <Play size={15} fill="currentColor" />
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -70,6 +69,16 @@ function mediaState(project: Project, media: ProjectMediaWithSeo[]) {
   return { primaryImage, video, primaryGalleryId: primaryImage === galleryImages[0]?.url ? galleryImages[0]?.id : null };
 }
 
+function PlayOverlay({ portrait }: { portrait: boolean }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+      <span className={`flex items-center justify-center rounded-full border border-white/45 bg-black/65 text-white shadow-[0_18px_55px_rgba(0,0,0,.45)] backdrop-blur-md transition-transform duration-300 group-hover:scale-105 ${portrait ? "h-14 w-14 sm:h-16 sm:w-16" : "h-16 w-16 sm:h-20 sm:w-20"}`}>
+        <Play size={portrait ? 22 : 26} fill="currentColor" className="ml-1" />
+      </span>
+    </div>
+  );
+}
+
 export function ProjectMedia({
   project,
   categoryName,
@@ -82,38 +91,53 @@ export function ProjectMedia({
   copy?: MediaCopy;
 }) {
   const { primaryImage, video } = mediaState(project, media);
-  const primaryVideoSource = getVideoSource(video);
-  const isDriveMainVideo = primaryVideoSource?.provider === "google-drive";
-  const mainVideoOrientation = PROJECT_VIDEO_ORIENTATION[project.slug] ?? "landscape";
-  const isPortraitMainVideo = mainVideoOrientation === "portrait";
+  const orientation = normalizeVideoOrientation(project.videoOrientation);
+  const isPortraitMainVideo = orientation === "portrait";
   const previewAlt = project.thumbnailAlt?.trim() || `${project.title} ${copy.previewAltSuffix || "project preview"}`;
 
   return (
     <section className="bg-[var(--background-primary)] py-6 sm:py-12 lg:py-16">
       <div className="mx-auto w-full max-w-[1600px] px-4 sm:px-8 lg:px-12 2xl:px-16">
-        <div className={`relative overflow-hidden bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)] ${isDriveMainVideo ? "-mx-4 w-[calc(100%+2rem)] rounded-none sm:mx-0 sm:w-full sm:rounded-[12px]" : "rounded-[12px]"} ${video ? "" : "aspect-video border border-white/10"}`}>
-          <ProjectSlate project={project} categoryName={categoryName} hasVideo={Boolean(video)} selectedProjectLabel={copy.selectedProjectLabel} />
-          {video ? (
-            <div className={`relative min-w-0 ${isPortraitMainVideo ? "mx-auto w-full max-w-[315px]" : "w-full"}`}>
-              <VideoPlayer
-                videoUrl={video}
-                posterUrl={primaryImage}
-                posterFit={isPortraitMainVideo ? "cover" : "project-banner"}
-                posterOnlyIdle={isDriveMainVideo}
-                title={project.title}
-                orientation={mainVideoOrientation}
-                className="w-full"
+        {video ? (
+          <div className={isPortraitMainVideo ? "mx-auto w-full max-w-[360px]" : "w-full"}>
+            <VideoLaunchSurface
+              videoUrl={video}
+              title={project.title}
+              posterUrl={primaryImage}
+              orientation={orientation}
+              className="w-full overflow-hidden rounded-[12px] bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)]"
+            >
+              <div className={`relative overflow-hidden border border-white/10 bg-[var(--surface-primary)] ${isPortraitMainVideo ? "aspect-[9/16]" : "aspect-video"}`}>
+                <ProjectSlate project={project} categoryName={categoryName} hasVideo selectedProjectLabel={copy.selectedProjectLabel} />
+                {primaryImage ? (
+                  <div
+                    className={`absolute inset-0 bg-center bg-no-repeat transition-transform duration-500 group-hover:scale-[1.01] ${isPortraitMainVideo ? "bg-cover" : "bg-contain lg:bg-cover"}`}
+                    style={{ backgroundImage: `url('${primaryImage}')` }}
+                    role="img"
+                    aria-label={previewAlt}
+                  />
+                ) : null}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10" aria-hidden />
+                <PlayOverlay portrait={isPortraitMainVideo} />
+                <span className="pointer-events-none absolute bottom-4 left-4 z-20 rounded-full border border-white/15 bg-black/55 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/85 backdrop-blur-md sm:bottom-5 sm:left-5">
+                  Play fullscreen
+                </span>
+              </div>
+            </VideoLaunchSurface>
+          </div>
+        ) : (
+          <div className="relative aspect-video overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_30px_100px_rgba(0,0,0,0.34)]">
+            <ProjectSlate project={project} categoryName={categoryName} hasVideo={false} selectedProjectLabel={copy.selectedProjectLabel} />
+            {primaryImage ? (
+              <div
+                className="absolute inset-0 bg-contain bg-center bg-no-repeat lg:bg-cover"
+                style={{ backgroundImage: `url('${primaryImage}')` }}
+                role="img"
+                aria-label={previewAlt}
               />
-            </div>
-          ) : primaryImage ? (
-            <div
-              className="absolute inset-0 bg-contain bg-center bg-no-repeat lg:bg-cover"
-              style={{ backgroundImage: `url('${primaryImage}')` }}
-              role="img"
-              aria-label={previewAlt}
-            />
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -141,13 +165,24 @@ export function ProjectGallery({
         <div className="mt-8 grid gap-5 sm:gap-6 md:grid-cols-2 lg:mt-10 lg:gap-8">
           {items.map((item, index) => {
             const label = item.altText?.trim() || item.title?.trim() || fallbackAlt;
+            const spanClass = index % 3 === 0 ? "md:col-span-2" : "";
+            if (item.type === "video") {
+              return (
+                <VideoLaunchSurface
+                  key={item.id}
+                  videoUrl={item.url}
+                  title={item.title?.trim() || fallbackAlt}
+                  orientation="auto"
+                  className={`relative aspect-video w-full overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] ${spanClass}`}
+                >
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,var(--accent-glow),transparent_36%),linear-gradient(145deg,var(--surface-elevated),var(--background-primary))]" />
+                  <PlayOverlay portrait={false} />
+                </VideoLaunchSurface>
+              );
+            }
             return (
-              <figure key={item.id} className={`relative aspect-video overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] ${index % 3 === 0 ? "md:col-span-2" : ""}`} title={item.title ?? undefined}>
-                {item.type === "video" ? (
-                  <VideoPlayer videoUrl={item.url} title={item.title?.trim() || fallbackAlt} className="h-full w-full" />
-                ) : (
-                  <div className="h-full w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url('${item.url}')` }} role="img" aria-label={label} />
-                )}
+              <figure key={item.id} className={`relative aspect-video overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] ${spanClass}`} title={item.title ?? undefined}>
+                <div className="h-full w-full bg-contain bg-center bg-no-repeat" style={{ backgroundImage: `url('${item.url}')` }} role="img" aria-label={label} />
                 {item.description?.trim() ? <figcaption className="sr-only">{item.description}</figcaption> : null}
               </figure>
             );
