@@ -32,12 +32,18 @@ export function RelatedProjects({ projects }: { projects: Entry[] }) {
             const portrait = project.videoOrientation === "portrait";
             const playable = Boolean(project.videoUrl && getVideoSource(project.videoUrl));
             const banner = (
-              <div className={`relative overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] ${portrait ? "mx-auto aspect-[9/16] w-full max-w-[300px]" : "aspect-video w-full"}`}>
+              <div className="relative aspect-video w-full overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)]">
                 {imageUrl ? (
                   canUseOptimizedImage(imageUrl) ? (
-                    <Image src={imageUrl} alt={alt} fill sizes={portrait ? "300px" : "(max-width: 767px) 100vw, 33vw"} className="object-cover transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]" />
+                    <>
+                      {portrait ? <Image src={imageUrl} alt="" aria-hidden fill sizes="(max-width: 767px) 100vw, 33vw" className="scale-110 object-cover object-center opacity-45 blur-xl" /> : null}
+                      <Image src={imageUrl} alt={alt} fill sizes="(max-width: 767px) 100vw, 33vw" className={`${portrait ? "object-contain" : "object-cover"} object-center transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]`} />
+                    </>
                   ) : (
-                    <div role="img" aria-label={alt} className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]" style={{ backgroundImage: `url('${imageUrl}')` }} />
+                    <>
+                      {portrait ? <div aria-hidden className="absolute -inset-4 scale-110 bg-cover bg-center bg-no-repeat opacity-45 blur-xl" style={{ backgroundImage: `url('${imageUrl}')` }} /> : null}
+                      <div role="img" aria-label={alt} className={`absolute inset-0 bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01] ${portrait ? "bg-contain" : "bg-cover"}`} style={{ backgroundImage: `url('${imageUrl}')` }} />
+                    </>
                   )
                 ) : (
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_18%,var(--accent-glow),transparent_34%),linear-gradient(145deg,var(--surface-elevated),var(--background-primary))]" aria-hidden />

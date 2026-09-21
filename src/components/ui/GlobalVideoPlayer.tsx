@@ -9,7 +9,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
   type ReactNode,
 } from "react";
 import { getVideoSource, normalizeVideoOrientation, type VideoOrientation } from "@/lib/media/video";
@@ -40,12 +39,10 @@ function DirectVideo({
   src,
   posterUrl,
   title,
-  onDetectedOrientation,
 }: {
   src: string;
   posterUrl?: string | null;
   title: string;
-  onDetectedOrientation: (orientation: Exclude<VideoOrientation, "auto">) => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [paused, setPaused] = useState(false);
@@ -84,9 +81,6 @@ function DirectVideo({
         onLoadedMetadata={(event) => {
           const video = event.currentTarget;
           setDuration(Number.isFinite(video.duration) ? video.duration : 0);
-          if (video.videoWidth && video.videoHeight) {
-            onDetectedOrientation(video.videoHeight > video.videoWidth ? "portrait" : "landscape");
-          }
           void video.play().catch(() => setPaused(true));
         }}
         onDurationChange={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
@@ -155,15 +149,11 @@ function DirectVideo({
 export function GlobalVideoPlayerProvider({ children }: { children: ReactNode }) {
   const historyEntryRef = useRef(false);
   const [request, setRequest] = useState<GlobalVideoRequest | null>(null);
-  const [detectedOrientation, setDetectedOrientation] = useState<Exclude<VideoOrientation, "auto">>("landscape");
   const source = useMemo(() => getVideoSource(request?.videoUrl), [request?.videoUrl]);
-  const requestedOrientation = normalizeVideoOrientation(request?.orientation);
-  const resolvedOrientation = requestedOrientation === "auto" ? detectedOrientation : requestedOrientation;
   const active = Boolean(request && source);
 
   const resetPlayer = useCallback(() => {
     setRequest(null);
-    setDetectedOrientation("landscape");
   }, []);
 
   const closeVideo = useCallback(() => {
@@ -176,15 +166,13 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
 
   const openVideo = useCallback((next: GlobalVideoRequest) => {
     if (!getVideoSource(next.videoUrl)) return;
-    const orientation = normalizeVideoOrientation(next.orientation);
 
     if (typeof window !== "undefined" && !historyEntryRef.current) {
       window.history.pushState({ ...(window.history.state ?? {}), portfolioVideoPlayer: true }, "", window.location.href);
       historyEntryRef.current = true;
     }
 
-    setDetectedOrientation(orientation === "auto" ? "landscape" : orientation);
-    setRequest({ ...next, orientation });
+    setRequest({ ...next, orientation: normalizeVideoOrientation(next.orientation) });
   }, []);
 
   useEffect(() => {
@@ -209,12 +197,6 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     };
   }, [active, closeVideo, resetPlayer]);
 
-  const providerLandscape = source?.provider === "youtube" || source?.provider === "google-drive";
-  const portraitPlayer = !providerLandscape && resolvedOrientation === "portrait";
-  const playerStyle: CSSProperties = portraitPlayer
-    ? { height: "min(100dvh, calc(100vw * 16 / 9))", aspectRatio: "9 / 16" }
-    : { width: "min(100vw, calc(100dvh * 16 / 9))", aspectRatio: "16 / 9" };
-
   return (
     <GlobalVideoContext.Provider value={{ openVideo, closeVideo, active }}>
       {children}
@@ -223,14 +205,14 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         aria-modal="true"
         aria-label={request ? `${request.title} video player` : "Video player"}
         aria-hidden={!active}
-        className={`fixed inset-0 z-[300] flex h-[100dvh] min-h-screen w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-black px-2 py-11 transition-[opacity,visibility] duration-150 sm:px-4 sm:py-12 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
       >
         {active ? (
           <button
             type="button"
             onClick={closeVideo}
-            className="fixed z-[360] flex h-12 w-12 items-center justify-center rounded-full border border-white/35 bg-black/80 text-white shadow-[0_10px_35px_rgba(0,0,0,.75)] backdrop-blur-md transition hover:border-white/70 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
-            style={{ top: "max(12px, env(safe-area-inset-top))", right: "max(12px, env(safe-area-inset-right))" }}
+            className="fixed z-[360] flex h-12 w-12 touch-manipulation items-center justify-center rounded-full border border-white/40 bg-black/90 text-white shadow-[0_10px_35px_rgba(0,0,0,.75)] backdrop-blur-md transition hover:border-white/75 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+            style={{ top: "max(10px, env(safe-area-inset-top))", right: "max(10px, env(safe-area-inset-right))" }}
             aria-label="Close video"
             title="Close video"
           >
@@ -239,19 +221,19 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
         ) : null}
 
         {active && request && source ? (
-          <div className="relative max-h-[100dvh] max-w-[100vw] overflow-hidden bg-black" style={playerStyle}>
+          <div
+            className="relative max-w-[1600px] overflow-hidden rounded-[4px] bg-black shadow-[0_30px_100px_rgba(0,0,0,.7)]"
+            style={{ height: "min(56.25vw, calc(100dvh - 88px), 900px)", aspectRatio: "16 / 9" }}
+          >
             {source.provider === "direct" ? (
               <DirectVideo
                 src={source.mediaUrl}
                 posterUrl={request.posterUrl}
                 title={request.title}
-                onDetectedOrientation={(orientation) => {
-                  if (requestedOrientation === "auto") setDetectedOrientation(orientation);
-                }}
               />
             ) : source.provider === "youtube" ? (
               <iframe
-                src={`${source.embedUrl}&autoplay=1&controls=1&fs=1&iv_load_policy=3`}
+                src={`${source.embedUrl}&autoplay=1&controls=1&fs=1&iv_load_policy=3&modestbranding=1`}
                 title={request.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen

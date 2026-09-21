@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { InteractiveWorkVisual } from "@/components/home/InteractiveWorkVisual";
@@ -26,10 +28,12 @@ export function WorkCard({
   project,
   categoryName,
   size = "default",
+  previewActive = false,
 }: {
   project: Project;
   categoryName?: string;
   size?: "default" | "large";
+  previewActive?: boolean;
 }) {
   const visualUrl = usableVisual(project.thumbnailUrl)
     ? project.thumbnailUrl
@@ -38,44 +42,40 @@ export function WorkCard({
       : null;
   const large = size === "large";
   const metadata = [categoryName, project.year].filter(Boolean).join(" · ");
-  const portrait = project.videoOrientation === "portrait";
   const playable = Boolean(project.videoUrl && getVideoSource(project.videoUrl));
 
   const visual = (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--background-secondary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)]">
-      <div
-        className={`absolute overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_18px_55px_rgba(0,0,0,.35)] ${portrait ? "left-1/2 top-1/2 h-[90%] aspect-[9/16] -translate-x-1/2 -translate-y-1/2" : "left-1/2 top-1/2 w-[94%] aspect-video -translate-x-1/2 -translate-y-1/2"}`}
-      >
-        {visualUrl ? (
-          <InteractiveWorkVisual
-            title={project.title}
-            visualUrl={visualUrl}
-            videoUrl={project.videoUrl}
-            large={large}
-            categoryName={categoryName}
-            orientation={project.videoOrientation}
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-secondary)_68%)]">
-            <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:72px_72px]" aria-hidden />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_67%_38%,var(--accent-glow),transparent_38%)]" aria-hidden />
-            <span className="absolute right-[5%] top-1/2 -translate-y-1/2 select-none font-display text-[clamp(5rem,16vw,13rem)] font-semibold text-[var(--text-primary)] opacity-[0.055]" aria-hidden="true">
-              {initials(project.title)}
-            </span>
-            <div className="absolute inset-x-6 bottom-6 sm:inset-x-8 sm:bottom-8">
-              {categoryName && <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[var(--accent-primary)]">{categoryName}</p>}
-              <p className="mt-2 max-w-[75%] font-display text-xl font-semibold tracking-[-0.03em] text-[var(--text-primary)] sm:text-2xl">{project.title}</p>
-              <span className="mt-4 block h-px bg-gradient-to-r from-[var(--accent-primary)]/70 to-transparent" aria-hidden />
-            </div>
-          </div>
-        )}
-
-        <div className="pointer-events-none absolute inset-x-3 bottom-3 z-30 flex items-center justify-between gap-2 sm:inset-x-4 sm:bottom-4">
-          <span className="rounded-full border border-white/15 bg-black/60 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-md sm:text-xs">
-            {playable ? "Play video" : "View project"}
+    <div className="relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--background-secondary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)]">
+      {visualUrl ? (
+        <InteractiveWorkVisual
+          title={project.title}
+          visualUrl={visualUrl}
+          videoUrl={project.videoUrl}
+          large={large}
+          categoryName={categoryName}
+          orientation={project.videoOrientation}
+          autoPreview={previewActive}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-secondary)_68%)]">
+          <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] [background-size:72px_72px]" aria-hidden />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_67%_38%,var(--accent-glow),transparent_38%)]" aria-hidden />
+          <span className="absolute right-[5%] top-1/2 -translate-y-1/2 select-none font-display text-[clamp(5rem,16vw,13rem)] font-semibold text-[var(--text-primary)] opacity-[0.055]" aria-hidden="true">
+            {initials(project.title)}
           </span>
-          <ArrowUpRight size={18} className="text-[var(--accent-hover)] transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
+          <div className="absolute inset-x-6 bottom-6 sm:inset-x-8 sm:bottom-8">
+            {categoryName && <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[var(--accent-primary)]">{categoryName}</p>}
+            <p className="mt-2 max-w-[75%] font-display text-xl font-semibold tracking-[-0.03em] text-[var(--text-primary)] sm:text-2xl">{project.title}</p>
+            <span className="mt-4 block h-px bg-gradient-to-r from-[var(--accent-primary)]/70 to-transparent" aria-hidden />
+          </div>
         </div>
+      )}
+
+      <div className="pointer-events-none absolute inset-x-3 bottom-3 z-30 flex items-center justify-between gap-2 sm:inset-x-4 sm:bottom-4">
+        <span className="rounded-full border border-white/15 bg-black/60 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-md sm:text-xs">
+          {playable ? "Play video" : "View project"}
+        </span>
+        <ArrowUpRight size={18} className="text-[var(--accent-hover)] transition-transform duration-300 motion-reduce:transition-none group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden="true" />
       </div>
     </div>
   );

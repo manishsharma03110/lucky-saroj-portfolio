@@ -49,15 +49,24 @@ function ProjectVisual({
   const playable = Boolean(project.videoUrl && getVideoSource(project.videoUrl));
   const featured = layout === "featured";
 
-  const innerMedia = (
-    <>
+  const visual = (
+    <div className={`relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)] ${featured ? "" : "bg-[var(--background-secondary)]"}`}>
       {visualUrl ? (
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]"
-          style={{ backgroundImage: `url('${visualUrl}')` }}
-          role="img"
-          aria-label={visualAlt}
-        />
+        <>
+          {portrait ? (
+            <div
+              className="absolute -inset-4 scale-110 bg-cover bg-center bg-no-repeat opacity-45 blur-xl"
+              style={{ backgroundImage: `url('${visualUrl}')` }}
+              aria-hidden
+            />
+          ) : null}
+          <div
+            className={`absolute inset-0 bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01] ${portrait ? "bg-contain" : "bg-cover"}`}
+            style={{ backgroundImage: `url('${visualUrl}')` }}
+            role="img"
+            aria-label={visualAlt}
+          />
+        </>
       ) : (
         <div className={`absolute inset-0 ${fallbackVariant === 0 ? "bg-[radial-gradient(circle_at_78%_25%,rgba(59,130,246,0.12),transparent_32%),linear-gradient(145deg,var(--surface-elevated)_0%,var(--background-primary)_76%)]" : fallbackVariant === 1 ? "bg-[radial-gradient(circle_at_20%_78%,rgba(59,130,246,0.10),transparent_30%),linear-gradient(125deg,var(--background-primary)_0%,var(--surface-elevated)_100%)]" : "bg-[linear-gradient(155deg,var(--surface-elevated)_0%,var(--surface-primary)_48%,var(--background-primary)_100%)]"}`}>
           <span className={`absolute select-none font-display text-[clamp(5rem,12vw,10rem)] leading-none text-white/[0.055] ${fallbackVariant === 1 ? "-left-2 bottom-0" : "right-5 top-2"}`} aria-hidden>
@@ -80,18 +89,6 @@ function ProjectVisual({
           Play video
         </span>
       )}
-    </>
-  );
-
-  const visual = featured ? (
-    <div className={`relative w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)] ${portrait ? "mx-auto aspect-[9/16] max-w-[420px]" : "aspect-video"}`}>
-      {innerMedia}
-    </div>
-  ) : (
-    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--background-secondary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)]">
-      <div className={`absolute left-1/2 top-1/2 overflow-hidden rounded-[10px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_16px_50px_rgba(0,0,0,.32)] ${portrait ? "h-[90%] aspect-[9/16] -translate-x-1/2 -translate-y-1/2" : "w-[94%] aspect-video -translate-x-1/2 -translate-y-1/2"}`}>
-        {innerMedia}
-      </div>
     </div>
   );
 

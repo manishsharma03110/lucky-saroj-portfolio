@@ -1,15 +1,20 @@
 import { Button } from "@/components/ui/Button";
-import { WorkCard } from "@/components/home/WorkCard";
+import { HomeSelectedWorkSlider } from "@/components/home/HomeSelectedWorkSlider";
 import { getPublishedProjects } from "@/lib/db/queries";
 import type { HomePageContent } from "@/lib/db/home-content-service";
 
 export async function SelectedWork({ content }: { content: HomePageContent }) {
-  const featuredProjects = await getPublishedProjects({ featuredOnly: true, limit: 3 });
+  const featuredProjects = await getPublishedProjects({ featuredOnly: true, limit: 6 });
   const projects = featuredProjects.length > 0
     ? featuredProjects
-    : await getPublishedProjects({ limit: 3 });
+    : await getPublishedProjects({ limit: 6 });
 
   if (projects.length === 0) return null;
+
+  const slides = projects.map(({ project, category }) => ({
+    project,
+    categoryName: category?.name,
+  }));
 
   return (
     <section id="home-selected-work" className="relative scroll-mt-24 bg-[var(--background-primary)] py-14 min-[480px]:py-16 md:py-28 lg:py-32 2xl:py-36">
@@ -27,11 +32,7 @@ export async function SelectedWork({ content }: { content: HomePageContent }) {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-10 2xl:gap-12">
-          {projects.map(({ project, category }) => (
-            <WorkCard key={project.id} project={project} categoryName={category?.name} />
-          ))}
-        </div>
+        <HomeSelectedWorkSlider slides={slides} />
       </div>
     </section>
   );
