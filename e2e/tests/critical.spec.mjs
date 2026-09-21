@@ -75,6 +75,7 @@ test("new and edit project preserve single field values and legacy source", asyn
   await expect(page.locator('input[name="videoUrl"]')).toHaveValue("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
   await page.getByRole("button", { name: "Publish Project", exact: true }).click();
   await expect(page).toHaveURL(/\/admin\/portfolio$/);
+  await page.getByRole("tab", { name: "Projects", exact: true }).click();
   const row = page.locator("tr").filter({ hasText: title });
   await row.locator('a[href^="/admin/portfolio/"]').first().click();
   const editURL = page.url();

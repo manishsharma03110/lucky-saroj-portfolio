@@ -36,7 +36,7 @@ Use Node.js 20+ and the committed lockfile:
 npm ci
 cp .env.example .env
 ```
-Configure DATABASE_URL, AUTH_SECRET and NEXT_PUBLIC_SITE_URL. Uploads also require PORTFOLIO_MEDIA_READ_WRITE_TOKEN for a dedicated Blob store. Use a disposable development database.
+Configure DATABASE_URL, AUTH_SECRET and NEXT_PUBLIC_SITE_URL. Uploads also require PORTFOLIO_MEDIA_READ_WRITE_TOKEN for a dedicated Blob store. Use a disposable development database. The guarded seed requires a localhost database name matching cms_phase3e_* and CMS_ALLOW_DESTRUCTIVE_LOCAL_DB_TESTS=1; it is disabled in production. Browser tests create their own fixtures in the separately guarded portfolio_e2e database.
 
 For a fresh disposable database, replay the SQL migrations with DATABASE_URL exported, then provision approved local content/admin using the seed script:
 ```bash

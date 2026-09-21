@@ -20,3 +20,5 @@ Coverage: seven public routes/overflow, slider navigation, both video orientatio
 Upload policy/error tests do not prove a real Vercel Blob round trip. Verify one MP4 and one image upload against a dedicated staging Blob store before release. Browser viewport emulation does not prove physical iPhone/Android behavior.
 
 Failures retain screenshots/traces in the Playwright HTML report. Skipped, blocked or unexecuted checks are not passes.
+
+Account coverage additionally checks add/delete, bcrypt verification, last-login recording, self-delete protection, role changes invalidating sessions, denied editor access and own-password rotation with old-password rejection. Pure validation/policy tests run in CI before migrations.
