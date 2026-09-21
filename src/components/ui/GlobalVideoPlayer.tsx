@@ -1,7 +1,6 @@
 "use client";
 
-import { Maximize2, Pause, Play, Volume2, VolumeX } from "lucide-react";
-import { flushSync } from "react-dom";
+import { Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import {
   createContext,
   useCallback,
@@ -154,10 +153,7 @@ function DirectVideo({
 }
 
 export function GlobalVideoPlayerProvider({ children }: { children: ReactNode }) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-  const nativeFullscreenRef = useRef(false);
   const historyEntryRef = useRef(false);
-  const [nativeFullscreen, setNativeFullscreen] = useState(false);
   const [request, setRequest] = useState<GlobalVideoRequest | null>(null);
   const [detectedOrientation, setDetectedOrientation] = useState<Exclude<VideoOrientation, "auto">>("landscape");
   const source = useMemo(() => getVideoSource(request?.videoUrl), [request?.videoUrl]);
@@ -168,11 +164,6 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
   const resetPlayer = useCallback(() => {
     setRequest(null);
     setDetectedOrientation("landscape");
-    setNativeFullscreen(false);
-    nativeFullscreenRef.current = false;
-    if (typeof document !== "undefined" && document.fullscreenElement) {
-      void document.exitFullscreen().catch(() => undefined);
-    }
   }, []);
 
   const closeVideo = useCallback(() => {
@@ -183,19 +174,6 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     resetPlayer();
   }, [resetPlayer]);
 
-  const requestNativeFullscreen = useCallback(() => {
-    if (typeof document === "undefined" || document.fullscreenElement) return;
-    const node = overlayRef.current;
-    if (!node?.requestFullscreen) return;
-    void node.requestFullscreen().then(() => {
-      nativeFullscreenRef.current = true;
-      setNativeFullscreen(true);
-    }).catch(() => {
-      nativeFullscreenRef.current = false;
-      setNativeFullscreen(false);
-    });
-  }, []);
-
   const openVideo = useCallback((next: GlobalVideoRequest) => {
     if (!getVideoSource(next.videoUrl)) return;
     const orientation = normalizeVideoOrientation(next.orientation);
@@ -205,12 +183,9 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
       historyEntryRef.current = true;
     }
 
-    flushSync(() => {
-      setDetectedOrientation(orientation === "auto" ? "landscape" : orientation);
-      setRequest({ ...next, orientation });
-    });
-    requestNativeFullscreen();
-  }, [requestNativeFullscreen]);
+    setDetectedOrientation(orientation === "auto" ? "landscape" : orientation);
+    setRequest({ ...next, orientation });
+  }, []);
 
   useEffect(() => {
     if (!active) return;
@@ -218,76 +193,53 @@ export function GlobalVideoPlayerProvider({ children }: { children: ReactNode })
     document.body.style.overflow = "hidden";
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !document.fullscreenElement) closeVideo();
+      if (event.key === "Escape") closeVideo();
     };
     const onPopState = () => {
       historyEntryRef.current = false;
       resetPlayer();
     };
-    const onFullscreenChange = () => {
-      const isFullscreen = Boolean(document.fullscreenElement);
-      setNativeFullscreen(isFullscreen);
-      if (nativeFullscreenRef.current && !isFullscreen) closeVideo();
-    };
 
     document.addEventListener("keydown", onKeyDown);
-    document.addEventListener("fullscreenchange", onFullscreenChange);
     window.addEventListener("popstate", onPopState);
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("fullscreenchange", onFullscreenChange);
       window.removeEventListener("popstate", onPopState);
     };
   }, [active, closeVideo, resetPlayer]);
 
-  const playerStyle: CSSProperties = resolvedOrientation === "portrait"
-    ? { height: "min(calc(100dvh - 64px), calc(100vw * 16 / 9))", aspectRatio: "9 / 16" }
-    : { width: "min(100vw, calc((100dvh - 64px) * 16 / 9))", aspectRatio: "16 / 9" };
-
-  const railStyle: CSSProperties = resolvedOrientation === "portrait"
-    ? { width: "min(100vw, calc((100dvh - 64px) * 9 / 16))" }
-    : { width: "min(100vw, calc((100dvh - 64px) * 16 / 9))" };
+  const providerLandscape = source?.provider === "youtube" || source?.provider === "google-drive";
+  const portraitPlayer = !providerLandscape && resolvedOrientation === "portrait";
+  const playerStyle: CSSProperties = portraitPlayer
+    ? { height: "min(100dvh, calc(100vw * 16 / 9))", aspectRatio: "9 / 16" }
+    : { width: "min(100vw, calc(100dvh * 16 / 9))", aspectRatio: "16 / 9" };
 
   return (
     <GlobalVideoContext.Provider value={{ openVideo, closeVideo, active }}>
       {children}
       <div
-        ref={overlayRef}
         role="dialog"
         aria-modal="true"
         aria-label={request ? `${request.title} video player` : "Video player"}
         aria-hidden={!active}
-        className={`fixed inset-0 z-[300] flex h-[100dvh] w-screen flex-col items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
+        className={`fixed inset-0 z-[300] flex h-[100dvh] min-h-screen w-screen items-center justify-center overflow-hidden bg-black transition-[opacity,visibility] duration-150 ${active ? "visible opacity-100" : "invisible pointer-events-none opacity-0"}`}
       >
         {active ? (
-          <div className="flex h-16 shrink-0 items-center justify-between px-1.5 sm:px-2" style={railStyle}>
-            <button
-              type="button"
-              onClick={closeVideo}
-              className="flex h-11 items-center gap-2 rounded-full border border-white/90 bg-white px-3.5 text-sm font-extrabold text-[#08090B] shadow-[0_10px_35px_rgba(0,0,0,.75)] transition hover:bg-[#F5F7FA] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[var(--accent-primary)] sm:px-4"
-              aria-label="Back to project"
-              title="Back to project"
-            >
-              <span aria-hidden className="text-[28px] font-black leading-none text-[var(--accent-primary)]">←</span>
-              <span>Back to project</span>
-            </button>
-
-            {!nativeFullscreen ? (
-              <button
-                type="button"
-                onClick={requestNativeFullscreen}
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-black text-white shadow-[0_10px_30px_rgba(0,0,0,.5)] transition hover:border-[var(--accent-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"
-                aria-label="Enter fullscreen"
-              >
-                <Maximize2 size={19} />
-              </button>
-            ) : <span aria-hidden className="h-11 w-11" />}
-          </div>
+          <button
+            type="button"
+            onClick={closeVideo}
+            className="fixed z-[360] flex h-12 w-12 items-center justify-center rounded-full border border-white/35 bg-black/80 text-white shadow-[0_10px_35px_rgba(0,0,0,.75)] backdrop-blur-md transition hover:border-white/70 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent-primary)]"
+            style={{ top: "max(12px, env(safe-area-inset-top))", right: "max(12px, env(safe-area-inset-right))" }}
+            aria-label="Close video"
+            title="Close video"
+          >
+            <X size={25} strokeWidth={2.4} />
+          </button>
         ) : null}
 
         {active && request && source ? (
-          <div className="relative max-h-[calc(100dvh-64px)] max-w-[100vw] overflow-hidden bg-black" style={playerStyle}>
+          <div className="relative max-h-[100dvh] max-w-[100vw] overflow-hidden bg-black" style={playerStyle}>
             {source.provider === "direct" ? (
               <DirectVideo
                 src={source.mediaUrl}
