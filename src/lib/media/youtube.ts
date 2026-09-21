@@ -32,6 +32,5 @@ export function getYouTubeEmbedUrl(value: string | null | undefined): string | n
   const id = getYouTubeVideoId(value);
   if (!id) return null;
 
-  // Keep playback inline inside the fixed project video frame.
-  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1`;
+  return `https://www.youtube-nocookie.com/embed/${id}?rel=0&playsinline=1&modestbranding=1`;
 }
