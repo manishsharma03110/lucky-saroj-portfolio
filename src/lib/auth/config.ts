@@ -7,12 +7,7 @@ import { eq } from "drizzle-orm";
 import { edgeAuthConfig } from "./edge-config";
 import { authorizeAdminCredentials } from "./credentials";
 import { applyAdminJwt, projectAdminSession } from "./callbacks";
-import {
-  clearAdminLoginFailures,
-  getAdminLoginRateLimitKey,
-  isAdminLoginRateLimited,
-  recordAdminLoginFailure,
-} from "./login-rate-limit";
+import { consumeAdminLoginAttempt, clearSharedLoginAttempts } from "./shared-login-rate-limit";
 
 export const authConfig: NextAuthConfig = {
   ...edgeAuthConfig,
@@ -27,8 +22,8 @@ export const authConfig: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (raw, request) => {
-        const rateLimitKey = getAdminLoginRateLimitKey(request, raw);
-        if (isAdminLoginRateLimited(rateLimitKey)) return null;
+        const attempt = await consumeAdminLoginAttempt(request, raw);
+        if (!attempt.allowed) return null;
 
         const admin = await authorizeAdminCredentials(raw, {
           findByEmail: async (email) => {
@@ -50,12 +45,11 @@ export const authConfig: NextAuthConfig = {
         });
 
         if (!admin) {
-          recordAdminLoginFailure(rateLimitKey);
           return null;
         }
 
         await adminRoleService.recordLogin({ actorId: admin.id, actorSessionVersion: admin.sessionVersion });
-        clearAdminLoginFailures(rateLimitKey);
+        await clearSharedLoginAttempts(attempt.accountKey);
         return admin;
       },
     }),

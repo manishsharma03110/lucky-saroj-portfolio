@@ -65,6 +65,9 @@ jobs:
       - name: Replay SQL migrations
         run: npm run ci:migrate
 
+      - name: Shared login throttle concurrency and expiry tests
+        run: npx tsx --test src/lib/auth/shared-login-rate-limit.runtime.test.ts
+
       - name: Verify Phase 9 schema
         run: npm run ci:verify-phase9
 
