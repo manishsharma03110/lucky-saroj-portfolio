@@ -14,7 +14,7 @@ for (const theme of ["dark", "light"]) {
       const result = await hero.evaluate(el => {
         const h=el.getBoundingClientRect(), bg=el.querySelector('[data-hero-background]'), b=bg.getBoundingClientRect();
         const img=bg.querySelector('img'), text=el.querySelector('h1').getBoundingClientRect();
-        return {covers: Math.abs(h.width-b.width)<1 && Math.abs(h.height-b.height)<1,
+        return {covers: Math.abs(el.clientWidth-b.width)<1 && Math.abs(el.clientHeight-b.height)<1,
           radius:getComputedStyle(bg).borderRadius, fit:getComputedStyle(img).objectFit,
           textFits:text.left>=h.left && text.right<=h.right+1, overflow:document.documentElement.scrollWidth>innerWidth+1};
       });
@@ -45,10 +45,12 @@ test("public route metadata, semantic structure, links and runtime audit", async
 test("security boundaries, crawl endpoints and missing page", async ({request,page}) => {
   const cleanup=await request.get('/api/contact/attachment/cleanup',{headers:{'user-agent':'vercel-cron/1.0'}});
   expect(cleanup.status()).toBe(403);
-  for (const path of ['/api/upload/initiate','/api/upload/complete','/api/upload/image']) {
+  for (const path of ['/api/upload/initiate','/api/upload/image']) {
     const response=await request.post(path,{data:{}});
     expect([401,403]).toContain(response.status());
   }
+  const completion=await request.post('/api/upload/complete',{data:{}});
+  expect(completion.status()).toBe(400); // Signed Blob callback, not a session-authenticated endpoint.
   await page.goto('/admin/users'); await expect(page).toHaveURL(/\/admin\/login/);
   const missing=await request.get('/definitely-not-a-real-page-audit'); expect(missing.status()).toBe(404);
   const robots=await request.get('/robots.txt'); expect(robots.ok()).toBe(true); expect(await robots.text()).toContain('Sitemap:');
