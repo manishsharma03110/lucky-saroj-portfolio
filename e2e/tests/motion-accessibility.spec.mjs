@@ -2,7 +2,7 @@ import { test, expect } from "playwright/test";
 
 test("first interaction navigates without an unsolicited contact dialog", async ({ page }) => {
   await page.goto("/");
-  await page.locator('a[href="/portfolio"]').first().click();
+  await page.locator('main a[href="/portfolio"]').first().click();
   await expect(page).toHaveURL(/\/portfolio$/);
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
