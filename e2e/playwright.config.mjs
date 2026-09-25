@@ -8,7 +8,6 @@ export default defineConfig({
   maxFailures: 3,
   timeout: 60000, expect: { timeout: 15000 },
   reporter: [["list"], ["html", { open: "never" }]],
-  globalSetup: "./setup.mjs",
   use: { baseURL, trace: "retain-on-failure", screenshot: "only-on-failure" },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },

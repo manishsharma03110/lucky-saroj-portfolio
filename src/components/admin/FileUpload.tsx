@@ -110,7 +110,7 @@ export function FileUpload({
             : "Unsupported image format."
           : kind === "video"
             ? `Upload blocked: video must be between 1 byte and ${MAX_VIDEO_UPLOAD_MB} MB.`
-            : "Image file is too large or empty.",
+            : "Upload blocked: image must be between 1 byte and 4 MB.",
       );
       if (inputRef.current) inputRef.current.value = "";
       return;
