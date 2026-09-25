@@ -92,12 +92,12 @@ export function MobileMenu({
             })}
             <li className="pt-2">
               <Link
-                href="/contact"
+                href="/admin"
                 onClick={onClose}
-                aria-label="Let's Talk — Contact"
-                className="block rounded-full bg-[var(--color-accent)] px-4 py-3 text-center text-sm font-medium text-white"
+                aria-label="Admin"
+                className="block rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] px-4 py-3 text-center text-sm font-medium text-white"
               >
-                Let&rsquo;s Talk
+                Admin
               </Link>
             </li>
           </ul>

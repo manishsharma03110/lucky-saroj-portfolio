@@ -19,8 +19,6 @@ export function Header({
   logoImageUrl,
   siteName = "Lucky Saroj",
   roleLabel = "Video Editor",
-  ctaLabel = "Let’s Talk",
-  ctaUrl = "/contact",
   navLabels = {},
   navItems,
 }: {
@@ -28,8 +26,6 @@ export function Header({
   logoImageUrl?: string | null;
   siteName?: string;
   roleLabel?: string;
-  ctaLabel?: string;
-  ctaUrl?: string;
   navLabels?: Partial<Record<"home" | "about" | "portfolio" | "services" | "experience" | "contact", string>>;
   navItems?: NavItem[];
 }) {
@@ -135,8 +131,8 @@ export function Header({
 
         <div className="ml-auto mr-3 min-[960px]:ml-3"><ThemeToggle /></div>
         <div className="hidden min-[960px]:block">
-          <Button href={ctaUrl} withArrow className="!bg-[#2563eb] !px-4 !py-2.5 !text-white xl:!px-5 motion-safe:transition-transform motion-safe:duration-300 hover:-translate-y-0.5">
-            {ctaLabel}
+          <Button href="/admin" withArrow className="!bg-[#2563eb] !px-4 !py-2.5 !text-white xl:!px-5 motion-safe:transition-transform motion-safe:duration-300 hover:-translate-y-0.5">
+            Admin
           </Button>
         </div>
 
