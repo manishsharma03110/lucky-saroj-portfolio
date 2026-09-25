@@ -38,14 +38,6 @@
 }
 
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .boundary :global(article:hover),
-  .boundary :global([class*="card"]:hover),
-  .boundary :global([class*="Card"]:hover) {
-    transform: translateY(-4px);
-    border-color: rgba(59, 130, 246, 0.24);
-    box-shadow: var(--media-shadow-hover);
-  }
-
   .boundary :global(article:hover img),
   .boundary :global([class*="card"]:hover img),
   .boundary :global([class*="Card"]:hover img) {

@@ -1,6 +1,6 @@
 import { test, expect } from "playwright/test";
 
-// Returning-visitor state prevents the intentionally automatic contact popup from stealing the first click.
+// Historical returning-visitor state remains harmless for regression compatibility.
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => sessionStorage.setItem("contact-popup-shown", "1"));
 });
@@ -19,6 +19,7 @@ for (const path of ["/","/about","/portfolio","/services","/experience","/testim
     expect(response.status()).toBe(200);
     await expect(page.locator("h1").first()).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBeTruthy();
+    expect(((await page.title()).match(/Lucky Saroj/g) || []).length).toBeLessThanOrEqual(1);
   });
 }
 

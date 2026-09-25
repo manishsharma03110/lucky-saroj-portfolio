@@ -70,7 +70,7 @@ function ProjectVisual({
         </div>
       )}
       {playable && (
-        <span className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-primary)]/55 bg-black/65 text-[var(--accent-hover)] shadow-[0_8px_28px_rgba(0,0,0,.4)] backdrop-blur-sm sm:right-4 sm:top-4" aria-hidden>
+        <span className="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-primary)]/55 bg-black/65 text-white shadow-[0_8px_28px_rgba(0,0,0,.4)] backdrop-blur-sm sm:right-4 sm:top-4" aria-hidden>
           <Play size={14} fill="currentColor" />
         </span>
       )}
