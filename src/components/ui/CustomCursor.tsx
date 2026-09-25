@@ -69,7 +69,7 @@ export function CustomCursorProvider({ children }: { children: ReactNode }) {
             animate={{
               width: label ? 72 : 10,
               height: label ? 72 : 10,
-              backgroundColor: label ? "var(--cine-accent)" : "rgba(245,244,242,0.9)",
+              backgroundColor: label ? "var(--cine-accent)" : "var(--cursor-color)",
             }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center justify-center rounded-full"

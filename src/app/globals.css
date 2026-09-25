@@ -71,11 +71,11 @@ h1,h2,h3,h4,h5,.font-display { font-family:var(--font-display); }
 :root { color-scheme:dark; --theme-scheme:dark; --foreground-rgb:255,255,255; --background-rgb:8,9,11;
 --tone-08090b:#08090b;--tone-090b0f:#090b0f;--tone-0d0f13:#0d0f13;--tone-121419:#121419;--tone-14171d:#14171d;--tone-181b22:#181b22;--tone-242832:#242832;--tone-282d36:#282d36;--tone-2b303a:#2b303a;--tone-30353f:#30353f;--tone-34d399:#34d399;--tone-3f4652:#3f4652;--tone-485162:#485162;--tone-60a5fa:#60a5fa;--tone-626975:#626975;--tone-6ee7b7:#6ee7b7;--tone-7f8793:#7f8793;--tone-9298a3:#9298a3;--tone-93c5fd:#93c5fd;--tone-94a3b8:#94a3b8;--tone-a5acb8:#a5acb8;--tone-c7ccd5:#c7ccd5;--tone-d4d8e0:#d4d8e0;--tone-d5d9e0:#d5d9e0;--tone-d9dee7:#d9dee7;--tone-dfe3e9:#dfe3e9;--tone-dfe4eb:#dfe4eb;--tone-e2e5e9:#e2e5e9;--tone-e5e9ef:#e5e9ef;--tone-e8ecf2:#e8ecf2;--tone-edf0f5:#edf0f5;--tone-f5f7fa:#f5f7fa;--tone-f7f9fc:#f7f9fc;--tone-f87171:#f87171;--tone-f8fafc:#f8fafc;--tone-fbbf24:#fbbf24;--tone-fca5a5:#fca5a5;
 }
-:root[data-theme="light"] { color-scheme:light; --theme-scheme:light; --foreground-rgb:23,32,51; --background-rgb:248,250,252; --background-primary:#f8fafc; --background-secondary:#edf1f7; --surface-primary:#ffffff; --surface-elevated:#e5ebf3; --text-primary:#172033; --text-secondary:#475569; --text-muted:#596579; --border-primary:#cbd5e1; --border-soft:rgba(23,32,51,.12); --border-hover:rgba(23,32,51,.25); --accent-primary:#2563eb; --accent-hover:#1d4ed8; --accent-active:#1e40af;
---tone-08090b:#f8fafc;--tone-090b0f:#f8fafc;--tone-0d0f13:#f8fafc;--tone-121419:#ffffff;--tone-14171d:#ffffff;--tone-181b22:#ffffff;--tone-242832:#d5dce7;--tone-282d36:#d5dce7;--tone-2b303a:#d5dce7;--tone-30353f:#d5dce7;--tone-34d399:#047857;--tone-3f4652:#5b6575;--tone-485162:#5b6575;--tone-60a5fa:#1d4ed8;--tone-626975:#5b6575;--tone-6ee7b7:#047857;--tone-7f8793:#5b6575;--tone-9298a3:#354155;--tone-93c5fd:#1d4ed8;--tone-94a3b8:#354155;--tone-a5acb8:#354155;--tone-c7ccd5:#354155;--tone-d4d8e0:#172033;--tone-d5d9e0:#172033;--tone-d9dee7:#172033;--tone-dfe3e9:#172033;--tone-dfe4eb:#172033;--tone-e2e5e9:#172033;--tone-e5e9ef:#172033;--tone-e8ecf2:#172033;--tone-edf0f5:#172033;--tone-f5f7fa:#172033;--tone-f7f9fc:#172033;--tone-f87171:#b91c1c;--tone-f8fafc:#172033;--tone-fbbf24:#92400e;--tone-fca5a5:#b91c1c;
+:root[data-theme="light"] { color-scheme:light; --theme-scheme:light; --foreground-rgb:32,35,38; --background-rgb:250,250,249; --background-primary:#fafaf9; --background-secondary:#f1f2f0; --surface-primary:#ffffff; --surface-elevated:#eceeeb; --text-primary:#202326; --text-secondary:#515960; --text-muted:#626970; --border-primary:#d9ddda; --border-soft:rgba(32,35,38,.12); --border-hover:rgba(32,35,38,.25); --accent-primary:#2457c5; --accent-hover:#1d46a0; --accent-active:#183c89;
+--tone-08090b:#fafaf9;--tone-090b0f:#fafaf9;--tone-0d0f13:#fafaf9;--tone-121419:#ffffff;--tone-14171d:#ffffff;--tone-181b22:#ffffff;--tone-242832:#d9ddda;--tone-282d36:#d9ddda;--tone-2b303a:#d9ddda;--tone-30353f:#d9ddda;--tone-34d399:#047857;--tone-3f4652:#626970;--tone-485162:#626970;--tone-60a5fa:#1d46a0;--tone-626975:#626970;--tone-6ee7b7:#047857;--tone-7f8793:#626970;--tone-9298a3:#41484f;--tone-93c5fd:#1d46a0;--tone-94a3b8:#41484f;--tone-a5acb8:#41484f;--tone-c7ccd5:#41484f;--tone-d4d8e0:#202326;--tone-d5d9e0:#202326;--tone-d9dee7:#202326;--tone-dfe3e9:#202326;--tone-dfe4eb:#202326;--tone-e2e5e9:#202326;--tone-e5e9ef:#202326;--tone-e8ecf2:#202326;--tone-edf0f5:#202326;--tone-f5f7fa:#202326;--tone-f7f9fc:#202326;--tone-f87171:#b91c1c;--tone-f8fafc:#202326;--tone-fbbf24:#92400e;--tone-fca5a5:#b91c1c;
 }
 
-:root[data-theme="light"] .public-site { --public-accent-primary:#2563eb; --public-accent-hover:#1d4ed8; --public-accent-active:#1e40af; --public-accent-text:#1d4ed8; --surface:#fff; --border-default:#cbd5e1; --border-hover:rgba(23,32,51,.25); }
+:root[data-theme="light"] .public-site { --public-accent-primary:#2457c5; --public-accent-hover:#1d46a0; --public-accent-active:#183c89; --public-accent-text:#1d46a0; --surface:#fff; --border-default:#d9ddda; --border-hover:rgba(32,35,38,.25); }
 .theme-toggle { display:inline-flex; flex-shrink:0; min-height:44px; align-items:center; justify-content:center; gap:7px; padding:8px 11px; border:1px solid var(--border-primary); border-radius:10px; background:var(--surface-primary); color:var(--text-primary); font-size:12px; font-weight:600; cursor:pointer; }
 .theme-toggle:hover { border-color:var(--accent-primary); }
 .admin-login-theme { position:fixed; top:12px; right:12px; z-index:60; }
@@ -83,4 +83,17 @@ body:has([aria-label="Admin navigation"]) .admin-login-theme { display:none; }
 @media(max-width:380px) { .theme-toggle span { display:none; } }
 /* A visible border in either theme, while video controls keep their dark cinema surface. */
 :root[data-theme="light"] :is(.public-site,[data-admin-surface]) [class*="border-white"]:not(.video-dialog *) { border-color:var(--border-soft); }
-:root[data-theme="light"] .public-site::after { opacity:.012; }
+:root[data-theme="light"] .public-site::after { display:none; }
+
+/* Light surfaces use quiet elevation and natural image colors. */
+:root { --media-shadow:0 22px 70px rgba(0,0,0,.2); --media-shadow-hover:0 28px 90px rgba(0,0,0,.34); --contact-scrim:rgba(0,0,0,.88); --contact-shadow:0 28px 90px rgba(0,0,0,.82); --cursor-color:rgba(245,244,242,.9); }
+:root[data-theme="light"] { --accent-soft:rgba(36,87,197,.06); --accent-glow:transparent; --media-shadow:0 3px 14px rgba(32,35,38,.06); --media-shadow-hover:0 8px 24px rgba(32,35,38,.1); --contact-scrim:rgba(32,35,38,.35); --contact-shadow:0 20px 60px rgba(32,35,38,.16); --cursor-color:#202326; }
+:root[data-theme="light"] .public-site { --public-accent-subtle:rgba(36,87,197,.06); --public-accent-border:rgba(36,87,197,.24); --public-focus-ring:#2457c5; --public-accent-glow:transparent; --public-accent-gradient:linear-gradient(135deg,#2457c5,#1d46a0); }
+:root[data-theme="light"] .work-visual img,
+:root[data-theme="light"] .work-visual [role="img"] { filter:none; }
+
+:root[data-theme="light"] .contact-popup-backdrop > [aria-hidden="true"],
+:root[data-theme="light"] .contact-popup-hero > img,
+:root[data-theme="light"] .contact-popup-hero > [aria-hidden="true"] { display:none; }
+:root[data-theme="light"] .contact-popup-hero { min-height:0; background:var(--background-primary); }
+:root[data-theme="light"] .contact-popup-hero > div:last-child { position:relative; padding:64px 28px 20px; }

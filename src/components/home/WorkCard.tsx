@@ -45,7 +45,7 @@ export function WorkCard({
   const projectHref = `/portfolio/${project.slug}`;
 
   const visual = (
-    <div className="relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--background-secondary)] shadow-[0_24px_80px_rgba(0,0,0,0.24)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_30px_100px_rgba(0,0,0,0.42)]">
+    <div className="relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--background-secondary)] shadow-[var(--media-shadow)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[var(--media-shadow-hover)]">
       {visualUrl ? (
         <InteractiveWorkVisual
           title={project.title}

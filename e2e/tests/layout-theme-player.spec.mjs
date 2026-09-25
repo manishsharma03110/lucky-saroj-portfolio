@@ -37,7 +37,7 @@ test("theme persists across all public pages, reload and CMS login", async ({pag
     await page.goto(path);
     await expect(page.locator("html")).toHaveAttribute("data-theme","light");
     const colors=await page.locator("body").evaluate(el=>({bg:getComputedStyle(el).backgroundColor,text:getComputedStyle(el).color}));
-    expect(colors.bg).toBe("rgb(248, 250, 252)"); expect(colors.text).toBe("rgb(23, 32, 51)");
+    expect(colors.bg).toBe("rgb(250, 250, 249)"); expect(colors.text).toBe("rgb(32, 35, 38)");
     await expect(toggle(page)).toHaveAttribute("aria-pressed","true");
   }
   await login(page);

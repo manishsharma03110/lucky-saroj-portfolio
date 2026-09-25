@@ -82,3 +82,5 @@
     transition: none;
   }
 }
+
+:global([data-theme="light"]) .boundary::after { display:none; }
