@@ -1,29 +1,29 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { Moon, Sun } from "lucide-react";
 
 type Theme = "dark" | "light";
 const ThemeContext = createContext<{ theme: Theme; toggle: () => void } | null>(null);
 
+function snapshot(): Theme { return document.documentElement.dataset.theme === "light" ? "light" : "dark"; }
+function subscribe(notify: () => void) {
+  const sync = (event: StorageEvent) => {
+    if (event.key !== "portfolio-theme" && event.key !== null) return;
+    document.documentElement.dataset.theme = event.newValue === "light" ? "light" : "dark";
+    notify();
+  };
+  window.addEventListener("storage", sync);
+  window.addEventListener("portfolio-theme-change", notify);
+  return () => { window.removeEventListener("storage", sync); window.removeEventListener("portfolio-theme-change", notify); };
+}
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
-  useEffect(() => {
-    setTheme(document.documentElement.dataset.theme === "light" ? "light" : "dark");
-    const sync = (event: StorageEvent) => {
-      if (event.key !== "portfolio-theme" && event.key !== null) return;
-      const next = event.newValue === "light" ? "light" : "dark";
-      document.documentElement.dataset.theme = next;
-      setTheme(next);
-    };
-    window.addEventListener("storage", sync);
-    return () => window.removeEventListener("storage", sync);
-  }, []);
+  const theme = useSyncExternalStore(subscribe, snapshot, (): Theme => "dark");
   const toggle = () => {
-    const next = theme === "dark" ? "light" : "dark";
+    const next = snapshot() === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
-    setTheme(next);
-    try { localStorage.setItem("portfolio-theme", next); } catch { /* Theme still works when storage is unavailable. */ }
+    try { localStorage.setItem("portfolio-theme", next); } catch { /* In-memory switching remains available. */ }
+    window.dispatchEvent(new Event("portfolio-theme-change"));
   };
   return <ThemeContext.Provider value={{ theme, toggle }}>{children}</ThemeContext.Provider>;
 }

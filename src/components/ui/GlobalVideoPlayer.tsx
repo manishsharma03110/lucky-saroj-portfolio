@@ -56,9 +56,10 @@ function DirectVideo({
   const [duration, setDuration] = useState(0);
   const [buffering, setBuffering] = useState(true);
 
-  const [controlsVisible, setControlsVisible] = useState(true);
+  const [recentActivity, setControlsVisible] = useState(true);
   const [interacting, setInteracting] = useState(false);
   const [keyboardFocus, setKeyboardFocus] = useState(false);
+  const controlsVisible = recentActivity || paused || buffering || interacting || keyboardFocus;
   const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const revealControls = useCallback(() => {
     if (hideTimer.current) clearTimeout(hideTimer.current);
@@ -68,9 +69,18 @@ function DirectVideo({
     }
   }, [paused, buffering, interacting, keyboardFocus]);
   useEffect(() => {
-    revealControls();
+    if (!paused && !buffering && !interacting && !keyboardFocus) {
+      hideTimer.current = setTimeout(() => setControlsVisible(false), 2500);
+    }
     return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
-  }, [revealControls]);
+  }, [paused, buffering, interacting, keyboardFocus]);
+  useEffect(() => {
+    if (!interacting) return;
+    const end = () => setInteracting(false);
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
+    return () => { window.removeEventListener("pointerup", end); window.removeEventListener("pointercancel", end); };
+  }, [interacting]);
 
   const togglePlayback = useCallback(async () => {
     const video = videoRef.current;
