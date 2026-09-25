@@ -209,13 +209,13 @@ export function FileUpload({
       <input type="hidden" name={assetIdName} value={assetId} />
 
       {requiredAspectRatio && kind === "image" && (
-        <p className="mb-3 mt-1 text-xs text-[var(--text-readable, var(--text-muted))]">
+        <p className="mb-3 mt-1 text-xs text-[var(--text-readable,var(--text-muted))]">
           Required: {requiredAspectRatio.label} aspect ratio. Recommended {requiredAspectRatio.recommended ?? (requiredAspectRatio.width > requiredAspectRatio.height ? "1920×1080 px" : "1080×1920 px")}. Other ratios are blocked before upload. Uploaded images are compressed automatically.
         </p>
       )}
 
       {kind === "video" && (
-        <p className="mb-3 mt-1 text-xs text-[var(--text-readable, var(--text-muted))]">
+        <p className="mb-3 mt-1 text-xs text-[var(--text-readable,var(--text-muted))]">
           Upload a compressed MP4/WebM up to {MAX_VIDEO_UPLOAD_MB} MB. Existing external videos remain available under Advanced / Legacy.
         </p>
       )}
@@ -233,7 +233,7 @@ export function FileUpload({
               <div className="min-w-0 w-full max-w-full">
                 <Link2 className="mx-auto mb-2 text-[var(--accent-primary)]" size={24} />
                 <p className="text-sm font-semibold text-[var(--text-primary)]">{providerLabel(url)}</p>
-                <p className="mt-1 truncate text-xs text-[var(--text-readable, var(--text-muted))]" title={url}>{url}</p>
+                <p className="mt-1 truncate text-xs text-[var(--text-readable,var(--text-muted))]" title={url}>{url}</p>
               </div>
             </div>
           )}
@@ -293,7 +293,7 @@ export function FileUpload({
       {kind === "video" && (
         <details className="min-w-0 max-w-full mt-4 rounded-md border border-white/10 p-3">
           <summary className="cursor-pointer text-sm font-medium">Advanced / Legacy video URL</summary>
-          {url && !assetId && <p className="my-2 text-xs text-[var(--text-readable, var(--text-muted))]">Saved source: {providerLabel(url)}. It stays unchanged unless you replace it.</p>}
+          {url && !assetId && <p className="my-2 text-xs text-[var(--text-readable,var(--text-muted))]">Saved source: {providerLabel(url)}. It stays unchanged unless you replace it.</p>}
           <Label htmlFor={externalVideoInputId}>Or paste any video URL</Label>
           <Input
             id={externalVideoInputId}
@@ -308,7 +308,7 @@ export function FileUpload({
               setError(null);
             }}
           />
-          <p className="mt-1 text-xs text-[var(--text-readable, var(--text-muted))]">
+          <p className="mt-1 text-xs text-[var(--text-readable,var(--text-muted))]">
             CMS accepts any valid http(s) URL. Known providers open inside the portfolio player when supported; other sites are saved safely and get an external-source fallback instead of blocking project save.
           </p>
         </details>

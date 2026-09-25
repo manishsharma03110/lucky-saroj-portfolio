@@ -100,7 +100,7 @@ export function WorkCard({
             {project.title}
           </h3>
         </div>
-        {metadata && <p className="text-sm text-[var(--text-readable, var(--text-muted))] md:text-right">{metadata}</p>}
+        {metadata && <p className="text-sm text-[var(--text-readable,var(--text-muted))] md:text-right">{metadata}</p>}
       </Link>
     </article>
   );

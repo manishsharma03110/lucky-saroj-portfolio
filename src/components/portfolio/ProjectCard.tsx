@@ -100,7 +100,7 @@ function ProjectDetailsLink({ project, metadata, copy, featured }: { project: Pr
         <h2 className={featured ? "mt-4 break-words font-display text-[clamp(2.25rem,3.6vw,3.5rem)] font-semibold leading-none tracking-[-0.045em] text-[var(--text-primary)]" : "break-words font-display text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)] sm:text-3xl"}>
           {project.title}
         </h2>
-        {metadata && <p className={`${featured ? "mt-4" : "mt-2"} break-words text-sm text-[var(--text-readable, var(--text-muted))]`}>{metadata}</p>}
+        {metadata && <p className={`${featured ? "mt-4" : "mt-2"} break-words text-sm text-[var(--text-readable,var(--text-muted))]`}>{metadata}</p>}
         {featured && project.description && <p className="mt-6 line-clamp-4 text-base leading-7 text-[var(--text-secondary)]">{project.description}</p>}
         {featured && <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)] transition-colors group-hover:text-[var(--accent-hover)]">{copy.viewLabel} <ArrowUpRight size={17} aria-hidden /></span>}
       </div>

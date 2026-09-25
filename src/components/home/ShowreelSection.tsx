@@ -15,7 +15,7 @@ export function ShowreelSection({ showreel, content }: { showreel: Awaited<Retur
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{content.showreelEyebrow}</p>
             <h2 className="max-w-4xl font-display text-[clamp(2.25rem,4.5vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.045em] text-[var(--text-primary)]">{showreel.title}</h2>
           </div>
-          {showreel.duration && <p className="max-w-md text-sm uppercase tracking-[0.16em] text-[var(--text-readable, var(--text-muted))]">{content.showreelRuntimeLabel} · {showreel.duration}</p>}
+          {showreel.duration && <p className="max-w-md text-sm uppercase tracking-[0.16em] text-[var(--text-readable,var(--text-muted))]">{content.showreelRuntimeLabel} · {showreel.duration}</p>}
         </div>
 
         <VideoLaunchSurface
