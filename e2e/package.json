@@ -5,6 +5,7 @@
     "test": "playwright test"
   },
   "devDependencies": {
-    "playwright": "1.62.1"
+    "playwright": "1.62.1",
+    "@axe-core/playwright": "4.10.2"
   }
 }

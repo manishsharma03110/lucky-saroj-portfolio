@@ -19,7 +19,7 @@ jobs:
   quality:
     name: Lint and Build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     services:
       postgres:
         image: postgres:18
@@ -60,7 +60,7 @@ jobs:
         run: npm run lint
 
       - name: Account validation and policy tests
-        run: npx tsx --test src/lib/auth/account-validation.test.ts src/lib/page-content-extra.test.ts src/lib/auth/upload-initiation.runtime.test.ts src/lib/media/upload-policy.test.ts
+        run: npx tsx --test src/lib/auth/authorization-security.runtime.test.ts src/lib/auth/cron-authorization.test.ts src/lib/auth/account-validation.test.ts src/lib/page-content-extra.test.ts src/lib/auth/upload-initiation.runtime.test.ts src/lib/media/upload-policy.test.ts
 
       - name: Replay SQL migrations
         run: npm run ci:migrate
@@ -82,8 +82,8 @@ jobs:
       - name: Install fixture generator
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Install Chromium
-        run: cd e2e && npx playwright install --with-deps chromium
+      - name: Install browser engines
+        run: cd e2e && npx playwright install --with-deps chromium firefox webkit
 
       - name: Prepare disposable browser database
         run: |
@@ -107,3 +107,4 @@ jobs:
             e2e/playwright-report
             e2e/test-results
           if-no-files-found: ignore
+

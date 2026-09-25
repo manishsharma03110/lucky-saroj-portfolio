@@ -1,3 +1,4 @@
+import { isAuthorizedCron } from "@/lib/auth/cron-authorization";
 import { del, list } from "@vercel/blob";
 import { NextResponse } from "next/server";
 import { getPortfolioMediaBlobToken } from "@/app/api/upload/blob-token";
@@ -6,7 +7,7 @@ export const runtime = "nodejs";
 const RETENTION_MS = 60 * 24 * 60 * 60 * 1000;
 
 export async function GET(request: Request) {
-  if (request.headers.get("user-agent") !== "vercel-cron/1.0") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!isAuthorizedCron(request.headers.get("authorization"), process.env.CRON_SECRET)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const token = getPortfolioMediaBlobToken();
   const cutoff = Date.now() - RETENTION_MS;
   let cursor: string | undefined;
@@ -19,3 +20,4 @@ export async function GET(request: Request) {
   } while (cursor);
   return NextResponse.json({ deleted, retentionDays: 60 });
 }
+
