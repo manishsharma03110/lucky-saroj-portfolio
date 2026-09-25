@@ -48,7 +48,7 @@ function ProjectVisual({
   const featured = layout === "featured";
 
   const visual = (
-    <div className={`relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[0_22px_70px_rgba(0,0,0,0.2)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[0_28px_90px_rgba(0,0,0,0.34)] ${featured ? "" : "bg-[var(--background-secondary)]"}`}>
+    <div className={`relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[var(--media-shadow)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[var(--media-shadow-hover)] ${featured ? "" : "bg-[var(--background-secondary)]"}`}>
       {visualUrl ? (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]"

@@ -58,3 +58,7 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal,.revealVisible,.heroContent > *,.scrollCue { opacity:1; transform:none; animation:none; transition:none; }
 }
+
+:global([data-theme="light"]) .glassHeader { background:rgba(250,250,249,.97); backdrop-filter:none; -webkit-backdrop-filter:none; }
+:global([data-theme="light"]) .glassHeaderScrolled { border-color:var(--border-primary); box-shadow:0 2px 12px rgba(32,35,38,.04); }
+:global([data-theme="light"]) .logoLink:hover .logoMark { transform:none; box-shadow:none; }

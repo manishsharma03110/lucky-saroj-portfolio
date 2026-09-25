@@ -609,3 +609,8 @@
     transform: none;
   }
 }
+
+:global([data-theme="light"]) .shell { background:var(--background-primary); }
+:global([data-theme="light"]) .desktopSidebar { background:var(--surface-primary); box-shadow:1px 0 0 var(--border-soft); backdrop-filter:none; }
+:global([data-theme="light"]) .statCard,
+:global([data-theme="light"]) .panel { background:var(--surface-primary); box-shadow:0 2px 8px rgba(32,35,38,.03); border-color:var(--border-primary); }

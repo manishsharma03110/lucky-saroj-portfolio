@@ -24,3 +24,9 @@
 @keyframes enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 480px) { .page { padding-block: 32px; } .card { padding: 30px 24px; } .input { font-size: 16px; } .security { font-size: 10px; } }
 @media (prefers-reduced-motion: reduce) { .card { animation: none; } .input, .submit { transition: none; } .submit:hover:not(:disabled) { transform: none; } }
+
+:global([data-theme="light"]) .page { background:var(--background-primary); }
+:global([data-theme="light"]) .card { background:var(--surface-primary); border-color:var(--border-primary); box-shadow:0 12px 40px rgba(32,35,38,.07); backdrop-filter:none; }
+:global([data-theme="light"]) .brand { background:var(--accent-soft); border-color:var(--border-primary); box-shadow:none; color:var(--accent-primary); }
+:global([data-theme="light"]) .submit { background:var(--accent-primary); box-shadow:none; }
+:global([data-theme="light"]) .submit:hover:not(:disabled) { background:var(--accent-hover); filter:none; box-shadow:none; }
