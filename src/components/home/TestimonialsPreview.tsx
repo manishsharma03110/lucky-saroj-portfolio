@@ -59,7 +59,7 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
               </Link>
             </header>
 
-            <article className="relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] px-6 pb-7 pt-9 shadow-[0_24px_80px_rgba(0,0,0,0.2)] sm:px-9 sm:pb-9 sm:pt-11 lg:min-h-[340px] lg:px-11">
+            <article className="relative overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] px-6 pb-7 pt-9 shadow-[var(--media-shadow)] sm:px-9 sm:pb-9 sm:pt-11 lg:min-h-[340px] lg:px-11">
               <span className="absolute left-0 top-0 h-1 w-28 bg-[var(--accent-primary)]" aria-hidden />
               <span className="absolute bottom-5 right-5 h-7 w-7 border-b border-r border-white/15" aria-hidden />
 

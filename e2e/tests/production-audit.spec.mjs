@@ -61,40 +61,46 @@ test("security boundaries, crawl endpoints and missing page", async ({request,pa
 
 test("WCAG automated audit across public pages in both themes", async ({page},info) => {
   test.skip(info.project.name !== "desktop", "One complete axe audit; other engines run behavior checks.");
-  test.setTimeout(180000);
+  test.setTimeout(240000);
+  await page.emulateMedia({reducedMotion:"reduce"});
   const findings=[];
   for(const theme of ["dark","light"]) {
     for(const path of routes) {
       await page.goto(path);
       if(await page.locator('html').getAttribute('data-theme') !== theme) await page.getByRole('button',{name:'Light mode',exact:true}).filter({visible:true}).first().click();
+      await page.waitForTimeout(700); // Let theme colors settle before measuring contrast.
       const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
       findings.push({path,theme,violations:result.violations.map(v=>({id:v.id,impact:v.impact,description:v.description,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))});
     }
   }
   await info.attach('accessibility-audit',{body:JSON.stringify(findings,null,2),contentType:'application/json'});
   console.log('ACCESSIBILITY_AUDIT',JSON.stringify(findings));
-  expect(findings.flatMap(f=>f.violations.filter(v=>v.impact==='critical'))).toEqual([]);
+  expect(findings.flatMap(f=>f.violations.filter(v=>['critical','serious'].includes(v.impact)))).toEqual([]);
 });
 
 test("CMS route inventory and accessible forms", async ({page},info) => {
   test.skip(info.project.name!=="desktop", "CMS inventory is tested once; critical mutations run in desktop and mobile.");
-  test.setTimeout(180000);
+  test.setTimeout(240000);
+  await page.emulateMedia({reducedMotion:"reduce"});
   await page.goto('/admin/login');
   await page.getByLabel('Email or Username').fill(process.env.E2E_ADMIN_EMAIL);
   await page.getByLabel('Password',{exact:true}).fill(process.env.E2E_ADMIN_PASSWORD);
   await page.getByRole('button',{name:'Sign in',exact:true}).click();
   await expect(page).toHaveURL(/\/admin\/(?!login)/);
   const rows=[];
+  for(const theme of ["dark","light"]) {
   for(const path of ['dashboard','home','about','portfolio','portfolio/new','services','experience','contact','testimonials','categories','pages','showreel','navigation','messages','account','users','security','settings','maintenance','activity','seo']) {
     const response=await page.goto('/admin/'+path);
+    if(await page.locator("html").getAttribute("data-theme")!==theme) await page.getByRole("button",{name:"Light mode",exact:true}).filter({visible:true}).first().click();
     expect(response.status()).toBe(200);
     await expect(page.locator('h1').first()).toBeVisible();
     const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();
-    rows.push({path,finalPath:new URL(page.url()).pathname,violations:result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))});
+    rows.push({path,theme,finalPath:new URL(page.url()).pathname,violations:result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>({target:n.target,summary:n.failureSummary}))}))});
+  }
   }
   await info.attach('cms-audit',{body:JSON.stringify(rows,null,2),contentType:'application/json'});
   console.log('CMS_AUDIT',JSON.stringify(rows));
-  expect(rows.flatMap(r=>r.violations.filter(v=>v.impact==='critical'))).toEqual([]);
+  expect(rows.flatMap(r=>r.violations.filter(v=>['critical','serious'].includes(v.impact)))).toEqual([]);
 });
 
 test("homepage performance diagnostics on production build",async({page},info)=>{

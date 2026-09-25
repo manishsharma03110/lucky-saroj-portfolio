@@ -41,7 +41,7 @@ export function ContactOptionsEditor({ name, defaultValue }: { name: string; def
             <div className="mb-3 flex items-start justify-between gap-4">
               <div>
                 <h4 className="text-sm font-semibold text-[#f5f7fa]">{group.title}</h4>
-                <p className="mt-1 text-xs text-[#626975]">{group.description}</p>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">{group.description}</p>
               </div>
               <button
                 type="button"
@@ -88,3 +88,4 @@ export function ContactOptionsEditor({ name, defaultValue }: { name: string; def
     </div>
   );
 }
+

@@ -26,6 +26,8 @@ Release candidate: PR #97. This report distinguishes source inspection, isolated
 | S03 | Attachment URL validation | Medium / P1 | A foreign URL containing `blob.vercel-storage.com/contact-attachments/` passed substring validation. | Parse URL; require HTTPS, actual public Blob hostname, attachment path, no credentials or custom port. | Host/path spoof regression tests. |
 | A01 | Testimonials motion | Low / P2 | One extra testimonial repeated continuously in marquee without keyboard pause. | Render additional testimonials once in wrapping layout; preserve original text. | Source reviewed and public page regression. |
 | SEO01 | Project titles | Low / P2 | Eight published project titles repeated Lucky Saroj via metadata template. | Use absolute project title when CMS title already contains brand. | Reproduced on live project detail pages; follow-up live titles required after release. |
+| A02 | Primary buttons | Medium / P1 | White 14px button labels on #3B82F6 have insufficient normal-text contrast. | Use #2563EB with darker hover/pressed states for solid buttons in both themes. | Automated contrast audit and preview review. |
+| P01 | Server queries | Low / P2 | Metadata and page render repeat project/settings reads. | Request-scoped React cache shares results within a render, without cross-request stale CMS data. | Build and public/detail regressions; field impact not benchmarked. |
 | OPS01 | Test environment | Informational / P2 | Production-start test server rejected insecure local PostgreSQL connection. | CI creates a one-day local TLS certificate and trusts its CA; production TLS rule preserved. | CI rerun. |
 
 ## Public pages
