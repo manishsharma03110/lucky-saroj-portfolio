@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import { useMotionPreference } from "@/components/ui/useMotionPreference";
+import { DepthSurface } from "@/components/ui/DepthSurface";
 import { Play } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { canUseOptimizedImage } from "@/lib/media/image-source";
@@ -22,20 +24,13 @@ export function InteractiveWorkVisual({
   orientation?: VideoOrientation;
   autoPreview?: boolean;
 }) {
-  const surfaceRef = useRef<HTMLDivElement>(null);
-  const [motionAllowed, setMotionAllowed] = useState(false);
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: no-preference) and (pointer: fine)");
-    const update = () => { setMotionAllowed(query.matches); if (!query.matches && surfaceRef.current) surfaceRef.current.style.transform = ""; };
-    update(); query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, []);
+  const motionAllowed = useMotionPreference();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hovered, setHovered] = useState(false);
   const source = useMemo(() => getVideoSource(videoUrl), [videoUrl]);
   const directVideo = source?.provider === "direct";
   const optimizedVisual = canUseOptimizedImage(visualUrl);
-  const previewVisible = autoPreview || (motionAllowed && hovered);
+  const previewVisible = motionAllowed && (autoPreview || hovered);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -50,7 +45,7 @@ export function InteractiveWorkVisual({
   }, [directVideo, previewVisible]);
 
   const providerPreviewUrl = useMemo(() => {
-    if (!autoPreview || !source || source.provider === "direct") return null;
+    if (!previewVisible || !source || source.provider === "direct") return null;
     if (source.provider === "youtube") {
       return `${source.embedUrl}&autoplay=1&mute=1&controls=0&modestbranding=1&iv_load_policy=3&disablekb=1`;
     }
@@ -58,20 +53,13 @@ export function InteractiveWorkVisual({
       return `${source.embedUrl}${source.embedUrl.includes("?") ? "&" : "?"}autoplay=1`;
     }
     return null;
-  }, [autoPreview, source]);
+  }, [previewVisible, source]);
 
   return (
+    <DepthSurface className="h-full w-full">
     <div
-      ref={surfaceRef}
-      onPointerMove={(event) => {
-        if (!motionAllowed || !surfaceRef.current) return;
-        const box = event.currentTarget.getBoundingClientRect();
-        const x = (event.clientX - box.left) / box.width - 0.5;
-        const y = (event.clientY - box.top) / box.height - 0.5;
-        surfaceRef.current.style.transform = `perspective(1000px) rotateX(${-y * 3}deg) rotateY(${x * 3}deg)`;
-      }}
       onPointerEnter={() => setHovered(true)}
-      onPointerLeave={() => { setHovered(false); if (surfaceRef.current) surfaceRef.current.style.transform = ""; }}
+      onPointerLeave={() => setHovered(false)}
       className="work-visual relative h-full w-full overflow-hidden bg-[var(--surface-primary)]"
     >
       {visualUrl ? (
@@ -102,7 +90,7 @@ export function InteractiveWorkVisual({
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="none"
           aria-label={`${title} preview`}
           className={`pointer-events-none absolute inset-0 z-10 h-full w-full object-cover object-center transition-opacity duration-400 ${previewVisible ? "opacity-100" : "opacity-0"}`}
         />
@@ -122,16 +110,17 @@ export function InteractiveWorkVisual({
       <div className="pointer-events-none absolute inset-0 z-[15] bg-gradient-to-t from-black/30 via-transparent to-black/10" aria-hidden />
 
       {categoryName && (
-        <span className="pointer-events-none absolute left-4 top-4 z-20 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[var(--accent-hover)] backdrop-blur-md sm:left-5 sm:top-5">
+        <span className="pointer-events-none absolute left-4 top-4 z-20 rounded-full border border-white/15 bg-black/55 px-3 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-blue-200 backdrop-blur-md sm:left-5 sm:top-5">
           {categoryName}
         </span>
       )}
 
       {videoUrl && (
-        <span className="pointer-events-none absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-primary)]/55 bg-black/70 text-[var(--accent-hover)] shadow-[0_8px_30px_rgba(0,0,0,.4)] backdrop-blur-md sm:right-5 sm:top-5" aria-hidden="true">
+        <span className="pointer-events-none absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-primary)]/55 bg-black/70 text-blue-200 shadow-[0_8px_30px_rgba(0,0,0,.4)] backdrop-blur-md sm:right-5 sm:top-5" aria-hidden="true">
           <Play size={14} fill="currentColor" />
         </span>
       )}
     </div>
+    </DepthSurface>
   );
 }

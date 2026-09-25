@@ -10,9 +10,9 @@ export function PageMotionBoundary({ children, className = "" }: { children: Rea
     const items = Array.from(root.querySelectorAll<HTMLElement>(":scope > section, :scope > aside")); if (!items.length) return;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reducedMotion || !("IntersectionObserver" in window)) { items.forEach((item) => item.setAttribute("data-motion-visible", "true")); return; }
-    items.forEach((item, index) => { item.dataset.motionIndex = String(index % 4); });
+    items.forEach((item, index) => { item.dataset.motionIndex = String(index % 4); if (item.getBoundingClientRect().top > window.innerHeight) item.dataset.motionPending = "true"; });
     const observer = new IntersectionObserver((entries) => { entries.forEach((entry) => { if (!entry.isIntersecting) return; (entry.target as HTMLElement).setAttribute("data-motion-visible", "true"); observer.unobserve(entry.target); }); }, { threshold: 0.08, rootMargin: "0px 0px -7% 0px" });
-    items.forEach((item) => observer.observe(item)); return () => observer.disconnect();
+    items.forEach((item) => observer.observe(item)); return () => { observer.disconnect(); items.forEach((item) => { delete item.dataset.motionPending; }); };
   }, []);
   return <div ref={ref} className={`${styles.boundary} ${className}`}>{children}</div>;
 }

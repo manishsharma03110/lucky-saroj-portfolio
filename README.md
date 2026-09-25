@@ -72,3 +72,14 @@ See [database migrations](docs/database-migrations.md) and [PR audit](docs/pr-au
 CMS metadata includes page/project titles and descriptions, H1/H2 overrides, canonical/social metadata, JSON-LD, Google verification and optional Analytics. Contact inquiries are stored in the CMS inbox.
 
 Project banners accept portrait, landscape and square images without required dimensions/aspect ratio. Video orientation defaults to Auto; neither it nor banner dimensions need manual entry. See [video workflow](docs/video-workflow.md).
+
+
+### Motion and release QA (PR #96)
+
+Public content renders visibly before JavaScript. Scroll reveals progressively enhance offscreen sections; portrait/landscape banners retain a single centered cover layer. Project images use a small requestAnimationFrame-driven 3D tilt on mouse devices only. Reduced-motion and touch users get a static surface. The selected-work carousel has a persistent pause control, pauses when offscreen, and suppresses automatic video previews for reduced motion. Contact opens only from its explicit floating button; Escape closes it and restores focus.
+
+Admin login throttling uses the shared `admin_login_attempts` PostgreSQL table (migration `0024_shared_login_throttle.sql`), not per-worker memory: five attempts per address/identifier pair and fifty per address per 15-minute window. Successful login clears the pair bucket, not the address budget. Only SHA-256 keys are persisted, expired rows are cleaned in bounded batches, and database failures fail closed. Vercel's trusted forwarded-IP header is used in deployment.
+
+Before deploying this auth change, create a Neon backup branch, replay migration 0024 on a verification branch, then apply the additive migration to the production database. The old app remains compatible with the new table. If application validation fails, restore the previous Vercel deployment; retain the additive table to avoid deleting data.
+
+CI covers desktop/mobile-emulated public and CMS workflows, motion preferences, keyboard contact controls, first-click navigation, no-JavaScript visibility, uploads, banner orientation, long URLs, player controls, and isolated-database throttle concurrency/expiry. Physical-device QA is outside this release's requested scope.

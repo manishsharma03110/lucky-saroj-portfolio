@@ -410,3 +410,11 @@ export const projectToolsRelations = relations(projectTools, ({ one }) => ({ pro
 export const aboutProfileRelations = relations(aboutProfile, ({ many }) => ({ skills: many(aboutSkills), tools: many(aboutTools) }));
 export const aboutSkillsRelations = relations(aboutSkills, ({ one }) => ({ profile: one(aboutProfile, { fields: [aboutSkills.profileId], references: [aboutProfile.id] }) }));
 export const aboutToolsRelations = relations(aboutTools, ({ one }) => ({ profile: one(aboutProfile, { fields: [aboutTools.profileId], references: [aboutProfile.id] }) }));
+export const adminLoginAttempts = pgTable("admin_login_attempts", {
+  keyHash: text("key_hash").primaryKey(),
+  attempts: integer("attempts").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+}, (table) => [
+  check("admin_login_attempts_attempts_check", sql`${table.attempts} > 0`),
+  index("admin_login_attempts_expiry_idx").on(table.expiresAt),
+]);
