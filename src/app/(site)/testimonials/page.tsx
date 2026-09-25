@@ -36,7 +36,7 @@ export default async function TestimonialsPage() {
                 <blockquote className="mt-6 max-w-[42ch] text-xl font-medium leading-[1.55] tracking-[-0.025em] text-[var(--text-primary)] sm:text-2xl">&ldquo;{testimonial.testimonialText}&rdquo;</blockquote>
                 <div className="mt-8 flex items-center gap-4 border-t border-white/10 pt-5">
                   {testimonial.profileImageUrl && <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-white/10 bg-[var(--surface-elevated)]"><Image src={testimonial.profileImageUrl} alt={`${testimonial.clientName} profile`} fill sizes="44px" className="object-cover" /></span>}
-                  <div><p className="font-semibold text-[var(--text-primary)]">{testimonial.clientName}</p><p className="mt-1 text-sm text-[var(--text-muted)]">{[testimonial.designation, testimonial.company].filter(Boolean).join(" · ")}</p></div>
+                  <div><p className="font-semibold text-[var(--text-primary)]">{testimonial.clientName}</p><p className="mt-1 text-sm text-[var(--text-readable,var(--text-muted))]">{[testimonial.designation, testimonial.company].filter(Boolean).join(" · ")}</p></div>
                 </div>
               </article>
             ))}

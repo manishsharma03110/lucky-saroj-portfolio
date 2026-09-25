@@ -100,7 +100,7 @@ export default async function PortfolioPage({ searchParams }: { searchParams: Pr
                         {seo.pageH2 || copy.collectionHeading}
                       </h2>
                     </div>
-                    <p className="hidden text-sm text-[var(--text-muted)] sm:block">
+                    <p className="hidden text-sm text-[var(--text-readable,var(--text-muted))] sm:block">
                       {collection.length} {collection.length === 1 ? copy.collectionProjectSingular : copy.collectionProjectPlural}
                     </p>
                   </div>
@@ -124,7 +124,7 @@ export default async function PortfolioPage({ searchParams }: { searchParams: Pr
                 <aside className="mt-16 border-y border-white/10 bg-[var(--surface-primary)] px-6 py-9 sm:mt-20 sm:px-8 sm:py-11 lg:mt-24 lg:grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)_auto] lg:items-end lg:gap-12 lg:px-10">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{copy.caseStudyEyebrow}</p>
-                    <p className="mt-3 text-sm text-[var(--text-muted)]">
+                    <p className="mt-3 text-sm text-[var(--text-readable,var(--text-muted))]">
                       {[featured.category?.name, featured.project.clientName, featured.project.year].filter(Boolean).join(" · ")}
                     </p>
                   </div>

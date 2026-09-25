@@ -93,7 +93,7 @@ export function ExperienceHero(props: ExperienceHeroProps) {
                 <div className="flex min-w-0 items-center gap-3 bg-[var(--surface-primary)] px-4 py-4 sm:px-5">
                   <Briefcase size={18} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden />
                   <div className="min-w-0">
-                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{currentRoleLabel}</p>
+                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-readable,var(--text-muted))]">{currentRoleLabel}</p>
                     <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-[var(--text-primary)]">{current?.role ?? "—"}</p>
                   </div>
                 </div>
@@ -101,7 +101,7 @@ export function ExperienceHero(props: ExperienceHeroProps) {
                 <div className="flex min-w-0 items-center gap-3 bg-[var(--surface-primary)] px-4 py-4 sm:px-5">
                   <MapPin size={18} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden />
                   <div className="min-w-0">
-                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{locationLabel}</p>
+                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-readable,var(--text-muted))]">{locationLabel}</p>
                     <p className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-[var(--text-primary)]">{current?.location ?? "—"}</p>
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export function ExperienceHero(props: ExperienceHeroProps) {
                 <div className="flex min-w-0 items-center gap-3 bg-[var(--surface-primary)] px-4 py-4 sm:px-5">
                   <CalendarDays size={18} className="shrink-0 text-[var(--accent-primary)]" strokeWidth={1.6} aria-hidden />
                   <div className="min-w-0">
-                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-muted)]">{entriesLabel}</p>
+                    <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-[var(--text-readable,var(--text-muted))]">{entriesLabel}</p>
                     <p className="mt-1 text-sm font-medium text-[var(--text-primary)]">{experiences.length}</p>
                   </div>
                 </div>
@@ -119,7 +119,7 @@ export function ExperienceHero(props: ExperienceHeroProps) {
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-7 sm:mt-12 sm:pt-8 lg:mt-14">
-          <div className="flex items-center justify-between gap-4 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)] sm:text-xs">
+          <div className="flex items-center justify-between gap-4 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-readable,var(--text-muted))] sm:text-xs">
             <span>{firstStart}</span>
             <span className="text-center text-[var(--accent-primary)]">Career timeline</span>
             <span>{currentEnd}</span>

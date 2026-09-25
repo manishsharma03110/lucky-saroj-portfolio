@@ -41,7 +41,7 @@ export function ContactOptionsEditor({ name, defaultValue }: { name: string; def
             <div className="mb-3 flex items-start justify-between gap-4">
               <div>
                 <h4 className="text-sm font-semibold text-[var(--text-primary)]">{group.title}</h4>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">{group.description}</p>
+                <p className="mt-1 text-xs text-[var(--text-readable,var(--text-muted))]">{group.description}</p>
               </div>
               <button
                 type="button"

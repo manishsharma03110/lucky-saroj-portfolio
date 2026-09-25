@@ -64,7 +64,7 @@ export function CountUpStat({
 
   return (
     <div ref={rootRef} className="min-w-0 border-white/10 px-3 py-4 text-center odd:border-r sm:border-r sm:px-5 sm:py-5 sm:last:border-r-0">
-      <dd className="text-[1.75rem] font-semibold tracking-[-0.04em] text-[var(--accent-primary)] lg:text-3xl" aria-label={fallback}>
+      <dd className="text-[1.75rem] font-semibold tracking-[-0.04em] text-[var(--stat-value,var(--accent-primary))] lg:text-3xl" aria-label={fallback}>
         <span ref={valueRef} aria-hidden="true">{fallback}</span>
       </dd>
       <dt className="mt-1 text-[0.7rem] uppercase tracking-[0.16em] text-[var(--text-secondary)]">{label}</dt>

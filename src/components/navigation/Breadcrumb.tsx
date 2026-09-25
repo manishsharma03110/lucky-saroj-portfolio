@@ -23,7 +23,7 @@ export function Breadcrumb({ items }: { items: BreadcrumbItem[] }) {
     <>
       <JsonLd data={schema} />
       <nav aria-label="Breadcrumb" className="border-b border-white/[0.07] bg-[var(--background-primary)]">
-        <div className="mx-auto flex min-h-11 w-full max-w-[1480px] items-center gap-1.5 overflow-x-auto px-5 py-2 text-xs text-[var(--text-muted)] sm:px-8 lg:px-12 2xl:px-16">
+        <div className="mx-auto flex min-h-11 w-full max-w-[1480px] items-center gap-1.5 overflow-x-auto px-5 py-2 text-xs text-[var(--text-readable,var(--text-muted))] sm:px-8 lg:px-12 2xl:px-16">
           {items.map((item, index) => {
             const current = index === items.length - 1;
             return (
