@@ -82,7 +82,7 @@ export function MobileMenu({
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "block rounded-md px-3 py-3 text-base font-medium transition-colors",
-                      active ? "text-[var(--color-accent)]" : "text-white/85 hover:text-white"
+                      active ? "text-[var(--color-accent)]" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                     )}
                   >
                     {link.label}

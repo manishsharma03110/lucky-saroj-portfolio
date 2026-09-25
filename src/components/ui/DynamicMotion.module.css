@@ -26,8 +26,8 @@
 }
 
 .glassHeader {
-  background: rgba(8, 9, 11, 0.88);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(var(--background-rgb),0.88);
+  border-bottom: 1px solid rgba(var(--foreground-rgb),0.08);
   transition:
     background 320ms ease,
     border-color 320ms ease,
@@ -42,7 +42,7 @@
 }
 
 .glassHeaderScrolled {
-  background: rgba(8, 9, 11, 0.94);
+  background: rgba(var(--background-rgb),0.94);
   border-bottom-color: rgba(59, 130, 246, 0.22);
   box-shadow: 0 16px 44px rgba(0, 0, 0, 0.28);
 }

@@ -6,6 +6,8 @@ import { getSiteSettings } from "@/lib/db/queries";
 import { DEFAULT_SITE_DESCRIPTION, DEFAULT_SITE_TITLE, resolveSiteUrl } from "@/lib/seo";
 import { CmsLiveSync } from "@/components/CmsLiveSync";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { themeInitScript } from "@/lib/theme-init";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--font-inter", display: "swap" });
 const poppins = Poppins({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-poppins", display: "swap" });
@@ -38,14 +40,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" className={`${inter.variable} ${poppins.variable} h-full antialiased`}>
+    <html lang="en" data-theme="dark" suppressHydrationWarning data-scroll-behavior="smooth" className={`${inter.variable} ${poppins.variable} h-full antialiased`}>
       <head>
+        <script id="theme-init" dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <link rel="preconnect" href="https://drive.google.com" />
         <link rel="preconnect" href="https://drive.usercontent.google.com" />
         <link rel="dns-prefetch" href="//drive.google.com" />
         <link rel="dns-prefetch" href="//drive.usercontent.google.com" />
       </head>
-      <body className="min-h-full flex flex-col"><CmsLiveSync />{children}</body>
+      <body className="min-h-full flex flex-col"><ThemeProvider><CmsLiveSync />{children}</ThemeProvider></body>
     </html>
   );
 }

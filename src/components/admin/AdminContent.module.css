@@ -16,7 +16,7 @@
 
 .primaryAction:hover {
   border-color: rgba(96, 165, 250, 0.62);
-  background: #60a5fa;
+  background: var(--tone-60a5fa);
   transform: translateY(-1px);
 }
 
@@ -29,8 +29,8 @@
 .formCard,
 .itemCard,
 .emptyState {
-  border: 1px solid #242832;
-  background: #121419;
+  border: 1px solid var(--tone-242832);
+  background: var(--tone-121419);
 }
 
 .tableCard,
@@ -51,13 +51,13 @@
 }
 
 .table thead {
-  border-bottom: 1px solid #242832;
-  background: #0d0f13;
+  border-bottom: 1px solid var(--tone-242832);
+  background: var(--tone-0d0f13);
 }
 
 .table th {
   padding: 13px 18px;
-  color: #626975;
+  color: var(--tone-626975);
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.12em;
@@ -65,7 +65,7 @@
 }
 
 .table tbody tr {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  border-bottom: 1px solid rgba(var(--foreground-rgb),0.055);
   transition: background-color 180ms ease;
 }
 
@@ -74,26 +74,26 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.018);
+  background: rgba(var(--foreground-rgb),0.018);
 }
 
 .table td {
   padding: 15px 18px;
-  color: #9298a3;
+  color: var(--tone-9298a3);
   vertical-align: middle;
 }
 
 .tableTitle {
-  color: #f5f7fa !important;
+  color: var(--tone-f5f7fa) !important;
   font-weight: 600;
 }
 
 .muted {
-  color: #9298a3;
+  color: var(--tone-9298a3);
 }
 
 .slug {
-  color: #626975;
+  color: var(--tone-626975);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
 }
@@ -116,20 +116,20 @@
 .activeBadge {
   border: 1px solid rgba(52, 211, 153, 0.22);
   background: rgba(16, 185, 129, 0.08);
-  color: #6ee7b7;
+  color: var(--tone-6ee7b7);
 }
 
 .statusDraft {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.035);
-  color: #9298a3;
+  border: 1px solid rgba(var(--foreground-rgb),0.08);
+  background: rgba(var(--foreground-rgb),0.035);
+  color: var(--tone-9298a3);
 }
 
 .featuredBadge,
 .currentBadge {
   border: 1px solid rgba(59, 130, 246, 0.24);
   background: rgba(59, 130, 246, 0.08);
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
 }
 
 .actionGroup {
@@ -148,25 +148,25 @@
   place-items: center;
   border: 1px solid transparent;
   border-radius: 8px;
-  color: #9298a3;
+  color: var(--tone-9298a3);
   transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
 }
 
 .iconAction:hover {
   border-color: rgba(59, 130, 246, 0.22);
   background: rgba(59, 130, 246, 0.08);
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
 }
 
 .tableCard button[aria-label="Delete"]:hover,
 .itemCard button[aria-label="Delete"]:hover {
   border-color: rgba(248, 113, 113, 0.24);
   background: rgba(248, 113, 113, 0.08);
-  color: #fca5a5;
+  color: var(--tone-fca5a5);
 }
 
 .tableCard button[role="switch"] {
-  background: #242832;
+  background: var(--tone-242832);
 }
 
 .tableCard button[role="switch"][aria-checked="true"] {
@@ -179,7 +179,7 @@
   place-items: center;
   border-radius: 14px;
   padding: 28px;
-  color: #626975;
+  color: var(--tone-626975);
   font-size: 13px;
   text-align: center;
 }
@@ -187,7 +187,7 @@
 .tableCard .emptyState {
   min-height: 130px;
   border: 0;
-  border-top: 1px solid #242832;
+  border-top: 1px solid var(--tone-242832);
   border-radius: 0;
 }
 
@@ -216,8 +216,8 @@
 }
 
 .itemCard:hover {
-  border-color: rgba(255, 255, 255, 0.13);
-  background: #14171d;
+  border-color: rgba(var(--foreground-rgb),0.13);
+  background: var(--tone-14171d);
 }
 
 .itemTop {
@@ -243,7 +243,7 @@
   border: 1px solid rgba(59, 130, 246, 0.18);
   border-radius: 10px;
   background: rgba(59, 130, 246, 0.08);
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
 }
 
 .itemCopy {
@@ -252,7 +252,7 @@
 
 .itemCopy h3 {
   margin: 0;
-  color: #f5f7fa;
+  color: var(--tone-f5f7fa);
   font-family: var(--font-display);
   font-size: 14px;
   font-weight: 600;
@@ -261,7 +261,7 @@
 
 .itemCopy p {
   margin: 5px 0 0;
-  color: #9298a3;
+  color: var(--tone-9298a3);
   font-size: 12px;
   line-height: 1.6;
 }
@@ -283,7 +283,7 @@
 
 .editDisclosure {
   margin-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(var(--foreground-rgb),0.06);
   padding-top: 12px;
 }
 
@@ -292,7 +292,7 @@
   align-items: center;
   gap: 7px;
   border-radius: 7px;
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
@@ -304,7 +304,7 @@
 }
 
 .editDisclosure > summary:hover {
-  color: #93c5fd;
+  color: var(--tone-93c5fd);
 }
 
 .editBody {
@@ -313,7 +313,7 @@
 
 .dateLabel {
   margin: 0 0 5px;
-  color: #60a5fa;
+  color: var(--tone-60a5fa);
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.11em;
@@ -322,7 +322,7 @@
 
 .company {
   margin-top: 3px !important;
-  color: #60a5fa !important;
+  color: var(--tone-60a5fa) !important;
   font-weight: 550;
 }
 
@@ -332,7 +332,7 @@
 
 .formHeader {
   margin: 0 0 18px;
-  color: #f5f7fa;
+  color: var(--tone-f5f7fa);
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 650;
@@ -341,32 +341,39 @@
 
 .formBody {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: 18px;
 }
 
+.formBody > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .formCard label {
-  color: #d5d9e0;
+  color: var(--tone-d5d9e0);
 }
 
 .formCard input:not([type="checkbox"]),
 .formCard textarea,
 .formCard select {
-  border-color: #242832;
+  border-color: var(--tone-242832);
   border-radius: 9px;
-  background: #0d0f13;
-  color: #f5f7fa;
+  background: var(--tone-0d0f13);
+  color: var(--tone-f5f7fa);
   box-shadow: none;
 }
 
 .formCard input:not([type="checkbox"])::placeholder,
 .formCard textarea::placeholder {
-  color: #626975;
+  color: var(--tone-626975);
 }
 
 .formCard input:not([type="checkbox"]):hover,
 .formCard textarea:hover,
 .formCard select:hover {
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(var(--foreground-rgb),0.16);
 }
 
 .formCard input:not([type="checkbox"]):focus,
@@ -378,15 +385,15 @@
 }
 
 .formCard select option {
-  background: #0d0f13;
-  color: #f5f7fa;
+  background: var(--tone-0d0f13);
+  color: var(--tone-f5f7fa);
 }
 
 .checkboxRow {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #d5d9e0;
+  color: var(--tone-d5d9e0);
   font-size: 13px;
   cursor: pointer;
 }
@@ -407,7 +414,7 @@
 }
 
 .formCard button[type="submit"]:hover:not(:disabled) {
-  background: #60a5fa;
+  background: var(--tone-60a5fa);
 }
 
 .formCard button[type="submit"]:active:not(:disabled) {
@@ -417,7 +424,7 @@
 .fieldError,
 .formError {
   margin-top: 6px;
-  color: #fca5a5;
+  color: var(--tone-fca5a5);
   font-size: 12px;
   line-height: 1.45;
 }
@@ -457,9 +464,9 @@
     display: grid;
     gap: 0;
     margin-bottom: 10px;
-    border: 1px solid #242832 !important;
+    border: 1px solid var(--tone-242832) !important;
     border-radius: 12px;
-    background: #121419;
+    background: var(--tone-121419);
     padding: 8px 14px;
   }
 
@@ -468,7 +475,7 @@
     grid-template-columns: minmax(86px, 0.38fr) 1fr;
     align-items: center;
     gap: 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+    border-bottom: 1px solid rgba(var(--foreground-rgb),0.055);
     padding: 11px 0;
   }
 
@@ -478,7 +485,7 @@
 
   .table td::before {
     content: attr(data-label);
-    color: #626975;
+    color: var(--tone-626975);
     font-size: 9px;
     font-weight: 650;
     letter-spacing: 0.1em;
