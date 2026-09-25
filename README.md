@@ -83,3 +83,12 @@ Admin login throttling uses the shared `admin_login_attempts` PostgreSQL table (
 Before deploying this auth change, create a Neon backup branch, replay migration 0024 on a verification branch, then apply the additive migration to the production database. The old app remains compatible with the new table. If application validation fails, restore the previous Vercel deployment; retain the additive table to avoid deleting data.
 
 CI covers desktop/mobile-emulated public and CMS workflows, motion preferences, keyboard contact controls, first-click navigation, no-JavaScript visibility, uploads, banner orientation, long URLs, player controls, and isolated-database throttle concurrency/expiry. Physical-device QA is outside this release's requested scope.
+
+
+### Production audit and attachment operations
+
+See [the 25 September production audit](docs/production-audit-2026-09-25.md) for scope, findings and remaining operational checks. The hero uses one full-section responsive image in both themes; light colors follow the editorial electric-blue palette. Public contact attachments are limited to 4 MB to stay within the Vercel function request limit; CMS MP4/WebM uploads still use the direct Blob workflow.
+
+Configure a strong **CRON_SECRET** in the Vercel production environment. Attachment cleanup now requires its exact Bearer authorization; a missing secret deliberately disables cleanup. Never commit its value. Contact submission and attachment limits use independent hashed keys in the existing expiring PostgreSQL counter table, shared across serverless workers.
+
+Browser CI runs the production server against a disposable TLS-enabled database. Its temporary one-day certificate and AUTH_TRUST_HOST setting apply only to localhost CI. Production database certificate verification remains mandatory. Firefox/WebKit smoke checks, five hero viewport widths, public/CMS axe reports and lab performance diagnostics supplement Chromium critical regressions. These reports do not claim physical-device or field Core Web Vitals verification.

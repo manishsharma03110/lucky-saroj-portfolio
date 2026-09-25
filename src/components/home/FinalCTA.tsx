@@ -19,7 +19,7 @@ export function FinalCTA({ content }: { content: HomePageContent }) {
             href={content.finalCtaButtonUrl}
             variant="cine-solid"
             withArrow
-            className="mt-8 !rounded-md !bg-[var(--accent-primary)] !px-7 !py-3.5 !font-semibold !text-[var(--background-primary)] hover:!bg-[var(--accent-hover)]"
+            className="mt-8 !rounded-md !bg-[#2563eb] !px-7 !py-3.5 !font-semibold !text-white hover:!bg-[#1d4ed8]"
           >
             {content.finalCtaButtonLabel}
           </Button>

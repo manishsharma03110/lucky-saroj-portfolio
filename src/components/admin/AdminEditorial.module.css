@@ -25,13 +25,13 @@
 .saveBar button {
   min-height: 44px;
   border-radius: 10px;
-  background: #3b82f6;
+  background: #2563eb;
   padding-inline: 20px;
   color: #fff;
 }
 
 .saveBar button:hover:not(:disabled) {
-  background: var(--tone-60a5fa);
+  background: #1d4ed8;
 }
 
 .testimonialCard,
@@ -64,7 +64,7 @@
 
 .identity p {
   margin: 4px 0 0;
-  color: var(--tone-626975);
+  color: var(--text-muted);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -112,7 +112,7 @@
 }
 
 .statusArchived {
-  color: var(--tone-626975);
+  color: var(--text-muted);
 }
 
 .statusSelect {
@@ -145,7 +145,7 @@
 
 .metaLine {
   margin: 12px 0 0;
-  color: var(--tone-626975);
+  color: var(--text-muted);
   font-size: 11px;
   line-height: 1.6;
 }
@@ -283,7 +283,7 @@
 
 .helper {
   margin-top: 6px;
-  color: var(--tone-626975);
+  color: var(--text-muted);
   font-size: 11px;
   line-height: 1.55;
 }

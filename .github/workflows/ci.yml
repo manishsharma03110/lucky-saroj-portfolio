@@ -19,7 +19,7 @@ jobs:
   quality:
     name: Lint and Build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     services:
       postgres:
         image: postgres:18
@@ -60,13 +60,21 @@ jobs:
         run: npm run lint
 
       - name: Account validation and policy tests
-        run: npx tsx --test src/lib/auth/account-validation.test.ts src/lib/page-content-extra.test.ts src/lib/auth/upload-initiation.runtime.test.ts src/lib/media/upload-policy.test.ts
+        run: npx tsx --test src/lib/auth/authorization-security.runtime.test.ts src/lib/validations/contact-attachment.test.ts src/lib/auth/cron-authorization.test.ts src/lib/auth/account-validation.test.ts src/lib/page-content-extra.test.ts src/lib/auth/upload-initiation.runtime.test.ts src/lib/media/upload-policy.test.ts
 
       - name: Replay SQL migrations
         run: npm run ci:migrate
 
       - name: Shared login throttle concurrency and expiry tests
-        run: npx tsx --test src/lib/auth/shared-login-rate-limit.runtime.test.ts
+        run: npx tsx --test src/lib/auth/shared-login-rate-limit.runtime.test.ts src/lib/auth/public-request-rate-limit.runtime.test.ts
+
+      - name: Verify database atomicity and transaction lifecycle
+        env:
+          TEST_DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/cms_phase3e_audit
+          CMS_ALLOW_DESTRUCTIVE_LOCAL_DB_TESTS: "1"
+        run: |
+          node --input-type=module -e "import pg from 'pg'; const c=new pg.Client({connectionString:process.env.DATABASE_URL}); await c.connect(); await c.query('CREATE DATABASE cms_phase3e_audit'); await c.end();"
+          npx tsx --test src/lib/db/transaction.integration.test.ts
 
       - name: Verify Phase 9 schema
         run: npm run ci:verify-phase9
@@ -82,17 +90,33 @@ jobs:
       - name: Install fixture generator
         run: sudo apt-get update && sudo apt-get install -y ffmpeg
 
-      - name: Install Chromium
-        run: cd e2e && npx playwright install --with-deps chromium
+      - name: Install browser engines
+        run: cd e2e && npx playwright install --with-deps chromium firefox webkit
 
       - name: Prepare disposable browser database
         run: |
           node --input-type=module -e "import pg from 'pg'; const c=new pg.Client({connectionString:process.env.DATABASE_URL}); await c.connect(); await c.query('CREATE DATABASE portfolio_e2e'); await c.end();"
           DATABASE_URL=postgresql://ci:ci@127.0.0.1:5432/portfolio_e2e npm run ci:migrate
 
+      - name: Enable verified TLS on disposable browser database
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          openssl req -x509 -newkey rsa:2048 -nodes -keyout /tmp/portfolio-ci.key -out /tmp/portfolio-ci.crt -days 1 -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" >/dev/null 2>&1
+          docker cp /tmp/portfolio-ci.key "$POSTGRES_CONTAINER:/tmp/portfolio-ci.key"
+          docker cp /tmp/portfolio-ci.crt "$POSTGRES_CONTAINER:/tmp/portfolio-ci.crt"
+          docker exec -u root "$POSTGRES_CONTAINER" chown postgres:postgres /tmp/portfolio-ci.key /tmp/portfolio-ci.crt
+          docker exec -u root "$POSTGRES_CONTAINER" chmod 600 /tmp/portfolio-ci.key
+          docker exec "$POSTGRES_CONTAINER" psql -U ci -d ci -c "ALTER SYSTEM SET ssl_cert_file='/tmp/portfolio-ci.crt'"
+          docker exec "$POSTGRES_CONTAINER" psql -U ci -d ci -c "ALTER SYSTEM SET ssl_key_file='/tmp/portfolio-ci.key'"
+          docker exec "$POSTGRES_CONTAINER" psql -U ci -d ci -c "ALTER SYSTEM SET ssl=on"
+          docker exec "$POSTGRES_CONTAINER" psql -U ci -d ci -c "SELECT pg_reload_conf()"
+
       - name: Critical browser regressions
         env:
-          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/portfolio_e2e
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/portfolio_e2e?sslmode=verify-full
+          NODE_EXTRA_CA_CERTS: /tmp/portfolio-ci.crt
+          AUTH_TRUST_HOST: "true"
           E2E_ADMIN_EMAIL: regression@example.test
           E2E_ADMIN_PASSWORD: ci-disposable-test-password-only
           CMS_ALLOW_DESTRUCTIVE_LOCAL_DB_TESTS: "1"
@@ -107,3 +131,4 @@ jobs:
             e2e/playwright-report
             e2e/test-results
           if-no-files-found: ignore
+

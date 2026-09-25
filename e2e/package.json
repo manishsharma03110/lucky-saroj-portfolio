@@ -2,9 +2,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "pretest": "node --input-type=module -e \"import setup from './setup.mjs'; await setup();\""
   },
   "devDependencies": {
-    "playwright": "1.62.1"
+    "playwright": "1.62.1",
+    "@axe-core/playwright": "4.10.2"
   }
 }

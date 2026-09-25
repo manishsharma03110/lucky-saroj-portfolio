@@ -16,18 +16,18 @@ const validatedTarget = validateDestructiveTransactionTestTarget({
 const databaseUrl = validatedTarget.href;
 const verificationPool = new Pool({ connectionString: databaseUrl, max: 8 });
 
-type TransactionModule = typeof import("./index");
+type TransactionModule = typeof import("./core");
 let transactionModule: TransactionModule;
 
-type ContextDbHasTransaction = "transaction" extends keyof import("./index").CmsTransactionContext["db"] ? true : false;
+type ContextDbHasTransaction = "transaction" extends keyof import("./core").CmsTransactionContext["db"] ? true : false;
 const contextDbHasNoTransaction: false = false as ContextDbHasTransaction;
 void contextDbHasNoTransaction;
-type InsertReturn = ReturnType<import("./index").CmsTransactionContext["db"]["insert"]>;
+type InsertReturn = ReturnType<import("./core").CmsTransactionContext["db"]["insert"]>;
 type InsertReturnsPromise = InsertReturn extends Promise<unknown> ? true : false;
 type InsertResultHasNoValuesBuilder = Awaited<InsertReturn> extends { values: unknown } ? false : true;
 type PublicDbForbiddenKeys = Extract<
   "transaction" | "$client" | "session" | "from" | "where" | "values" | "set" | "prepare",
-  keyof import("./index").CmsTransactionContext["db"]
+  keyof import("./core").CmsTransactionContext["db"]
 >;
 const insertReturnsPromise: true = true as InsertReturnsPromise;
 const insertResultHasNoValuesBuilder: true = true as InsertResultHasNoValuesBuilder;
@@ -68,7 +68,7 @@ before(async () => {
       value integer NOT NULL
     )
   `);
-  transactionModule = await import("./index");
+  transactionModule = await import("./core");
 });
 
 after(async () => {
@@ -442,3 +442,4 @@ test("rollback leaves zero partial rows", async () => {
   }));
   for (const id of ids) assert.equal(await countRows(id), 0);
 });
+
