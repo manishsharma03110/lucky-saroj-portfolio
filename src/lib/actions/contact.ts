@@ -1,5 +1,7 @@
 "use server";
 
+import { headers } from "next/headers";
+import { consumePublicRequest } from "@/lib/auth/public-request-rate-limit";
 import { db, schema } from "@/lib/db";
 import { getServices } from "@/lib/db/queries";
 import { getPageContent } from "@/lib/db/page-content-service";
@@ -16,6 +18,7 @@ const dependencies: ContactSubmissionDependencies = {
     return parseContactOptionsConfig(contactPage.content.contactOptionsConfig);
   },
   createMessage: async (message) => {
+    if (!await consumePublicRequest(await headers(), "contact")) throw new Error("Contact request limit reached");
     await db.insert(schema.contactMessages).values({ ...message, status: "new" });
   },
 };
@@ -46,3 +49,4 @@ export async function submitPopupContactForm(_prevState: ContactFormState, formD
 export async function submitFullContactForm(_prevState: ContactFormState, formData: FormData): Promise<ContactFormState> {
   return handleFullContactSubmission(contactSubmissionFromFormData(formData));
 }
+

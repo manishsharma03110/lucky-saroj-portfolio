@@ -1,6 +1,5 @@
 import { ArrowUpRight, Quote } from "lucide-react";
 import Link from "next/link";
-import { Marquee } from "@/components/ui/Marquee";
 import { getPublishedTestimonials } from "@/lib/db/queries";
 import type { HomePageContent } from "@/lib/db/home-content-service";
 
@@ -97,7 +96,7 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
 
         {additional.length > 0 && (
           <div className="mt-8 border-y border-white/[0.08] py-5 sm:mt-10" aria-label="More client testimonials">
-            <Marquee durationSeconds={Math.max(30, additional.length * 10)}>
+            <div className="flex flex-wrap gap-8">
               {additional.map((testimonial) => (
                 <article key={testimonial.id} className="flex w-[min(78vw,390px)] shrink-0 items-start gap-4 py-2 sm:w-[360px]">
                   <Quote size={18} strokeWidth={1.35} className="mt-1 shrink-0 text-[var(--accent-primary)]/75" aria-hidden />
@@ -110,10 +109,11 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
                   </div>
                 </article>
               ))}
-            </Marquee>
+            </div>
           </div>
         )}
       </div>
     </section>
   );
 }
+
