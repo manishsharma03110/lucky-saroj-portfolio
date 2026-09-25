@@ -38,7 +38,7 @@ export function ExperienceList({
                 <li key={experience.id} className="group/timeline grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] gap-x-3 gap-y-4 lg:grid-cols-[140px_48px_minmax(0,1fr)] lg:gap-x-6 lg:gap-y-0">
                   <div className="col-start-2 row-start-1 flex flex-wrap items-baseline gap-x-2 lg:col-start-1 lg:block lg:pr-1 lg:text-right">
                     <p className="font-display text-sm font-semibold tracking-[0.18em] text-[var(--accent-primary)]">{String(index + 1).padStart(2, "0")}</p>
-                    <p className="text-sm tabular-nums whitespace-nowrap text-[var(--text-muted)] lg:mt-2">{experience.startDate}{endDate && <><span aria-hidden> — </span><span className={current ? "text-[var(--accent-primary)]" : undefined}>{endDate}</span></>}</p>
+                    <p className="text-sm tabular-nums whitespace-nowrap text-[var(--text-readable, var(--text-muted))] lg:mt-2">{experience.startDate}{endDate && <><span aria-hidden> — </span><span className={current ? "text-[var(--accent-primary)]" : undefined}>{endDate}</span></>}</p>
                   </div>
                   <div className="relative col-start-1 row-span-2 row-start-1 min-h-full lg:col-start-2 lg:row-span-1">
                     <span className="absolute bottom-[-1.25rem] left-1/2 top-0 w-px -translate-x-1/2 bg-white/10 group-last/timeline:hidden" aria-hidden />
@@ -49,7 +49,7 @@ export function ExperienceList({
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-3"><h3 className="break-words font-display text-2xl font-semibold tracking-[-0.035em] text-[var(--text-primary)] sm:text-3xl">{experience.role}</h3>{current && <span className="rounded-sm border border-[var(--accent-primary)]/45 bg-[var(--accent-primary)]/10 px-2 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-primary)]">{currentBadgeLabel}</span>}</div>
                       <p className="mt-3 break-words text-base font-medium text-[var(--text-secondary)]">{experience.company}</p>
-                      {experience.location && <p className="mt-3 flex items-center gap-2 break-words text-sm text-[var(--text-muted)]"><MapPin size={14} strokeWidth={1.6} aria-hidden />{experience.location}</p>}
+                      {experience.location && <p className="mt-3 flex items-center gap-2 break-words text-sm text-[var(--text-readable, var(--text-muted))]"><MapPin size={14} strokeWidth={1.6} aria-hidden />{experience.location}</p>}
                     </div>
                     <span className="hidden h-full w-px bg-white/10 lg:block" aria-hidden />
                     <div className="min-w-0">{experience.description && <p className="max-w-3xl whitespace-pre-line break-words text-base leading-7 text-[var(--text-secondary)]">{experience.description}</p>}</div>

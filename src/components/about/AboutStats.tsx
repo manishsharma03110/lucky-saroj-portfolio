@@ -22,7 +22,7 @@ export function AboutStats({ years, projects, clients, views, yearsLabel, projec
       <dl className="mx-auto grid w-full max-w-[1480px] grid-cols-2 px-5 sm:px-8 lg:grid-cols-4 lg:px-12 2xl:px-16">
         {stats.map(({ value, label }) => (
           <div key={label} className="min-w-0 border-b border-white/10 px-3 py-5 text-center even:border-l lg:border-b-0 lg:border-l lg:px-7 lg:first:border-l-0">
-            <dd className="font-display text-3xl font-semibold tracking-[-0.045em] text-[var(--accent-primary)] sm:text-4xl">{value}</dd><dt className="mt-2 text-[0.68rem] uppercase tracking-[0.16em] text-[var(--text-secondary)]">{label}</dt>
+            <dd className="font-display text-3xl font-semibold tracking-[-0.045em] text-[var(--stat-value,var(--accent-primary))] sm:text-4xl">{value}</dd><dt className="mt-2 text-[0.68rem] uppercase tracking-[0.16em] text-[var(--text-secondary)]">{label}</dt>
           </div>
         ))}
       </dl>

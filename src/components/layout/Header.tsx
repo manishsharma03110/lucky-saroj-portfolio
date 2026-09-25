@@ -105,7 +105,7 @@ export function Header({
           </span>
           <span className="hidden flex-col leading-none sm:flex">
             <span className="font-display text-sm font-semibold uppercase tracking-wide">{siteName}</span>
-            <span className="timecode !text-[var(--text-muted)]">{roleLabel}</span>
+            <span className="timecode !text-[var(--text-readable, var(--text-muted))]">{roleLabel}</span>
           </span>
         </Link>
 

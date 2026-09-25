@@ -26,7 +26,7 @@ function Attribution({
       )}
       <cite className="min-w-0 not-italic">
         <span className="block font-medium text-[var(--text-primary)]">{name}</span>
-        {detail && <span className="mt-1 block text-sm text-[var(--text-muted)]">{detail}</span>}
+        {detail && <span className="mt-1 block text-sm text-[var(--text-readable, var(--text-muted))]">{detail}</span>}
       </cite>
     </div>
   );
@@ -80,7 +80,7 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
               <div>
                 <div className="flex items-center justify-between gap-4">
                   <Quote size={25} strokeWidth={1.25} className="text-[var(--accent-primary)]/80" aria-hidden />
-                  <span className="text-[0.65rem] font-medium tracking-[0.2em] text-[var(--text-muted)]" aria-hidden>02</span>
+                  <span className="text-[0.65rem] font-medium tracking-[0.2em] text-[var(--text-readable, var(--text-muted))]" aria-hidden>02</span>
                 </div>
                 <blockquote className="mt-7 max-w-[30ch] text-xl font-medium leading-[1.55] tracking-[-0.025em] text-[var(--text-primary)] sm:text-[1.375rem]">
                   &ldquo;{secondary.testimonialText}&rdquo;
@@ -104,7 +104,7 @@ export async function TestimonialsPreview({ content }: { content: HomePageConten
                     <blockquote className="line-clamp-3 text-sm leading-6 text-[var(--text-secondary)]">&ldquo;{testimonial.testimonialText}&rdquo;</blockquote>
                     <p className="mt-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--text-primary)]">{testimonial.clientName}</p>
                     {[testimonial.designation, testimonial.company].filter(Boolean).length > 0 && (
-                      <p className="mt-1 text-xs text-[var(--text-muted)]">{[testimonial.designation, testimonial.company].filter(Boolean).join(" · ")}</p>
+                      <p className="mt-1 text-xs text-[var(--text-readable, var(--text-muted))]">{[testimonial.designation, testimonial.company].filter(Boolean).join(" · ")}</p>
                     )}
                   </div>
                 </article>

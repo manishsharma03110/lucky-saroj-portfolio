@@ -27,9 +27,9 @@ export function Journey({ experiences, eyebrow, heading, linkLabel, linkUrl, pre
                 <div>
                   <h3 className="font-display text-2xl font-semibold tracking-[-0.03em] text-[var(--text-primary)]">{experience.role}</h3>
                   <p className="mt-2 text-base leading-6 text-[var(--text-secondary)]">{experience.company}{experience.location ? ` · ${experience.location}` : ""}</p>
-                  {experience.description && <p className="mt-3 max-w-2xl whitespace-pre-line text-base leading-7 text-[var(--text-muted)]">{experience.description}</p>}
+                  {experience.description && <p className="mt-3 max-w-2xl whitespace-pre-line text-base leading-7 text-[var(--text-readable, var(--text-muted))]">{experience.description}</p>}
                 </div>
-                <p className="text-sm tabular-nums text-[var(--text-muted)] sm:text-right">{experience.startDate}{end ? ` — ${end}` : ""}</p>
+                <p className="text-sm tabular-nums text-[var(--text-readable, var(--text-muted))] sm:text-right">{experience.startDate}{end ? ` — ${end}` : ""}</p>
               </li>
             );
           })}

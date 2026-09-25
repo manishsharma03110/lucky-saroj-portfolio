@@ -64,7 +64,7 @@
 
 .identity p {
   margin: 4px 0 0;
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
   font-size: 12px;
   line-height: 1.5;
 }
@@ -112,7 +112,7 @@
 }
 
 .statusArchived {
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
 }
 
 .statusSelect {
@@ -145,7 +145,7 @@
 
 .metaLine {
   margin: 12px 0 0;
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
   font-size: 11px;
   line-height: 1.6;
 }
@@ -283,7 +283,7 @@
 
 .helper {
   margin-top: 6px;
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
   font-size: 11px;
   line-height: 1.55;
 }

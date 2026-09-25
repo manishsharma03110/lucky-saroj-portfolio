@@ -97,7 +97,7 @@ export function HomeSelectedWorkSlider({ slides }: { slides: Slide[] }) {
                 className="flex h-11 w-8 items-center justify-center rounded focus-visible:outline-2 focus-visible:outline-[var(--focus)]"
                 aria-label={`Show ${slide.project.title}`}
                 aria-current={index === logicalIndex ? "true" : undefined}
-              ><span aria-hidden="true" className={`h-1.5 rounded-full transition-[width,background-color] motion-reduce:transition-none ${index === logicalIndex ? "w-8 bg-[var(--accent-primary)]" : "w-3 bg-[var(--text-muted)]"}`} /></button>
+              ><span aria-hidden="true" className={`h-1.5 rounded-full transition-[width,background-color] motion-reduce:transition-none ${index === logicalIndex ? "w-8 bg-[var(--accent-primary)]" : "w-3 bg-[var(--text-readable, var(--text-muted))]"}`} /></button>
             ))}
           </div>
 

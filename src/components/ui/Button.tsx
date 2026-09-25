@@ -34,7 +34,7 @@ export function Button({
   href?: string;
   withArrow?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
-  const classes = cn(base, variantClasses[variant], withArrow && "group", className);
+  const classes = cn(base, "studio-button", `studio-button-${variant}`, variantClasses[variant], withArrow && "group", className);
   const content = withArrow ? (
     <>
       {children}

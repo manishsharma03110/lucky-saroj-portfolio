@@ -37,7 +37,7 @@ export async function EditingStyles({ content }: { content: HomePageContent }) {
                     <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--accent-primary)]/35 text-[var(--accent-primary)]">
                       <Icon size={19} strokeWidth={1.5} aria-hidden />
                     </span>
-                    <span className="text-xs tabular-nums text-[var(--text-muted)]">{String(index + 1).padStart(2, "0")}</span>
+                    <span className="text-xs tabular-nums text-[var(--text-readable, var(--text-muted))]">{String(index + 1).padStart(2, "0")}</span>
                   </div>
                   <h3 className="mt-5 text-xl font-medium tracking-[-0.03em] text-[var(--text-primary)] transition-colors group-hover:text-[var(--accent-hover)] sm:mt-6">{service.name}</h3>
                   {service.description && <p className="mt-3 max-w-sm text-sm leading-6 text-[var(--text-secondary)]">{service.description}</p>}

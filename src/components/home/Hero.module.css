@@ -6,15 +6,15 @@
 .copy { width:min(100%,700px); }
 .copy h1 { font-size:clamp(3rem,6.5vw,7rem); }
 .contentWrap { min-height:760px; }
-:global([data-theme="light"]) .overlay { background:linear-gradient(90deg,rgba(247,248,250,.98) 0%,rgba(247,248,250,.94) 38%,rgba(247,248,250,.30) 70%,rgba(247,248,250,.05) 100%); }
-:global([data-theme="light"]) .overlay + .overlay { background:linear-gradient(0deg,#f7f8fa,transparent); }
+:global([data-theme="light"]) .overlay { background:linear-gradient(90deg,rgba(244,248,255,.98) 0%,rgba(244,248,255,.94) 38%,rgba(244,248,255,.30) 70%,rgba(244,248,255,.05) 100%); }
+:global([data-theme="light"]) .overlay + .overlay { background:linear-gradient(0deg,#f4f8ff,transparent); }
 @media(max-width:60rem) {
   .image { object-position:68% center; }
   .contentWrap { min-height:680px; }
   .copy { max-width:620px; }
   .copy h1 { font-size:clamp(2.65rem,9vw,5rem); }
   .overlay { background:linear-gradient(180deg,rgba(8,9,11,.4),rgba(8,9,11,.88) 32%,#08090b 90%); }
-  :global([data-theme="light"]) .overlay { background:linear-gradient(180deg,rgba(247,248,250,.35),rgba(247,248,250,.94) 32%,#f7f8fa 90%); }
+  :global([data-theme="light"]) .overlay { background:linear-gradient(180deg,rgba(244,248,255,.35),rgba(244,248,255,.94) 32%,#f4f8ff 90%); }
 }
 @media(max-width:40rem) {
   .contentWrap { min-height:min(740px,calc(100svh - 4rem)); padding-top:100px; }

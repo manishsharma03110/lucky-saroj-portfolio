@@ -61,7 +61,11 @@
   .reveal[data-reveal-pending],.reveal,.revealVisible,.heroContent > *,.scrollCue { opacity:1; transform:none; animation:none; transition:none; }
 }
 
-:global([data-theme="light"]) .glassHeader { background:rgba(247,248,250,.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
-:global([data-theme="light"]) .glassHeaderScrolled { border-color:var(--border-primary); box-shadow:0 2px 12px rgba(32,35,38,.04); }
+:global([data-theme="light"]) .glassHeader { background:rgba(244,248,255,.92); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
+:global([data-theme="light"]) .glassHeaderScrolled { background:rgba(255,255,255,.88); border-color:var(--border-soft); box-shadow:0 2px 12px rgba(15,23,42,.04); }
 :global([data-theme="light"]) .logoLink:hover .logoMark { transform:none; box-shadow:none; }
 
+
+:global([data-theme="light"]) .navLink { color:#334155; }
+:global([data-theme="light"]) .navLinkActive,
+:global([data-theme="light"]) .navLink:hover { color:var(--accent-primary); }

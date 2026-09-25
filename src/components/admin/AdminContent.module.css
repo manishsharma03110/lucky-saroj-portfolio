@@ -57,7 +57,7 @@
 
 .table th {
   padding: 13px 18px;
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
   font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.12em;
@@ -93,7 +93,7 @@
 }
 
 .slug {
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 12px;
 }
@@ -179,7 +179,7 @@
   place-items: center;
   border-radius: 14px;
   padding: 28px;
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
   font-size: 13px;
   text-align: center;
 }
@@ -367,7 +367,7 @@
 
 .formCard input:not([type="checkbox"])::placeholder,
 .formCard textarea::placeholder {
-  color: var(--text-muted);
+  color: var(--text-readable, var(--text-muted));
 }
 
 .formCard input:not([type="checkbox"]):hover,
@@ -485,7 +485,7 @@
 
   .table td::before {
     content: attr(data-label);
-    color: var(--text-muted);
+    color: var(--text-readable, var(--text-muted));
     font-size: 9px;
     font-weight: 650;
     letter-spacing: 0.1em;
