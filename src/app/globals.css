@@ -124,13 +124,21 @@ body:has([aria-label="Admin navigation"]) .admin-login-theme { display:none; }
   --public-accent-gradient: linear-gradient(#2563eb,#2563eb);
 }
 :root[data-theme="light"] .studio-button { border-radius:10px; }
-:root[data-theme="light"] .studio-button-secondary,
-:root[data-theme="light"] .studio-button-ghost { color:var(--text-primary); }
-:root[data-theme="light"] .studio-button-secondary { border-color:#bfd1ec; }
-:root[data-theme="light"] .studio-button-secondary:hover { background:var(--background-secondary); }
+:root[data-theme="light"] .public-site .studio-button-secondary,
+:root[data-theme="light"] .public-site .studio-button-ghost { color:var(--text-primary); }
+:root[data-theme="light"] .public-site .studio-button-secondary { border-color:#bfd1ec; }
+:root[data-theme="light"] .public-site .studio-button-secondary:hover { background:var(--background-secondary); }
 :root[data-theme="light"] :is(input,textarea)::placeholder { color:#94a3b8; opacity:1; }
 
 :root[data-theme="light"] :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]):not([type="color"]),textarea,select) {
   background-color:var(--surface-primary); border-color:var(--border-default); color:var(--text-primary);
 }
 :root[data-theme="light"] :is(input,textarea,select):focus { border-color:var(--accent-primary); }
+
+/* #64748B remains the design reference. Small copy on the tinted canvas
+   needs a stronger semantic color (the reference measures only 4.19–4.46:1). */
+:root[data-theme="light"] body {
+  --text-secondary: #52627a;
+  --cine-text-secondary: var(--text-secondary);
+  --color-muted: var(--text-secondary);
+}
