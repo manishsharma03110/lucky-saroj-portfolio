@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { PopupContactForm } from "./PopupContactForm";
 
-const SESSION_KEY = "contact-popup-shown";
 export const CONTACT_POPUP_HERO_IMAGE = "/uploads/contact/contact-popup-hero.png";
 
 export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, string>; optionsConfig?: string }) {
@@ -21,19 +20,6 @@ export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, str
     requestAnimationFrame(() => restoreFocusRef.current?.focus());
   }, []);
 
-  useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY)) return;
-    const activate = () => {
-      restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      setOpen(true);
-      sessionStorage.setItem(SESSION_KEY, "1");
-      window.removeEventListener("pointerdown", activate);
-      window.removeEventListener("keydown", activate);
-    };
-    window.addEventListener("pointerdown", activate, { once: true, passive: true });
-    window.addEventListener("keydown", activate, { once: true });
-    return () => { window.removeEventListener("pointerdown", activate); window.removeEventListener("keydown", activate); };
-  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -42,6 +28,7 @@ export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, str
     const frame = requestAnimationFrame(() => dialogRef.current?.querySelector<HTMLElement>('input:not([type="hidden"]), button, textarea')?.focus());
 
     function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") { event.preventDefault(); close(); return; }
       if (event.key !== "Tab" || !dialogRef.current) return;
       const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([type="hidden"]):not([disabled]), textarea:not([disabled]), select:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')).filter((element) => !element.hasAttribute("hidden"));
       if (focusable.length === 0) return;
@@ -57,9 +44,11 @@ export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, str
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [open]);
+  }, [open, close]);
 
   return (
+    <>
+      <button type="button" aria-haspopup="dialog" aria-expanded={open} onClick={(event) => { restoreFocusRef.current = event.currentTarget; setOpen(true); }} className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 rounded-full border border-[var(--border-primary)] bg-[var(--surface-elevated)] px-5 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-lg transition-colors hover:border-[var(--accent-primary)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--focus)]">{copy.popupHeading || "Contact"}</button>
     <AnimatePresence>
       {open && (
         <motion.div initial={reduceMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.24 }} className="contact-popup-backdrop fixed inset-0 z-[100] flex min-h-[100dvh] items-center justify-center overflow-hidden bg-[var(--contact-scrim)] p-3 backdrop-blur-md sm:p-4">
@@ -81,5 +70,6 @@ export function ContactPopup({ copy, optionsConfig }: { copy: Record<string, str
         </motion.div>
       )}
     </AnimatePresence>
+    </>
   );
 }

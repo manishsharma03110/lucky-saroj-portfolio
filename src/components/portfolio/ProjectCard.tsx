@@ -1,3 +1,4 @@
+import { DepthSurface } from "@/components/ui/DepthSurface";
 import { ArrowUpRight, Play } from "lucide-react";
 import Link from "next/link";
 import type { PortfolioProjectWithVideo } from "@/lib/db/queries";
@@ -48,7 +49,7 @@ function ProjectVisual({
   const featured = layout === "featured";
 
   const visual = (
-    <div className={`relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[var(--media-shadow)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[var(--media-shadow-hover)] ${featured ? "" : "bg-[var(--background-secondary)]"}`}>
+    <DepthSurface className={`relative aspect-video w-full overflow-hidden rounded-[12px] border border-white/10 bg-[var(--surface-primary)] shadow-[var(--media-shadow)] transition-[border-color,box-shadow] duration-500 motion-reduce:transition-none group-hover:border-[var(--accent-border)] group-hover:shadow-[var(--media-shadow-hover)] ${featured ? "" : "bg-[var(--background-secondary)]"}`}>
       {visualUrl ? (
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-500 motion-reduce:transition-none group-hover:scale-[1.01]"
@@ -78,7 +79,7 @@ function ProjectVisual({
           Open project
         </span>
       )}
-    </div>
+    </DepthSurface>
   );
 
   return (

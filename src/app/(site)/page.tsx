@@ -25,7 +25,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
+    <div className="overflow-hidden bg-[var(--background-primary)] text-[var(--text-primary)]">
       <Hero
         heading={seo.pageH1 || settings?.heroHeading || settings?.siteName || ""}
         subheading={seo.pageH2 || settings?.heroSubheading || ""}
@@ -44,6 +44,6 @@ export default async function HomePage() {
       <AboutPreview content={content} />
       <TestimonialsPreview content={content} />
       <FinalCTA content={content} />
-    </main>
+    </div>
   );
 }
