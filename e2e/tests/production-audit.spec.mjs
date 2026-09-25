@@ -37,6 +37,9 @@ test("public route metadata, semantic structure, links and runtime audit", async
     const badLinks=await page.locator('a[href]').evaluateAll(els=>els.filter(a=>/^javascript:|^$/.test(a.getAttribute('href'))).map(a=>a.textContent));
     expect(badLinks).toEqual([]);
     rows.push({path,status:response.status(),title:await page.title()});
+    // This audit deliberately uses full document navigations. Drain Next prefetches
+    // before unloading; WebKit reports interrupted fetches as page errors.
+    await page.waitForLoadState("networkidle");
   }
   expect(errors).toEqual([]);
   await info.attach("public-audit",{body:JSON.stringify(rows,null,2),contentType:"application/json"});
