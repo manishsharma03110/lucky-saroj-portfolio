@@ -91,3 +91,9 @@ body:has([aria-label="Admin navigation"]) .admin-login-theme { display:none; }
 :root[data-theme="light"] .public-site { --public-accent-subtle:rgba(36,87,197,.06); --public-accent-border:rgba(36,87,197,.24); --public-focus-ring:#2457c5; --public-accent-glow:transparent; --public-accent-gradient:linear-gradient(135deg,#2457c5,#1d46a0); }
 :root[data-theme="light"] .work-visual img,
 :root[data-theme="light"] .work-visual [role="img"] { filter:none; }
+
+:root[data-theme="light"] .contact-popup-backdrop > [aria-hidden="true"],
+:root[data-theme="light"] .contact-popup-hero > img,
+:root[data-theme="light"] .contact-popup-hero > [aria-hidden="true"] { display:none; }
+:root[data-theme="light"] .contact-popup-hero { min-height:0; background:var(--background-primary); }
+:root[data-theme="light"] .contact-popup-hero > div:last-child { position:relative; padding:64px 28px 20px; }
