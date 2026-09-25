@@ -28,7 +28,6 @@ export async function Footer({ content = {} }: { content?: Record<string, string
     socialEyebrow: content.footerSocialEyebrow || "Social presence",
     socialHeading: content.footerSocialHeading || "Follow my work",
     copyrightRole: content.footerCopyrightRole || "Video Editor",
-    adminLabel: content.footerAdminLabel || "Admin",
   };
   const exploreLinks = [
     { label: content.navHomeLabel || "Home", href: "/" },
@@ -80,7 +79,7 @@ export async function Footer({ content = {} }: { content?: Record<string, string
 
       {socials.length > 0 && <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><section className="border-t border-white/15 py-8" aria-labelledby="footer-social-title"><div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"><div><p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-[var(--accent-primary)]">{copy.socialEyebrow}</p><h2 id="footer-social-title" className="mt-2 font-display text-xl font-semibold text-[var(--text-primary)]">{copy.socialHeading}</h2></div><div className="grid grid-cols-2 gap-2 max-[360px]:grid-cols-1 sm:flex sm:flex-wrap lg:justify-end">{socials.map(({ icon: Icon, url, label }) => <a key={label} href={url ?? undefined} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-center justify-between gap-3 rounded-md border border-white/10 bg-white/[0.02] px-4 py-2.5 text-sm text-[var(--text-primary)] transition-[border-color,background-color,color,transform] duration-300 motion-reduce:transition-none hover:-translate-y-px hover:border-[var(--accent-primary)]/55 hover:bg-[var(--accent-primary)]/[0.06] hover:text-[var(--accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]"><span className="inline-flex min-w-0 items-center gap-2.5">{Icon && <Icon size={15} aria-hidden="true" />}<span className="break-words leading-5">{label}</span></span><ArrowUpRight size={15} aria-hidden="true" className="shrink-0 transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></a>)}</div></div></section></Container>}
 
-      <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><div className="flex flex-col gap-3 border-t border-white/10 py-4 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between"><p>© {year} {siteName}. All rights reserved. <span className="text-white/25">·</span> {copy.copyrightRole}</p><Link href="/admin/login" className="group inline-flex min-h-10 w-fit items-center gap-1.5 py-2 transition-colors hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus)]">{copy.adminLabel} <ArrowUpRight size={13} aria-hidden="true" className="transition-transform duration-300 motion-reduce:transition-none group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></Link></div></Container>
+      <Container className="relative max-w-[1480px] px-5 sm:px-8 lg:px-12 2xl:px-16"><div className="flex flex-col gap-3 border-t border-white/10 py-4 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between"><p>© {year} {siteName}. All rights reserved. <span className="text-white/25">·</span> {copy.copyrightRole}</p></div></Container>
     </footer>
   );
 }
